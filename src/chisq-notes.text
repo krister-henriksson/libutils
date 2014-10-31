@@ -1,0 +1,8 @@
+
+
+Method
+f()      -> f ret.
+f(x)     -> Xupdate(x) -> MDY, f updated; J expired
+(x)      -> Xupdate(x) -> f(x)
+value(x) -> 
+

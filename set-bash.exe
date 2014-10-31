@@ -1,0 +1,14 @@
+#! /bin/bash
+
+echo ""
+echo ""
+echo "If running bash, put these lines into ~/.bashrc :"
+echo ""
+cat bashsettings.text
+echo 'export LD_LIBRARY_PATH=$LIBDIR:${LD_LIBRARY_PATH}'
+echo 'export LD_RUN_PATH=$LIBDIR:${LD_RUN_PATH}'
+echo ""
+echo ""
+
+rm -f bashsettings.text
+

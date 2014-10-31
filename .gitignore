@@ -1,0 +1,12 @@
+
+# Comment
+
+# Ignore object files:
+obj/
+
+# Ignore emacs autosave files in cd and recursively:
+./**/*~
+
+# Ignore test binaries in cd and recursively:
+./**/a.out
+

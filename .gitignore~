@@ -1,0 +1,8 @@
+
+# Comment
+
+# Ignore object files:
+obj/
+# Ignore emacs autosave files in cd and recursively:
+./**/*~
+

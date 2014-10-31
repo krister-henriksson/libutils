@@ -1,0 +1,21 @@
+
+
+=============================================================================
+1. Edit 'vars.mk'
+=============================================================================
+2. Edit 'Makefile'
+  - Use empty DEBUG for performance runs, or manually strip the library file.
+  - Use empty PROF if desirable.
+=============================================================================
+3. Compilation: Make dynamic library:
+  ./make dynamic
+
+Make static library:
+  ./make static
+=============================================================================
+4. To get instructions on how to edit your bash file .bashrc, run
+
+./set-bash.exe
+=============================================================================
+
+
