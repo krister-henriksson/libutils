@@ -99,9 +99,9 @@ namespace funcfit {
 
       double FUNCTOLABS   = cond_conv.functolabs;
       double FUNCTOLREL   = cond_conv.functolrel;
-      double GRADTOLABS   = cond_conv.gradtolabs;
-      double STEPTOLABS   = cond_conv.steptolabs;
-      double STEPTOLREL   = cond_conv.steptolrel;
+      //double GRADTOLABS   = cond_conv.gradtolabs;
+      //double STEPTOLABS   = cond_conv.steptolabs;
+      //double STEPTOLREL   = cond_conv.steptolrel;
 
       int NITERMIN       = cond_conv.nitermin;
       int NITERMAX       = cond_conv.nitermax;

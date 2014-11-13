@@ -22,8 +22,6 @@ using utils::Vector;
 using utils::swap;
 
 
-
-
 namespace utils {
 
   /* #########################################################################
@@ -43,6 +41,7 @@ namespace utils {
     Matrix();
     ~Matrix();
 
+    Matrix(const int Nr, const int Nc);
     Matrix(const int Nr, const int Nc, const T & p);
 
     Matrix(const Matrix<T> & sv);
@@ -178,6 +177,15 @@ utils::Matrix<T>::~Matrix(){
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 template <typename T>
+utils::Matrix<T>::Matrix(const int Nr, const int Nc){
+  mnrows = Nr;
+  mncols = Nc;
+  int nelem = Nr * Nc;
+  mmat = new T [nelem] ();
+}
+  
+
+template <typename T>
 utils::Matrix<T>::Matrix(const int Nr, const int Nc, const T & p){
   mnrows = Nr;
   mncols = Nc;
@@ -196,12 +204,12 @@ utils::Matrix<T>::Matrix(const utils::Matrix<T> & sv){
   int Nr = sv.mnrows;
   int Nc = sv.mncols;
   if (Nr>0 && Nc>0){
-    mmat = new T [Nr*Nc] ();
+    int nelem = Nr * Nc;
+    mmat = new T [nelem] ();
     mnrows = Nr;
     mncols = Nc;
-    for (int i=0; i<Nr; ++i)
-      for (int j=0; j<Nc; ++j)
-	mmat[Nc*i+j] = sv.mmat[Nc*i+j];
+    for (int i=0; i<nelem; ++i)
+      mmat[i] = sv.mmat[i];
   }
   else {
     mmat=0;
@@ -243,17 +251,20 @@ utils::Matrix<T> & utils::Matrix<T>::operator=(const utils::Matrix<T> & sv){
       mncols=0;
     }
 
+
+    int nelem = Nr * Nc;
+
     if (mnrows==0 || mncols==0){
       // Destination not allocated. Allocate it.
-      mmat = new T [Nr*Nc] ();
+      mmat = new T [nelem] ();
       mnrows = Nr;
       mncols = Nc;
     }
 
     // Fill destination.
-    for (int i=0; i<Nr; ++i)
-      for (int j=0; j<Nc; ++j)
-	mmat[Nc*i+j] = sv.elem(i,j); //mat[nrows*i+j]; // no problem to access private member mat in object sv here ... ?
+    for (int i=0; i<nelem; ++i)
+      mmat[i] = sv.mmat[i]; // no problem to access private member mat in object sv here ... ?
+    //mmat[Nc*i+j] = sv.elem(i,j); //mat[nrows*i+j]; // no problem to access private member mat in object sv here ... ?
   }
   return *this;
 }
@@ -434,15 +445,12 @@ const T & utils::Matrix<T>::elem(const int & i, const int & j) const {
 template <typename T>
 void utils::Matrix<T>::row(const int & irow, const Vector<T> & v){
   int Nc = v.size();
-  int Nr = Nc;
 
   if (mnrows==0 || mncols==0){
     // Object not allocated. Allocate to same size as input vector.
-    mnrows = Nr;
+    mnrows = irow;
     mncols = Nc;
-    mmat = new T [Nr*Nc] ();
-    // Copy input data into object.
-    for (int j=0; j<Nc; ++j) mmat[Nc*irow+j] = v[j];
+    mmat = new T [mnrows*mncols] ();
   }
   else {
     // Object is allocated.
@@ -454,25 +462,24 @@ void utils::Matrix<T>::row(const int & irow, const Vector<T> & v){
       std::cout << "Cannot set a row which is of different length than the supplied vector. Exiting." << std::endl;
       exit(EXIT_FAILURE);
     }
-    // Copy input data into object.
-    for (int j=0; j<Nc; ++j) mmat[mncols*irow+j] = v[j];
   }
+
+  // Copy input data into object.
+  for (int j=0; j<Nc; ++j) mmat[mncols*irow+j] = v[j];
 }
 
+// ***********************************************************************************
 
 // Set a column:
 template <typename T>
 void utils::Matrix<T>::col(const int & icol, const Vector<T> & v){
   int Nr = v.size();
-  int Nc = Nr;
 
   if (mnrows==0 || mncols==0){
     // Object not allocated. Allocate to same size as input vector.
     mnrows = Nr;
-    mncols = Nc;
-    mmat = new T [Nr*Nc] ();
-    // Copy input data into object.
-    for (int j=0; j<Nc; ++j) mmat[Nc*j+icol] = v[j];
+    mncols = icol;
+    mmat = new T [mnrows*mncols] ();
   }
   else {
     // Object is allocated.
@@ -484,14 +491,13 @@ void utils::Matrix<T>::col(const int & icol, const Vector<T> & v){
       std::cout << "Cannot set a column which is of different length than the supplied vector. Exiting." << std::endl;
       exit(EXIT_FAILURE);
     }
-    // Copy input data into object.
-    for (int j=0; j<Nr; ++j) mmat[mncols*j+icol] = v[j];
   }
+
+  // Copy input data into object.
+  for (int j=0; j<Nr; ++j) mmat[mncols*j+icol] = v[j];
 }
 
-
-
-
+// ***********************************************************************************
 
 // Get a row:
 template <typename T>
@@ -502,13 +508,13 @@ Vector<T> utils::Matrix<T>::row(const int & irow) const {
     exit(EXIT_FAILURE);
   }
   */
-  Vector<T> v(mncols, 0);
+  Vector<T> v(mncols);
   for (int j=0; j<mncols; ++j)
     v[j] = mmat[mncols*irow+j];
   return v;
 }
 
-
+// ***********************************************************************************
 
 // Get a column:
 template <typename T>
@@ -519,7 +525,7 @@ Vector<T> utils::Matrix<T>::col(const int & icol) const {
     exit(EXIT_FAILURE);
   }
   */
-  Vector<T> v(mnrows, 0);
+  Vector<T> v(mnrows);
   for (int j=0; j<mnrows; ++j)
     v[j] = mmat[mncols*j+icol];
   return v;
@@ -565,7 +571,7 @@ utils::Matrix<T> utils::Matrix<T>::transpose(){
     std::cout << "Cannot transpose unallocated matrix of unknown size. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
-  utils::Matrix<T> tmpm(mncols, mnrows, 0);
+  utils::Matrix<T> tmpm(mncols, mnrows);
   for (int i=0; i<mnrows; ++i)
     for (int j=0; j<mncols; ++j)
       tmpm.elem(j,i) = elem(i,j);
@@ -934,7 +940,7 @@ utils::Matrix<T> utils::operator+(const utils::Matrix<T> & a, const utils::Matri
   }
   int Nr = a.nrows();
   int Nc = a.ncols();
-  utils::Matrix<T> r(Nr, Nc, 0);
+  utils::Matrix<T> r(Nr, Nc);
   for (int i=0; i!=Nr; ++i)
     for (int j=0; j!=Nc; ++j)
       r.elem(i,j) = a.elem(i,j) + b.elem(i,j);
@@ -950,7 +956,7 @@ utils::Matrix<T> utils::operator-(const utils::Matrix<T> & a, const utils::Matri
   }
   int Nr = a.nrows();
   int Nc = a.ncols();
-  utils::Matrix<T> r(Nr, Nc, 0);
+  utils::Matrix<T> r(Nr, Nc);
   for (int i=0; i!=Nr; ++i)
     for (int j=0; j!=Nc; ++j)
       r.elem(i,j) = a.elem(i,j) - b.elem(i,j);
@@ -968,11 +974,13 @@ utils::Matrix<T> utils::operator*(const utils::Matrix<T> & a, const utils::Matri
   int Nc = b.ncols();
   int N  = a.ncols();
   utils::Matrix<T> r(Nr, Nc, 0);
+
+
   for (int i=0; i!=Nr; ++i){
     for (int j=0; j!=Nc; ++j){
-      r.elem(i,j) = 0.0;
-      for (int k=0; k!=N; ++k)
+      for (int k=0; k!=N; ++k){
 	r.elem(i,j) += a.elem(i,k) * b.elem(k,j);
+      }
     }
   }
   return r;
@@ -990,8 +998,8 @@ Vector<T> utils::operator*(const utils::Matrix<T> & a, const Vector<T> & b){
   int Nr = a.nrows();
   int Nc = a.ncols();
   Vector<T> r(Nr, 0);
+
   for (int i=0; i<Nr; ++i){
-    r[i]=0;
     for (int j=0; j<Nc; ++j){
       r[i] += a.elem(i,j) * b[j];
     }
@@ -1010,9 +1018,9 @@ Vector<T> utils::operator*(const Vector<T> & a, const utils::Matrix<T> & b){
   }
   int Nr = a.size();
   int Nc = b.ncols();
-  Vector<T> r(Nr, 0);
+  Vector<T> r(Nr,0);
+
   for (int i=0; i!=Nr; ++i){
-    r[i]=0;
     for (int j=0; j!=Nc; ++j){
       r[i] += a[i] * b.elem(i,j);
     }
@@ -1032,6 +1040,7 @@ utils::Matrix<T> utils::operator*(const utils::Matrix<T> & a, const S & b){
   int Nc = a.ncols();
   T bp = T(b);
   utils::Matrix<T> r(Nr, Nc, 0);
+
   for (int i=0; i!=Nr; ++i)
     for (int j=0; j!=Nc; ++j)
       r.elem(i,j) = a.elem(i,j) * bp;
@@ -1059,6 +1068,7 @@ utils::Matrix<T> utils::operator/(const utils::Matrix<T> & a, const S & b){
   int Nc = a.ncols();
   T bp = T(b);
   utils::Matrix<T> r(Nr, Nc, 0);
+
   for (int i=0; i!=Nr; ++i)
     for (int j=0; j!=Nc; ++j)
       r.elem(i,j) = a.elem(i,j) / bp;
@@ -1073,9 +1083,10 @@ U & utils::operator<<(U & os, const utils::Matrix<T> & sv){
   int Nr = sv.nrows();
   int Nc = sv.ncols();
 
+  os << std::endl;
   for (int i=0; i!=Nr; ++i){
     for (int j=0; j!=Nc; ++j){
-      os << " " << sv.elem(i,j);
+      os << "  " << sv.elem(i,j);
       os.clear();
     }
     os << std::endl;

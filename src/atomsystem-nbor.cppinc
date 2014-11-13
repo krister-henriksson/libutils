@@ -107,8 +107,8 @@ void AtomSystem:: get_all_neighborcollections(){
     }
 
 
-    cout << "1 Average number of neighbors for all atoms is " << nn_tot / (1.0*natoms()) << endl;
-    cout << "1 Smallest distance between atoms is " << sqrt(td) << endl;
+    //cout << "1 Average number of neighbors for all atoms is " << nn_tot / (1.0*natoms()) << endl;
+    //cout << "1 Smallest distance between atoms is " << sqrt(td) << endl;
 
     return;
 
@@ -422,8 +422,8 @@ void AtomSystem:: get_all_neighborcollections(){
   //cout << "Verlet-list completed." << endl;
   //cout << "Size of neighborcollection of system is: " << mneighborcollection.size() << endl;
 
-  cout << "2 Average number of neighbors for all atoms is " << nn_tot / (1.0*natoms()) << endl;
-  cout << "2 Smallest distance between atoms is " << sqrt(td) << endl;
+  //cout << "2 Average number of neighbors for all atoms is " << nn_tot / (1.0*natoms()) << endl;
+  //cout << "2 Smallest distance between atoms is " << sqrt(td) << endl;
 
 
 

@@ -155,7 +155,7 @@ namespace funcfit {
       // Input: starting point point and constructor-set functor (containing
       // gradient method)
       // Purpose: minimize function, input point will not be changed
-      double eps = numeric_limits<double>::epsilon();
+      //double eps = numeric_limits<double>::epsilon();
       string methodstring("differential-evolution");
       int niter=0, i,j,k, i1,i2,i3,i4,i5, rj,rni;
       int ixmin, ixmax;

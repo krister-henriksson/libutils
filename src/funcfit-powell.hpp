@@ -79,9 +79,9 @@ namespace funcfit {
       Vector<parametertype> xtype = func.map_vector_as_free_parameters(par_type);
       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      double eps = numeric_limits<double>::epsilon();
+      //double eps = numeric_limits<double>::epsilon();
       std::string methodstring = "powell";
-      double fp, fp_old, fptt, td1,td2,td3, rtol;
+      double fp, fp_old, fptt, td1,td2,td3;
       int n = p.size(), niter=0, i,j;
       nr::Linemethod<T> linemeth(func);
       Vector<double> pt(n, 0), ptt(n, 0);

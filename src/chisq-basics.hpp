@@ -156,6 +156,9 @@ public:
   double operator()(void);
   double operator()(const Vector<double> & xi);
 
+  // Setting a parameter point explicitly:
+  void set_point(const Vector<double> & xi);
+
   bool           point_is_new(const Vector<double> & any);
 
   Vector<double> free_parameters(void);
@@ -174,17 +177,17 @@ public:
   bool point_is_good(void);
   bool point_is_good(const Vector<double> & xi);
 
+
+  double & barrier_scale(void);
+
   bool & use_weights(void);
   bool & use_scales(void);
-  double & barrier_scale(void);
 
   S & Param(void);
   Vector<T> & DataX(void);
   Vector<U> & DataY(void);
   Vector<U> & DataUncertaintyY(void);
   Vector<U> & DataWeightY(void);
-
-  void set_point(const Vector<double> & xi);
 
   // Set/get function pointers
   typename ChiSqFunc<S,T,U>::F_model  & ModelFuncPointer(void);
@@ -193,6 +196,13 @@ public:
   // Set/get ModelDataY
   Vector<U> & ModelDataY(void);
   Vector<U>   ModelDataY(const Vector<double> & xi);
+
+  void clear_data(void); // Removes DataX, DataY, DataUncertainty, DataWeightY, DataScaleY, ModelDataY
+
+  void finalize_setup();
+
+  void report_on_parameters_and_data();
+
 
   Vector<double>   f(const Vector<double> & xi);
   Vector<double> & f(void);
@@ -226,9 +236,10 @@ public:
   Vector<double> gradient_barrier(const Vector<double> & xi);
   Vector<double> gradient_barrier(void);
 
-  void report_on_parameters_and_data();
 
-  void finalize_setup();
+
+
+
 
   void backup();
   void restore();
@@ -636,6 +647,17 @@ double &  ChiSqFunc<S,T,U> ::barrier_scale(void){
 
 
 
+template <typename S, typename T, typename U>
+bool & ChiSqFunc<S,T,U> ::use_weights(void){
+  return muse_weights;
+}
+
+template <typename S, typename T, typename U>
+bool & ChiSqFunc<S,T,U> ::use_scales(void){
+  return muse_scales;
+}
+
+
 
 // ############################################################################
 // ############################################################################
@@ -686,16 +708,6 @@ void ChiSqFunc<S,T,U> ::set_point(const Vector<double> & xi){
 
 
 
-
-template <typename S, typename T, typename U>
-bool & ChiSqFunc<S,T,U> ::use_weights(void){
-  return muse_weights;
-}
-
-template <typename S, typename T, typename U>
-bool & ChiSqFunc<S,T,U> ::use_scales(void){
-  return muse_scales;
-}
 
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -760,6 +772,94 @@ Vector<U> & ChiSqFunc<S,T,U> ::ModelDataY(void){
     mstatus_MDY=updated;
   }
   return mModelDataY;
+}
+
+
+// Removes DataX, DataY, DataUncertainty, DataWeightY, DataScaleY, ModelDataY
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::clear_data(void){
+  mbarrier_scale = 1.0;
+  muse_weights = false;
+  muse_scales = false;
+  mDataX.resize(0);
+  mDataY.resize(0);
+  mDataUncertaintyY.resize(0);
+  mModelDataY.resize(0);
+
+  mstatus_X   = updated;
+  mstatus_MDY = expired;
+  mstatus_f   = expired;
+  mstatus_J   = expired;
+}
+
+
+
+
+
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::finalize_setup(){
+
+  if (!muse_weights && mDataUncertaintyY.size()==0)
+    aborterror("chisq-basics: DataUncertaintyY not set. Exiting.");
+  if (!muse_weights && mDataUncertaintyY.size() != mDataY.size())
+      aborterror("chisq-basics: DataUncertaintyY of wrong dimension. Exiting.");
+
+  if ( muse_weights && mDataWeightY.size()==0)
+    aborterror("chisq-basics: DataWeightY not set. Exiting.");
+  if ( muse_weights && mDataWeightY.size() != mDataY.size())
+    aborterror("chisq-basics: DataWeightY of wrong dimension. Exiting.");
+
+
+  // Normalize weights:
+  if ( muse_weights ){
+    double tmp=0.0;
+    for (int i=0; i<mDataY.size(); ++i)
+      tmp += mDataWeightY[i]*mDataWeightY[i];
+    tmp = 1.0/sqrt(tmp);
+    for (int i=0; i<mDataY.size(); ++i)
+      mDataWeightY[i] *= tmp;
+  }
+
+
+  double eps = std::numeric_limits<double>::epsilon();
+
+  mDataScaleY.resize( mDataY.size() );
+  for (int i=0; i<mDataY.size(); ++i)
+    mDataScaleY[i] = 1.0;
+
+  if (muse_scales){
+    // Set scales of DataY
+    for (int i=0; i<mDataY.size(); ++i){
+      mDataScaleY[i] = ((mDataY[i] < 0) ? -1 : 1) * mDataY[i];
+      if (mDataScaleY[i] < eps)
+	mDataScaleY[i] = eps;
+    }
+  }
+
+
+  // Set scales of constraints
+  // do it on the fly, saves save memory
+
+}
+
+
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::report_on_parameters_and_data(){
+  if (mModelDataY.size()==0 || mstatus_MDY==expired){
+    mModelDataY = (mModelFuncPointer)(mParam, mDataX);
+    mstatus_MDY = updated;
+  }
+
+  if (mReportFuncPointer != 0)
+    (mReportFuncPointer)(mParam, mDataX, mDataY, mModelDataY);
 }
 
 
@@ -1378,65 +1478,6 @@ Vector<double> ChiSqFunc<S,T,U> ::gradient_barrier(void){
 
 
 
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-template <typename S, typename T, typename U>
-void ChiSqFunc<S,T,U> ::report_on_parameters_and_data(){
-  if (mModelDataY.size()==0 || mstatus_MDY==expired){
-    mModelDataY = (mModelFuncPointer)(mParam, mDataX);
-    mstatus_MDY = updated;
-  }
-
-  if (mReportFuncPointer != 0)
-    (mReportFuncPointer)(mParam, mDataX, mDataY, mModelDataY);
-}
-
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-template <typename S, typename T, typename U>
-void ChiSqFunc<S,T,U> ::finalize_setup(){
-
-  if (!muse_weights && mDataUncertaintyY.size()<mDataY.size())
-    aborterror("chisq-basics: DataUncertaintyY not set. Exiting.");
-
-  if ( muse_weights && mDataWeightY.size()<mDataY.size())
-    aborterror("chisq-basics: DataWeightY not set. Exiting.");
-
-  // Normalize weights:
-  if ( muse_weights ){
-    double tmp=0.0;
-    for (int i=0; i<mDataY.size(); ++i)
-      tmp += mDataWeightY[i]*mDataWeightY[i];
-    tmp = 1.0/sqrt(tmp);
-    for (int i=0; i<mDataY.size(); ++i)
-      mDataWeightY[i] *= tmp;
-  }
-
-
-  double eps = std::numeric_limits<double>::epsilon();
-
-  mDataScaleY.resize( mDataY.size() );
-  for (int i=0; i<mDataY.size(); ++i)
-    mDataScaleY[i] = 1.0;
-
-  if (muse_scales){
-    // Set scales of DataY
-    for (int i=0; i<mDataY.size(); ++i){
-      mDataScaleY[i] = ((mDataY[i] < 0) ? -1 : 1) * mDataY[i];
-      if (mDataScaleY[i] < eps)
-	mDataScaleY[i] = eps;
-    }
-  }
-
-
-  // Set scales of constraints
-  // do it on the fly, saves save memory
-
-}
 
 
 

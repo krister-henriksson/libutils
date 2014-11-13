@@ -81,7 +81,6 @@ namespace funcfit {
       Matrix<double> J_trial;
       double fp_trial;
       string methodstring, choice;
-      bool stepOK;
       int n;
       int niter=0;
       double maxe=1.0, tmp;
@@ -272,10 +271,8 @@ namespace funcfit {
 
 	gain = (fp - fp_trial) / (0.5 * h * (mu * h + ag));
 
-	stepOK = false;
 	if (gain > 0){
 	  // Go to trial point
-	  stepOK = true;
 	  p = p_trial;
 	  f = f_trial;
 	  J = J_trial;

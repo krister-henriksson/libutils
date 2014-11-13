@@ -348,13 +348,13 @@ utils::Vector<T> & utils::Vector<T>::operator=(const utils::Vector<T> & sv){
   // Source is NOT empty
 
   // Delete destination, if it is allocated
-  if (mvec != 0){
-    delete[] mvec;
-    mvec = 0;
-    mN   = 0;
-    mresfrac = 1.0;
-    mNcap = mN + mresfrac * mN;
-  }
+  if (mvec != 0) delete[] mvec;
+
+  mvec = 0;
+  mN   = 0;
+  mresfrac = 1.0;
+  mNcap = mN + mresfrac * mN;
+  
 
   // Allocate destination and copy
   mN       = sv.mN;

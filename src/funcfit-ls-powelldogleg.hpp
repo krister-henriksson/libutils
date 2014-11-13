@@ -80,9 +80,7 @@ namespace funcfit {
       double fp, fp_old, gmagn, hmagn;
       double alpha, beta, gain;
       double fp_trial;
-      double rt_ini(rt);
       string methodstring, stepmeth, choice;
-      bool stepOK;
       int niter=0;
 
       status = Minimization_Status();
@@ -338,10 +336,8 @@ namespace funcfit {
 	gain = tmp1 / tmp2;
 
 
-	stepOK = false;
 	if (gain > 0){
 	  // Accept step
-	  stepOK = true;
 	  p = p_trial;
 	  f = f_trial;
 	  fp = fp_trial;

@@ -121,7 +121,7 @@ namespace funcfit {
       double gmagn, hmagn, fp_old;
       int niter=0;
       nr::Linemethod<T> linemeth(func);
-      double gg, dgg, test, den, temp, gam, fp;
+      double gg, dgg, gam, fp;
       int n = p.size();
       Vector<double> g(n,0), h(n,0), dx(n,0);
 
