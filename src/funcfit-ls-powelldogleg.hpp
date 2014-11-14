@@ -160,6 +160,9 @@ namespace funcfit {
 	    //cout << "Chi^2 components: " << func.f() << endl;
 	    //cout << "DataY: " << func.DataY() << endl;
 	    //cout << "ModelDataY: " << func.ModelDataY() << endl;
+	    printf("Par.index  Param.  Gradient  Step:\n");
+	    for (int i=0; i<ag.size(); ++i)
+	      printf("%5d  %20.10f  %20.10e  %20.10e\n", i, p[i], -1.0*ag[i], h[i]);
 	  }
 	  func.report_on_parameters_and_data();
 	}

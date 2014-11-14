@@ -132,11 +132,14 @@ bool funcfit::check_conv(const Vector<double> x,
 	absfx < FUNCTOLABS) counters_niter.niter_functolabs++;
     else counters_niter.niter_functolabs=0;
   }
+
+
   if (use_fx && use_fxold){
     if (FUNCTOLREL > 0.0 &&
 	dfxtol < FUNCTOLREL) counters_niter.niter_functolrel++;
     else counters_niter.niter_functolrel=0;
   }
+
 
   if (use_grad){
     status.gradmin = grad.magn();
@@ -144,6 +147,7 @@ bool funcfit::check_conv(const Vector<double> x,
 	gradtolabs_ok) counters_niter.niter_gradtolabs++;
     else counters_niter.niter_gradtolabs=0;
   }
+
 
   if (use_dx){
     if (STEPTOLABS > 0.0 &&
@@ -154,9 +158,11 @@ bool funcfit::check_conv(const Vector<double> x,
     else counters_niter.niter_steptolrel=0;
   }
 
+
   if (use_fx && use_fxold &&
-      fxold*(1+eps)>fx &&
-      fxold*(1-eps)<fx)
+      ( ( fxold*(1+eps)>fx && fxold*(1-eps)<fx )
+	||
+	( fx*(1+eps)>fxold && fx*(1-eps)<fxold ) ) )
     counters_niter.niter_samefuncval++;
   else
     counters_niter.niter_samefuncval = 0;
@@ -181,6 +187,7 @@ bool funcfit::check_conv(const Vector<double> x,
     return true;
   }
 
+
   if (FUNCTOLREL > 0.0 && use_fx && use_fxold &&
       counters_niter.niter_functolrel >= NITERMIN_FUNCTOLREL &&
       dfxtol < FUNCTOLREL){
@@ -197,6 +204,11 @@ bool funcfit::check_conv(const Vector<double> x,
 
 
 
+  cout << "STEPTOLABS " << STEPTOLABS << endl;
+  cout << "counters_niter.niter_steptolabs " << counters_niter.niter_steptolabs << endl;
+  cout << "steptolabs_ok " << steptolabs_ok << endl;
+  cout << "use_dx " << use_dx << endl;
+
   if (STEPTOLABS > 0.0 && use_dx &&
       counters_niter.niter_steptolabs >= NITERMIN_STEPTOLABS &&
       steptolabs_ok){
@@ -210,6 +222,7 @@ bool funcfit::check_conv(const Vector<double> x,
     status.fit_OK = true;
     return true;
   }
+
 
   if (STEPTOLREL > 0.0 && use_dx &&
       counters_niter.niter_steptolrel >= NITERMIN_STEPTOLREL &&
@@ -242,7 +255,8 @@ bool funcfit::check_conv(const Vector<double> x,
 
 
 
-
+  cout << "NITERMAX_SAMEFUNCVAL" << NITERMAX_SAMEFUNCVAL << endl;
+  cout << "counter_niter.niter_samefuncval " << counters_niter.niter_samefuncval << endl;
   if (NITERMAX_SAMEFUNCVAL > 0 &&
       counters_niter.niter_samefuncval >= NITERMAX_SAMEFUNCVAL){
     if (report_warn)

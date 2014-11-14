@@ -95,10 +95,10 @@ namespace funcfit {
 
     Cond_Conv(){
       double small = sqrt( std::numeric_limits<double>::epsilon() );
-      functolabs =  small;
-      steptolabs =  1e-5;
-      gradtolabs =  small;
+      functolabs =  1e-7;
       functolrel =  1e-5;
+      gradtolabs =  1e-5;
+      steptolabs =  1e-7;
       steptolrel =  1e-5;
 
       nitermin_functolabs = 5;
@@ -107,9 +107,9 @@ namespace funcfit {
       nitermin_functolrel = 5;
       nitermin_steptolrel = 5;
 
-      nitermin = 5;
+      nitermin = 3;
       nitermax = 200;
-      nitermax_samefuncval = 5;
+      nitermax_samefuncval = 10;
 
       report_conv = false;
       prefix_report_conv  = "";
