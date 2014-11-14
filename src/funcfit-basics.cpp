@@ -84,17 +84,20 @@ bool funcfit::check_conv(const Vector<double> x,
   int i,j;
   double absxi, absdxi, ri;
 
+  // ***************************************************************
   bool steptolabs_ok=false;
   if (STEPTOLABS > 0.0 && use_dx){
     j=0;
 
     for (i=0; i<x.size(); ++i){
-      absxi  = x[i];  if (absxi <0.0) absxi  *= -1.0;
+      absxi  = dx[i];  if (absxi <0.0) absxi  *= -1.0;
       if (absxi < STEPTOLABS) j++;
     }
     if (j==x.size()) steptolabs_ok=true;
   }
+  cout << "steptolabs , j = " << j << endl;
 
+  // ***************************************************************
   bool steptolrel_ok=false;
   if (STEPTOLREL > 0.0 && use_dx){
     j=0;
@@ -153,6 +156,10 @@ bool funcfit::check_conv(const Vector<double> x,
     if (STEPTOLABS > 0.0 &&
 	steptolabs_ok) counters_niter.niter_steptolabs++;
     else counters_niter.niter_steptolabs=0;
+  }
+
+
+  if (use_dx){
     if (STEPTOLREL > 0.0 &&
 	steptolrel_ok) counters_niter.niter_steptolrel++;
     else counters_niter.niter_steptolrel=0;
