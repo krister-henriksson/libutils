@@ -161,16 +161,14 @@ namespace funcfit {
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Check for convergence
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	if (niter>0){
-	  if ( check_conv(p, true,fp_old, true,fp, // use old and current function values
-			  false,Vector<double>(xi.size(),0), // use gradient
-			  true,xi,                  // use step taken
-			  niter,
-			  counters_niter,
-			  cond_conv, cond_debug, cond_print,
-			  methodstring, status) ){
-	    return func.all_parameters(p);
-	  }
+	if ( check_conv(p, true,fp_old, true,fp, // use old and current function values
+			false,Vector<double>(xi.size(),0), // use gradient
+			true,xi,                  // use step taken
+			niter,
+			counters_niter,
+			cond_conv, cond_debug, cond_print,
+			methodstring, status) ){
+	  return func.all_parameters(p);
 	}
 
 

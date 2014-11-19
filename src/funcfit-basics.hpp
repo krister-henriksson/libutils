@@ -95,11 +95,11 @@ namespace funcfit {
 
     Cond_Conv(){
       double small = sqrt( std::numeric_limits<double>::epsilon() );
-      functolabs =  1e-7;
-      functolrel =  1e-5;
-      gradtolabs =  1e-5;
-      steptolabs =  1e-7;
-      steptolrel =  1e-5;
+      functolabs =  small;
+      functolrel =  100*small;
+      gradtolabs =  100*small;
+      steptolabs =  small;
+      steptolrel =  100*small;
 
       nitermin_functolabs = 5;
       nitermin_steptolabs = 5;
@@ -161,8 +161,6 @@ namespace funcfit {
   class Cond_Print {
   public:
     bool report_iter; // report current pogress of minimization process?
-    bool report_iter_params; // report current parameter values?
-    int  report_iter_params_nmax; // report if # of params is LE (<=) this value
     bool report_warn; // report warnings?
     bool report_error; // report errors?
 
@@ -170,12 +168,12 @@ namespace funcfit {
     string prefix_report_warn;
     string prefix_report_error;
 
+    bool report_iter_params; // report current parameter values?
+    int  report_iter_params_nmax; // report if # of params is LE (<=) this value
 
 
     Cond_Print(){
       report_iter_params = false;
-      report_iter_params_nmax = 3;
-      report_iter = false;
       report_warn = false;
       report_error = true;
 
@@ -183,8 +181,30 @@ namespace funcfit {
       prefix_report_warn  = "";
       prefix_report_error = "";
 
+      report_iter_params_nmax = 3;
+      report_iter = false;
+
 
     }
+  } ;
+
+  // ####################################################################
+  // ####################################################################
+  // ####################################################################
+
+
+  class Cond_Exec {
+  public:
+    // Q: Perform auxiliary calculations (derivatives, Hessian, ...) that do not
+    // contribute to the value of the merit function?
+    // A: Always do this for normal operation.
+    bool exec_aux;
+
+
+    Cond_Exec(){
+      exec_aux = true;
+    }
+
   } ;
 
 

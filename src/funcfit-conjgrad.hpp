@@ -159,6 +159,7 @@ namespace funcfit {
 		  << methodstring << ": "
 		  << "Getting merit function value ... " << endl;
       fp = func(p);
+
       if (debug)
 	cout << prefix_report_debug
 		  << methodstring << ": "
@@ -189,6 +190,10 @@ namespace funcfit {
 	    printf("%s%s: Iter %4d  Func %15.8e                 Grad %15.8e\n",
 		   cond_print.prefix_report_iter.c_str(),
 		   methodstring.c_str(), niter, fp, gmagn);
+	    printf("Par.index  Param.  Gradient:\n");
+	    for (int i=0; i<p.size(); ++i)
+	      printf("%5d  %20.10f  %20.10e\n", i, p[i], xi[i]);
+
 	  }
 	  else {
 	    printf("%s%s: Iter %4d  Func %15.8e  Change %15.8e  Grad %15.8e "
@@ -196,6 +201,9 @@ namespace funcfit {
 		   cond_print.prefix_report_iter.c_str(),
 		   methodstring.c_str(), niter, fp, fp-fp_old, gmagn,
 		   hmagn);
+	    printf("Par.index  Param.  Gradient  Step:\n");
+	    for (int i=0; i<p.size(); ++i)
+	      printf("%5d  %20.10f  %20.10e  %20.10e\n", i, p[i], xi[i], dx[i]);
 	  }
 	  func.report_on_parameters_and_data();
 	}
@@ -208,15 +216,13 @@ namespace funcfit {
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Check for convergence
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	if (niter>0){
-	  if ( check_conv(p, true,fp_old, true,fp, // use old and current function values
-			  true,g,                  // use gradient
-			  true,dx,                 // use step taken
-			  niter,
-			  counters_niter,
-			  cond_conv, cond_debug, cond_print, methodstring, status) ){
-	    return func.all_parameters(p);
-	  }
+	if ( check_conv(p, true,fp_old, true,fp, // use old and current function values
+			true,g,                  // use gradient
+			true,dx,                 // use step taken
+			niter,
+			counters_niter,
+			cond_conv, cond_debug, cond_print, methodstring, status) ){
+	  return func.all_parameters(p);
 	}
 	
 

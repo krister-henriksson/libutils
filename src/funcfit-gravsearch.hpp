@@ -304,16 +304,14 @@ namespace funcfit {
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Check for convergence
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	if (niter>0){
-	  if ( check_conv(x[ixglobmin], true,fxglobmin_old, true,fxglobmin, // use old and current function values
-			  false,Vector<double>(x[ixglobmin].size(),0),// use gradient
-			  false,Vector<double>(x[ixglobmin].size(),0),// use step taken
-			  niter,
-			  counters_niter,
-			  cond_conv, cond_debug, cond_print,
-			  methodstring, status) ){
-	    return func.all_parameters(x[ixglobmin]);
-	  }
+	if ( check_conv(x[ixglobmin], true,fxglobmin_old, true,fxglobmin, // use old and current function values
+			false,Vector<double>(x[ixglobmin].size(),0),// use gradient
+			false,Vector<double>(x[ixglobmin].size(),0),// use step taken
+			niter,
+			counters_niter,
+			cond_conv, cond_debug, cond_print,
+			methodstring, status) ){
+	  return func.all_parameters(x[ixglobmin]);
 	}
 
 

@@ -125,7 +125,6 @@ private:
   Matrix<double> mJ_bak;
   Vector<double> X_bak;
   double mbarrier_scale;
-  bool muse_weights;
   bool muse_scales;
   object_status mstatus_X;
   object_status mstatus_MDY;
@@ -179,9 +178,9 @@ public:
 
 
   double & barrier_scale(void);
-
-  bool & use_weights(void);
   bool & use_scales(void);
+
+
 
   S & Param(void);
   Vector<T> & DataX(void);
@@ -243,7 +242,11 @@ public:
 
   void backup();
   void restore();
-  
+
+
+  void debug();
+
+
 } ;
 
 
@@ -256,7 +259,6 @@ ChiSqFunc<S,T,U> :: ChiSqFunc(){
   mModelFuncPointer = 0;
   mReportFuncPointer = 0;
   mbarrier_scale = 1.0;
-  muse_weights = false;
   muse_scales = false;
   mstatus_X   = updated;
   mstatus_MDY = expired;
@@ -290,7 +292,6 @@ ChiSqFunc<S,T,U> :: ChiSqFunc(const S & P,
   mModelFuncPointer = 0;
   mReportFuncPointer = 0;
   mbarrier_scale = 1.0;
-  muse_weights = false;
   muse_scales = false;
   mstatus_X   = updated;
   mstatus_MDY = expired;
@@ -322,7 +323,6 @@ ChiSqFunc<S,T,U> :: ChiSqFunc(const ChiSqFunc<S,T,U> & sv){
   mJ     = sv.mJ;
   mJ_bak = sv.mJ_bak;
   mbarrier_scale = sv.mbarrier_scale;
-  muse_weights = sv.muse_weights;
   muse_scales = sv.muse_scales;
   mstatus_X   = sv.mstatus_X;
   mstatus_MDY = sv.mstatus_MDY;
@@ -362,7 +362,6 @@ ChiSqFunc<S,T,U> & ChiSqFunc<S,T,U> ::operator=(const ChiSqFunc<S,T,U> & sv){
   mJ     = sv.mJ;
   mJ_bak = sv.mJ_bak;
   mbarrier_scale = sv.mbarrier_scale;
-  muse_weights = sv.muse_weights;
   muse_scales = sv.muse_scales;
   mstatus_X   = sv.mstatus_X;
   mstatus_MDY = sv.mstatus_MDY;
@@ -647,10 +646,6 @@ double &  ChiSqFunc<S,T,U> ::barrier_scale(void){
 
 
 
-template <typename S, typename T, typename U>
-bool & ChiSqFunc<S,T,U> ::use_weights(void){
-  return muse_weights;
-}
 
 template <typename S, typename T, typename U>
 bool & ChiSqFunc<S,T,U> ::use_scales(void){
@@ -779,7 +774,6 @@ Vector<U> & ChiSqFunc<S,T,U> ::ModelDataY(void){
 template <typename S, typename T, typename U>
 void ChiSqFunc<S,T,U> ::clear_data(void){
   mbarrier_scale = 1.0;
-  muse_weights = false;
   muse_scales = false;
   mDataX.resize(0);
   mDataY.resize(0);
@@ -803,26 +797,87 @@ void ChiSqFunc<S,T,U> ::clear_data(void){
 template <typename S, typename T, typename U>
 void ChiSqFunc<S,T,U> ::finalize_setup(){
 
-  if (!muse_weights && mDataUncertaintyY.size()==0)
-    aborterror("chisq-basics: DataUncertaintyY not set. Exiting.");
-  if (!muse_weights && mDataUncertaintyY.size() != mDataY.size())
-      aborterror("chisq-basics: DataUncertaintyY of wrong dimension. Exiting.");
+  // Check if any prefactor vectors are set:
+  if (mDataUncertaintyY.size() != mDataY.size() &&
+      mDataWeightY.size()      != mDataY.size()){
+    aborterror("Neither uncertainties nor weights are in use! Please fill any or both vectors.");
+  }
 
-  if ( muse_weights && mDataWeightY.size()==0)
-    aborterror("chisq-basics: DataWeightY not set. Exiting.");
-  if ( muse_weights && mDataWeightY.size() != mDataY.size())
-    aborterror("chisq-basics: DataWeightY of wrong dimension. Exiting.");
+  // Suppose uncertainty is set. Check for negative values. If such values found,
+  // then there must be a weight vector of the same size, and with certain properties.
+  if (mDataUncertaintyY.size() == mDataY.size()){
+    int neg=0;
+    for (int i=0; i<mDataUncertaintyY.size(); ++i){
+      if (mDataUncertaintyY[i]<0.0) neg++;
+    }
+    // No negative values:
+    if (neg==0) mDataWeightY = Vector<double>(mDataY.size(), -1.0);
+
+    // Negative values means we need the weight vector:
+    if (neg>0 && mDataWeightY.size() != mDataY.size()){
+      // aborterror("Uncertainty vector OK, but weight vector needed, and not supplied (or of wrong dimension).");
+      mDataWeightY = Vector<double>(mDataY.size(), 1.0);
+      for (int i=0; i<mDataUncertaintyY.size(); ++i){
+	if (mDataUncertaintyY[i]<0.0) mDataWeightY[i]=1.0;
+      }
+    }
+
+    // Check if negative uncertainty values are consistent with positive weight values:
+    if (neg>0 && mDataWeightY.size() == mDataY.size()){
+      int notOK1=0, notOK2=0;
+      for (int i=0; i<mDataUncertaintyY.size(); ++i){
+	if (mDataUncertaintyY[i]<0.0 && mDataWeightY[i]<0.0) notOK1++;
+	if (mDataUncertaintyY[i]>0.0 && mDataWeightY[i]>0.0) notOK2++;
+      }
+      if (notOK1>0 || notOK2>0)
+	aborterror("Uncertainty and weight vectors OK, but weight vector elements not consistent with uncertainty elements.");
+    }
+  }
+
+
+  // Suppose weight is set. Check for negative values. If such values found,
+  // then there must be an uncertainty vector of the same size, and with certain properties.
+  if (mDataWeightY.size() == mDataY.size()){
+    int neg=0;
+    for (int i=0; i<mDataWeightY.size(); ++i){
+      if (mDataWeightY[i]<0.0) neg++;
+    }
+    // No negative values:
+    if (neg==0) mDataUncertaintyY = Vector<double>(mDataY.size(), -1.0);
+
+    // Negative values means we need the uncertainty vector:
+    if (neg>0 && mDataUncertaintyY.size() != mDataY.size()){
+      // aborterror("Weight vector OK, but uncertainty vector needed, and not supplied (or of wrong dimension).");
+      mDataUncertaintyY = Vector<double>(mDataY.size(), 1.0);
+      for (int i=0; i<mDataWeightY.size(); ++i){
+	if (mDataWeightY[i]<0.0) mDataUncertaintyY[i]=1.0;
+      }
+    }      
+
+    // Check if negative weight values are consistent with positive uncertainty values:
+    if (neg>0 && mDataUncertaintyY.size() == mDataY.size()){
+      int notOK1=0, notOK2=0;
+      for (int i=0; i<mDataWeightY.size(); ++i){
+	if (mDataWeightY[i]<0.0 && mDataUncertaintyY[i]<0.0) notOK1++;
+	if (mDataWeightY[i]>0.0 && mDataUncertaintyY[i]>0.0) notOK2++;
+      }
+      if (notOK1>0 || notOK2>0)
+	aborterror("Weight and uncertainty vectors OK, but uncertainty vector elements not consistent with weight elements.");
+    }
+  }
+
+
+
 
 
   // Normalize weights:
-  if ( muse_weights ){
-    double tmp=0.0;
-    for (int i=0; i<mDataY.size(); ++i)
-      tmp += mDataWeightY[i]*mDataWeightY[i];
-    tmp = 1.0/sqrt(tmp);
-    for (int i=0; i<mDataY.size(); ++i)
-      mDataWeightY[i] *= tmp;
-  }
+  double tmp=0.0;
+  for (int i=0; i<mDataWeightY.size(); ++i)
+    if (mDataWeightY[i]>0.0) tmp += mDataWeightY[i]*mDataWeightY[i];
+  tmp = 1.0/sqrt(tmp);
+  for (int i=0; i<mDataWeightY.size(); ++i)
+    if (mDataWeightY[i]>0.0) mDataWeightY[i] *= tmp;
+
 
 
   double eps = std::numeric_limits<double>::epsilon();
@@ -910,29 +965,25 @@ void ChiSqFunc<S,T,U> ::calc_f(void){
 
   mModelDataY = ModelDataY();
 
-  if (muse_weights){
-    for (int i=0; i!=N; ++i)
-      mf[i] = double(mDataWeightY[i])
-	* (double(mDataY[i]) - double(mModelDataY[i]))
-	/ double(mDataScaleY[i]);
-  }
-  else {
-    for (int i=0; i!=N; ++i){
-      mf[i] = 1.0 / double(mDataUncertaintyY[i])
-	* (double(mDataY[i]) - double(mModelDataY[i]))
-	/ double(mDataScaleY[i]);
 
-      /*
+  for (int i=0; i!=N; ++i){
+    double td = mDataWeightY[i];
+    if (mDataWeightY[i]<0.0) td = 1.0/mDataUncertaintyY[i];
+    
+    mf[i] = td
+      * (double(mDataY[i]) - double(mModelDataY[i]))
+      / double(mDataScaleY[i]);
+    
+    /*
       cout << "data point " << i << "  uncert " << double(mDataUncertaintyY[i])
-	   << "  inputdata " << double(mDataY[i])
-	   << "  preddata " << double(mModelDataY[i])
-	   << "  datascale " << double(mDataScaleY[i])
-	   << endl;
-      */
-
-    }
+      << "  inputdata " << double(mDataY[i])
+      << "  preddata " << double(mModelDataY[i])
+      << "  datascale " << double(mDataScaleY[i])
+      << endl;
+    */
+    
   }
-
+  
   mstatus_f = updated;
   return;
 }
@@ -1107,17 +1158,14 @@ void ChiSqFunc<S,T,U> ::calc_df_dx(void){
     Xf[ix] = bakxi;
     mParam.Xupdate(Xf);
 
-    if (muse_weights){
-      for (int i=0; i<N; ++i)
-	mJ.elem(i, ix) = - double(mDataWeightY[i])
-	  * double( (MDataY1[i] - MDataY2[i])/U(2*dx) )
-	  / double(mDataScaleY[i]);
-    }
-    else {
-      for (int i=0; i<N; ++i)
-	mJ.elem(i, ix) = - 1.0 / double(mDataUncertaintyY[i])
-	  * double( (MDataY1[i] - MDataY2[i])/U(2*dx) )
-	  / double(mDataScaleY[i]);
+
+    for (int i=0; i<N; ++i){
+      double td = mDataWeightY[i];
+      if (mDataWeightY[i]<0.0) td = 1.0/mDataUncertaintyY[i];
+
+      mJ.elem(i, ix) = - td
+	* double( (MDataY1[i] - MDataY2[i])/U(2*dx) )
+	/ double(mDataScaleY[i]);
     }
 
   }
@@ -1237,27 +1285,17 @@ Vector < Matrix<double> > ChiSqFunc<S,T,U> ::d2f_dx1dx2(void){
 
 
 
-      if (muse_weights){
-	for (int k=0; k!=N; ++k){
-	  fpp_x1x2[k].elem(i,j) = - double(mDataWeightY[k])
+      for (int k=0; k!=N; ++k){
+	double td = mDataWeightY[k];
+	if (mDataWeightY[k]<0.0) td = 1.0/mDataUncertaintyY[k];
+	
+	fpp_x1x2[k].elem(i,j) = - td
 	    * ( double( (MDataY1[k] - MDataY2[k] - MDataY3[k] + MDataY4[k]) )
 		/ U(4.0*dx1*dx2) )
 	    / double(mDataScaleY[k]);
 	  
-	  // Symmetry:
-	  fpp_x1x2[k].elem(j,i) = fpp_x1x2[k].elem(i,j);
-	}
-      }
-      else {
-	for (int k=0; k!=N; ++k){
-	  fpp_x1x2[k].elem(i,j) = - 1.0 / double(mDataUncertaintyY[k])
-	    * ( double( (MDataY1[k] - MDataY2[k] - MDataY3[k] + MDataY4[k]) )
-		/ U(4.0*dx1*dx2) )
-	    / double(mDataScaleY[k]);
-	  
-	  // Symmetry:
-	  fpp_x1x2[k].elem(j,i) = fpp_x1x2[k].elem(i,j);
-	}
+	// Symmetry:
+	fpp_x1x2[k].elem(j,i) = fpp_x1x2[k].elem(i,j);
       }
 
 
@@ -1291,19 +1329,14 @@ Vector < Matrix<double> > ChiSqFunc<S,T,U> ::d2f_dx1dx2(void){
     mParam.Xupdate(Xf);
 
 
-    if (muse_weights){
-      for (int k=0; k!=N; ++k)
-	fpp_x1x2[k].elem(i,i) = - double(mDataWeightY[k])
-	  * ( double( (MDataY1[k] - 2.0 * mModelDataY[k] + MDataY2[k]) )
-	      / U(4.0*dx1*dx1) )
-	  / double(mDataScaleY[k]);
-    }
-    else {
-      for (int k=0; k!=N; ++k)
-	fpp_x1x2[k].elem(i,i) = - 1.0 / double(mDataUncertaintyY[k])
-	  * ( double( (MDataY1[k] - 2.0 * mModelDataY[k] + MDataY2[k]) )
-	      / U(4.0*dx1*dx1) )
-	  / double(mDataScaleY[k]);
+    for (int k=0; k!=N; ++k){
+      double td = mDataWeightY[k];
+      if (mDataWeightY[k]<0.0) td = 1.0/mDataUncertaintyY[k];
+
+      fpp_x1x2[k].elem(i,i) = - td
+	* ( double( (MDataY1[k] - 2.0 * mModelDataY[k] + MDataY2[k]) )
+	    / U(4.0*dx1*dx1) )
+	/ double(mDataScaleY[k]);
     }
 
   }
@@ -1508,6 +1541,27 @@ void ChiSqFunc<S,T,U> ::restore(){
   mstatus_MDY = mstatus_MDY_bak;
   mstatus_f   = mstatus_f_bak;
   mstatus_J   = mstatus_J_bak;
+}
+
+
+
+
+
+
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::debug(){
+
+  cout << "All  parameters: " << mParam.X() << endl;
+  //cout << "Free parameters: " << mParam.Xfree() << endl;
+  cout << "Number of DataX, DataY points: " << mDataX.size() << "  " << mDataY.size() << endl;
+  cout << "DataY            vector: " << mDataY << endl;
+  cout << "DataScaleY       vector: " << mDataScaleY << endl;
+  cout << "DataWeightY      vector: " << mDataWeightY << endl;
+  cout << "DataUncertaintyY vector: " << mDataUncertaintyY << endl;
+  cout << "barrier scale: " << mbarrier_scale << endl;
+  //cout << "ModelFuncPointer : " << mModelFuncPointer << endl;
+  //cout << "ReportFuncPointer: " << mReportFuncPointer << endl;
+
 }
 
 

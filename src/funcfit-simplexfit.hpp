@@ -251,6 +251,13 @@ namespace funcfit {
 	fp_old = fp;
 
 
+
+
+
+	if (niter>=NITERMAX) break;
+
+
+
 	// ********************************************************
 	// Calculate the fractional range from highest to lowest.
 	// Return if good enough.
@@ -303,7 +310,7 @@ namespace funcfit {
 	}
 
 
-	if (niter>=NITERMAX) break;
+
 
 
 

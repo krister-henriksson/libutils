@@ -1,8 +1,5 @@
 
 
-
-
-
 #include <limits>
 #include <string>
 
@@ -33,40 +30,56 @@ bool funcfit::check_conv(const Vector<double> x,
 			 Minimization_Status & status
 			 ){
 
-  double FUNCTOLABS = cond_conv.functolabs;
-  double STEPTOLABS = cond_conv.steptolabs;
-  double GRADTOLABS = cond_conv.gradtolabs;
-  double FUNCTOLREL = cond_conv.functolrel;
-  double STEPTOLREL = cond_conv.steptolrel;
+  double FUNCTOLABS       = cond_conv.functolabs;
+  double STEPTOLABS       = cond_conv.steptolabs;
+  double GRADTOLABS       = cond_conv.gradtolabs;
+  double FUNCTOLREL       = cond_conv.functolrel;
+  double STEPTOLREL       = cond_conv.steptolrel;
 
   int NITERMIN_FUNCTOLABS = cond_conv.nitermin_functolabs;
   int NITERMIN_STEPTOLABS = cond_conv.nitermin_steptolabs;
   int NITERMIN_GRADTOLABS = cond_conv.nitermin_gradtolabs;
   int NITERMIN_FUNCTOLREL = cond_conv.nitermin_functolrel;
   int NITERMIN_STEPTOLREL = cond_conv.nitermin_steptolrel;
+  int NITERMIN            = cond_conv.nitermin;
+  int NITERMAX            = cond_conv.nitermax;
+  int NITERMAX_SAMEFUNCVAL= cond_conv.nitermax_samefuncval;
+  bool report_conv        = cond_conv.report_conv;
 
-  int NITERMIN       = cond_conv.nitermin;
-  int NITERMAX       = cond_conv.nitermax;
-  int NITERMAX_SAMEFUNCVAL = cond_conv.nitermax_samefuncval;
-
-  if (niter <= NITERMIN) return false;
-
-
-  /*
-  bool debug          = cond_print.debug_fit_level0;
-  bool debug_linemeth = cond_print.debug_fit_level1;
-  bool report_iter    = cond_print.report_iter;
-  */
-  bool report_warn    = cond_print.report_warn;
-  bool report_error   = cond_print.report_error;
-
-  bool report_conv    = cond_conv.report_conv;
-    
+  bool report_warn        = cond_print.report_warn;
+  bool report_error       = cond_print.report_error;
+   
   double eps = std::numeric_limits<double>::epsilon();
+
 
   status.niter = niter;
 
+  // ###############################################################
+  // Check iteration counters before anything else. A maximum
+  // iteration count of 0 means we should just reach the reporting
+  // phase of the first iteration and then exit.
+  // ###############################################################
 
+  if (NITERMAX >= 0 && 
+      niter >= NITERMAX){
+    if (report_warn)
+      cout << cond_print.prefix_report_warn
+	   << methodstring << ": "
+	   << "Maximum number " << NITERMAX << " of iterations has been reached. Exiting." << endl;
+    status.nitermax_reached = true;
+    return true;
+  }
+
+  // ###############################################################
+  // On the first iteration there are no previous values of function
+  // value, gradient, etc, defined, so we should not check any of
+  // the conditions relating to those.
+  // ###############################################################
+
+  if (niter == 0) return false;
+
+
+  if (niter <= NITERMIN) return false;
 
 
   // ###############################################################
@@ -95,7 +108,7 @@ bool funcfit::check_conv(const Vector<double> x,
     }
     if (j==x.size()) steptolabs_ok=true;
   }
-  cout << "steptolabs , j = " << j << endl;
+  //cout << "steptolabs , j = " << j << endl;
 
   // ***************************************************************
   bool steptolrel_ok=false;
@@ -211,11 +224,12 @@ bool funcfit::check_conv(const Vector<double> x,
 
 
 
+  /*
   cout << "STEPTOLABS " << STEPTOLABS << endl;
   cout << "counters_niter.niter_steptolabs " << counters_niter.niter_steptolabs << endl;
   cout << "steptolabs_ok " << steptolabs_ok << endl;
   cout << "use_dx " << use_dx << endl;
-
+  */
   if (STEPTOLABS > 0.0 && use_dx &&
       counters_niter.niter_steptolabs >= NITERMIN_STEPTOLABS &&
       steptolabs_ok){
@@ -261,10 +275,7 @@ bool funcfit::check_conv(const Vector<double> x,
   }
 
 
-
-  cout << "NITERMAX_SAMEFUNCVAL" << NITERMAX_SAMEFUNCVAL << endl;
-  cout << "counter_niter.niter_samefuncval " << counters_niter.niter_samefuncval << endl;
-  if (NITERMAX_SAMEFUNCVAL > 0 &&
+  if (NITERMAX_SAMEFUNCVAL >= 0 &&
       counters_niter.niter_samefuncval >= NITERMAX_SAMEFUNCVAL){
     if (report_warn)
       cout << cond_print.prefix_report_warn
@@ -273,18 +284,6 @@ bool funcfit::check_conv(const Vector<double> x,
     status.nitermax_reached = true;
     return true;
   }
-
-
-  if (NITERMAX > 0 && 
-      niter >= NITERMAX){
-    if (report_warn)
-      cout << cond_print.prefix_report_warn
-	   << methodstring << ": "
-	   << "Maximum number " << NITERMAX << " of iterations has been reached. Exiting." << endl;
-    status.nitermax_reached = true;
-    return true;
-  }
-
 
 
 

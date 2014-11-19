@@ -150,6 +150,9 @@ namespace funcfit {
 	    printf("%s%s: Iter %4d  Func %15.8e                 Grad %15.8e\n",
 		   cond_print.prefix_report_iter.c_str(),
 		   methodstring.c_str(), niter, fp, gmagn);
+	    printf("Par.index  Param.  Gradient:\n");
+	    for (int i=0; i<ag.size(); ++i)
+	      printf("%5d  %20.10f  %20.10e\n", i, p[i], -1.0*ag[i]);
 	  }
 	  else {
 	    printf("%s%s: Iter %4d  Func %15.8e  Change %15.8e  Grad %15.8e "
@@ -170,17 +173,15 @@ namespace funcfit {
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Check for convergence
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	if (niter>0){
-	  if ( check_conv(p,
-			  true,fp_old, true,fp, // use old and current function values
-			  true,ag,              // use gradient
-			  true,h,               // use step taken
-			  niter,
-			  counters_niter,
-			  cond_conv, cond_debug, cond_print,
-			  methodstring, status) ){
-	    return func.all_parameters(p);
-	  }
+	if ( check_conv(p,
+			true,fp_old, true,fp, // use old and current function values
+			true,ag,              // use gradient
+			true,h,               // use step taken
+			niter,
+			counters_niter,
+			cond_conv, cond_debug, cond_print,
+			methodstring, status) ){
+	  return func.all_parameters(p);
 	}
 
 	if (rt < rt_min){
