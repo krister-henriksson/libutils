@@ -9,7 +9,12 @@
 #include <vector>
 #include <sstream>
 
+#include <boost/format.hpp>
 
+
+using boost::format;
+using std::string;
+using std::ostringstream;
 
 
 namespace utils {
@@ -27,13 +32,26 @@ namespace utils {
   
 
   template <typename T>
-  inline std::string tostring(const T & input){
-    std::ostringstream strbuf;
+  string tostring(const T & input){
+    ostringstream strbuf;
 
     strbuf.clear();
     strbuf << input;
     return strbuf.str();
   }
+
+
+
+  template <typename T>
+  string tostring_fmt(const string & fmt, const T & input){
+    ostringstream strbuf;
+
+    strbuf.clear();
+    strbuf << format(fmt) % input;
+    return strbuf.str();
+  }
+
+
     
 }
 

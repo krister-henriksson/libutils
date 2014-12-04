@@ -3,8 +3,20 @@
 
 
 
-void AtomSystem::dumpframe(ofstream & fout){
+void AtomSystem::dumpframe(ofstream & fout,
+			   string fmt
+			   ){
   int i;
+  string fmt_now;
+  const double llim=1.0e-4;
+  const double ulim=1.0e+4;
+  string formatf = "%20.10f";
+  string formate = "%20.10e";
+  double td;
+
+
+  if (use_def_xyz_fmt) fmt_now = def_xyz_fmt;
+  else                 fmt_now = fmt;
 
   /*
   elem.reserve(5);
@@ -16,14 +28,84 @@ void AtomSystem::dumpframe(ofstream & fout){
 
 
   fout << natoms() << endl;
-  fout << "Frame number " << iframe << " "
-       << time << " fs boxsize "
-       << boxlen[0] << " " << boxlen[1] << " " << boxlen[2] << endl;
+
+  if (fmt_now=="xyz"){
+    fout << "Frame number " << iframe << " ";
+
+    td = time;
+    if (abs(td)<llim || abs(td)>ulim) fout << format(formate) % td;
+    else                              fout << format(formatf) % td;
+    fout << " fs boxsize ";
+
+    td = boxlen[0];
+    if (abs(td)<llim || abs(td)>ulim) fout << format(formate) % td;
+    else                              fout << format(formatf) % td;
+    fout << " ";
+
+    td = boxlen[1];
+    if (abs(td)<llim || abs(td)>ulim) fout << format(formate) % td;
+    else                              fout << format(formatf) % td;
+    fout << " ";
+
+    td = boxlen[2];
+    if (abs(td)<llim || abs(td)>ulim) fout << format(formate) % td;
+    else                              fout << format(formatf) % td;
+    fout << endl;
+
+  }
+  else if (fmt_now=="extxyz"){
+
+    fout << "Lattice=\"";
+
+    string boxstr;
+    Vector<string> bstr(3);
+    for (int i=0; i<3; ++i){
+      td = boxlen[i] * boxdir.elem(i,0);
+      if (abs(td)<llim || abs(td)>ulim) boxstr + tostring_fmt(formate, td) + " ";
+      else                              boxstr + tostring_fmt(formatf, td) + " ";
+
+      td = boxlen[i] * boxdir.elem(i,1);
+      if (abs(td)<llim || abs(td)>ulim) boxstr + tostring_fmt(formate, td) + " ";
+      else                              boxstr + tostring_fmt(formatf, td) + " ";
+
+      td = boxlen[i] * boxdir.elem(i,2);
+      if (abs(td)<llim || abs(td)>ulim) boxstr + tostring_fmt(formate, td) + " ";
+      else                              boxstr + tostring_fmt(formatf, td) + " ";
+
+      if (i<2) boxstr + " ";
+      else     boxstr + "\"";
+      /*
+      bstr[i] = tostring_fmt("%.10f", boxlen[i] * boxdir.elem(i,0)) + " "
+	+ tostring_fmt("%.10f", boxlen[i] * boxdir.elem(i,1)) + " "
+	+ tostring_fmt("%.10f", boxlen[i] * boxdir.elem(i,2));
+      */
+    }
+    //fout << bstr[0] << " " << bstr[1] << " " << bstr[2] << "\"";
+    fout << " Properties=species:S:1:pos:R:3:type:I:1:index:I:1:other:S Time=0.0" << endl;
+  }
+
+
 
   for (i = 0; i < natoms(); ++i){
-    fout << matter[i] << " " << pos[i][0] << " " << pos[i][1] << " " << pos[i][2] << " "
-	 << type[i] << " " << idx[i] << " " << field[i] << endl;
+    fout << matter[i] << " ";
 
+    td = pos[i][0];
+    if (abs(td)<llim || abs(td)>ulim) fout << format(formate) % td << " ";
+    else                              fout << format(formatf) % td << " ";
+
+    td = pos[i][1];
+    if (abs(td)<llim || abs(td)>ulim) fout << format(formate) % td << " ";
+    else                              fout << format(formatf) % td << " ";
+
+    td = pos[i][2];
+    if (abs(td)<llim || abs(td)>ulim) fout << format(formate) % td << " ";
+    else                              fout << format(formatf) % td << " ";
+
+    fout << type[i] << " "
+	 << idx[i]
+	 << " " << field[i]
+	 << endl;
+    
   }
   
 
@@ -34,9 +116,9 @@ void AtomSystem::dumpframe(ofstream & fout){
 
 
 
-
-
-void AtomSystem::getframe(ifstream & fin){
+void AtomSystem::getframe(ifstream & fin,
+			  string fmt
+			  ){
   int ttype;
   int ns, atom_counter, tnatoms, iat;
   int tidx;

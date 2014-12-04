@@ -60,6 +60,10 @@ public:
  
   OMP_Info omp_info;
 
+  bool   use_def_xyz_fmt;
+  string def_xyz_fmt;
+
+
 
 public:
   AtomSystem();
@@ -135,8 +139,8 @@ public:
   // ##################################################################################
 
 
-  void dumpframe(ofstream & fout);
-  void getframe(ifstream & fin);
+  void dumpframe(ofstream & fout, string fmt="xyz");
+  void getframe(ifstream & fin,   string fmt="xyz");
 
   // ##################################################################################
   // ##################################################################################

@@ -10,6 +10,8 @@
 #include <limits>
 #include <algorithm>
 
+#include <boost/format.hpp>
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -42,8 +44,8 @@ using utils::Matrix;
 using utils::LUdecomp;
 using utils::get_line;
 using utils::get_substrings;
-
-
+using utils::tostring;
+using utils::tostring_fmt;
 using exiterrors::aborterror;
 
 
@@ -77,6 +79,11 @@ AtomSystem::AtomSystem()
   pos.cap(100);
 
   neighborcollection.cap(100);
+
+
+  use_def_xyz_fmt = false;
+  def_xyz_fmt = "xyz";
+
 }
 
 
@@ -106,6 +113,10 @@ AtomSystem::AtomSystem(const AtomSystem & sys){
   neighborcollection = sys.neighborcollection;
 
   omp_info = sys.omp_info;
+
+  use_def_xyz_fmt = sys.use_def_xyz_fmt;
+  def_xyz_fmt = sys.def_xyz_fmt;
+
 }
 
 
@@ -141,6 +152,9 @@ AtomSystem & AtomSystem::operator=(const AtomSystem & sys){
   neighborcollection = sys.neighborcollection;
 
   omp_info = sys.omp_info;
+
+  use_def_xyz_fmt = sys.use_def_xyz_fmt;
+  def_xyz_fmt = sys.def_xyz_fmt;
 
   return *this;
 }
