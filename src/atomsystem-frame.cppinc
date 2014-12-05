@@ -10,7 +10,8 @@ void AtomSystem::dumpframe(ofstream & fout,
   string fmt_now;
   const double llim=1.0e-4;
   const double ulim=1.0e+4;
-  string formatf = "%20.10f";
+  string formatf  = "%20.10f";
+  string formatfs = "%.10f";
   string formate = "%20.10e";
   double td;
 
@@ -56,31 +57,24 @@ void AtomSystem::dumpframe(ofstream & fout,
   else if (fmt_now=="extxyz"){
 
     fout << "Lattice=\"";
-
-    string boxstr;
-    Vector<string> bstr(3);
+    string boxstr = "";
     for (int i=0; i<3; ++i){
       td = boxlen[i] * boxdir.elem(i,0);
-      if (abs(td)<llim || abs(td)>ulim) boxstr + tostring_fmt(formate, td) + " ";
-      else                              boxstr + tostring_fmt(formatf, td) + " ";
+      if (abs(td)<llim || abs(td)>ulim) boxstr += tostring_fmt(formate,  td) + " ";
+      else                              boxstr += tostring_fmt(formatfs, td) + " ";
 
       td = boxlen[i] * boxdir.elem(i,1);
-      if (abs(td)<llim || abs(td)>ulim) boxstr + tostring_fmt(formate, td) + " ";
-      else                              boxstr + tostring_fmt(formatf, td) + " ";
+      if (abs(td)<llim || abs(td)>ulim) boxstr += tostring_fmt(formate,  td) + " ";
+      else                              boxstr += tostring_fmt(formatfs, td) + " ";
 
       td = boxlen[i] * boxdir.elem(i,2);
-      if (abs(td)<llim || abs(td)>ulim) boxstr + tostring_fmt(formate, td) + " ";
-      else                              boxstr + tostring_fmt(formatf, td) + " ";
+      if (abs(td)<llim || abs(td)>ulim) boxstr += tostring_fmt(formate,  td);
+      else                              boxstr += tostring_fmt(formatfs, td);
 
-      if (i<2) boxstr + " ";
-      else     boxstr + "\"";
-      /*
-      bstr[i] = tostring_fmt("%.10f", boxlen[i] * boxdir.elem(i,0)) + " "
-	+ tostring_fmt("%.10f", boxlen[i] * boxdir.elem(i,1)) + " "
-	+ tostring_fmt("%.10f", boxlen[i] * boxdir.elem(i,2));
-      */
+      if (i==2) boxstr += "\"";
+      else      boxstr += " ";
     }
-    //fout << bstr[0] << " " << bstr[1] << " " << bstr[2] << "\"";
+    fout << boxstr;
     fout << " Properties=species:S:1:pos:R:3:type:I:1:index:I:1:other:S Time=0.0" << endl;
   }
 

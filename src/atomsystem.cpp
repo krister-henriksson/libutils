@@ -177,19 +177,22 @@ void AtomSystem::clear_all_atoms(){
   pos.resize(0);
   matter.resize(0);
   field.resize(0);
+
+  neighborcollection.resize(0);
 }
 
 
 // Add an atom to the system. It is placed at the end of the matoms vector,
 // and the mnatoms counter is updated by 1.
 int AtomSystem::add_atom(){
-  int nat = pos.size();
-  nat++;
+  int nat = pos.size(); nat++;
+
   type.resize(nat);
   idx.resize(nat);
   pos.resize(nat);
   matter.resize(nat);
   field.resize(nat);
+
   neighborcollection.resize(nat);
   return nat-1;
 }
