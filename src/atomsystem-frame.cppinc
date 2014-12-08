@@ -59,15 +59,18 @@ void AtomSystem::dumpframe(ofstream & fout,
     fout << "Lattice=\"";
     string boxstr = "";
     for (int i=0; i<3; ++i){
-      td = boxlen[i] * boxdir.elem(i,0);
+      Vector<double> tv(3,0);
+      get_boxdir(i, tv);
+
+      td = boxlen[i] * tv[0];
       if (abs(td)<llim || abs(td)>ulim) boxstr += tostring_fmt(formate,  td) + " ";
       else                              boxstr += tostring_fmt(formatfs, td) + " ";
 
-      td = boxlen[i] * boxdir.elem(i,1);
+      td = boxlen[i] * tv[1];
       if (abs(td)<llim || abs(td)>ulim) boxstr += tostring_fmt(formate,  td) + " ";
       else                              boxstr += tostring_fmt(formatfs, td) + " ";
 
-      td = boxlen[i] * boxdir.elem(i,2);
+      td = boxlen[i] * tv[2];
       if (abs(td)<llim || abs(td)>ulim) boxstr += tostring_fmt(formate,  td);
       else                              boxstr += tostring_fmt(formatfs, td);
 
