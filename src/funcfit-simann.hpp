@@ -22,13 +22,14 @@
 #include "utils-math.hpp"
 #include "utils-vector.hpp"
 #include "utils-string.hpp"
+#include "utils-errors.hpp"
 
 #include "param.hpp"
 
 #include "mtwister.hpp"
 
 #include "funcfit-basics.hpp"
-#include "funcfit-exceptions.hpp"
+#include "funcfit-errors.hpp"
 
 
 
@@ -302,22 +303,36 @@ namespace funcfit {
 	stoch_red = false;
 	for (ch=0; ch<D; ++ch){
 
-	  // Start with previous point ...
-	  for (i=0; i<D; ++i) x_try[i] = x[i];
+	  // **************************************************************
+	  while (true){
+	    try {
 
-	  trial_failed = true;
-	  while (trial_failed){
-	    trial_failed = false;
+	      // Start with previous point ...
+	      for (i=0; i<D; ++i) x_try[i] = x[i];
 
-	    // ... and add a trial step in direction 'ch':
-	    td = (2.0*mtwister.unif()-1.0) * xch[ch];
-	    if (x_try[ch]+td < xmin[ch]) trial_failed=true;
-	    if (x_try[ch]+td > xmax[ch]) trial_failed=true;
+	      trial_failed = true;
+	      while (trial_failed){
+		trial_failed = false;
 
+		// ... and add a trial step in direction 'ch':
+		td = (2.0*mtwister.unif()-1.0) * xch[ch];
+		if (x_try[ch]+td < xmin[ch]) trial_failed=true;
+		if (x_try[ch]+td > xmax[ch]) trial_failed=true;
+
+	      }
+	      x_try[ch] += td;
+	      fp_try = func(x_try);
+	    }
+	    catch (funcfit::bad_point & err_bad_point){
+	      func.reset();
+	      cout << "Warning: Bad point " << x_try << ". Recreating point ..." << endl;
+	      cout << "Recommendation: Restate parameter limits and start over." << endl;
+	      continue;
+	    }
+	    break;
 	  }
-	  x_try[ch] += td;
-	  fp_try = func(x_try);
-
+	  // **************************************************************
+	  
 	  dfp = fp_try - fp;
 
 	  // Check trial function value:

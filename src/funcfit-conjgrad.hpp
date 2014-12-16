@@ -53,9 +53,6 @@ using utils::Vector;
 //    // * Return all parameters:
 //    utils::Vector<double> all_parameters(void);
 //    utils::Vector<double> all_parameters(const utils::Vector<double> & x);
-//    // * Check parameters:
-//    bool bad_point(void);
-//    bool bad_point(const utils::Vector<double> & x);
 //
 //  }
 //

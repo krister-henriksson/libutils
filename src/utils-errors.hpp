@@ -1,8 +1,8 @@
 
 
 
-#ifndef EXIT_ERRORS_HPP
-#define EXIT_ERRORS_HPP
+#ifndef UTILS_ERRORS_HPP
+#define UTILS_ERRORS_HPP
 
 
 #include <exception>
@@ -12,23 +12,27 @@
 #include <cstdlib>
 
 
-namespace exiterrors {
+namespace utils {
 
 
-  class bad_input
-    :
-    public std::exception
+  class bad_input : public std::exception
   {
   public:
     bad_input(std::string s); // constructor
   };
   
 
+
+
+
+
+
+
   void aborterror(const std::string s);
 
 
 
-} // namespace
+}
 
 
 

@@ -19,11 +19,11 @@
 #include "utils-math.hpp"
 #include "utils-vector.hpp"
 #include "utils-matrix.hpp"
-#include "exiterrors.hpp"
+#include "utils-errors.hpp"
 
 #include "param.hpp"
 
-#include "funcfit-exceptions.hpp"
+#include "funcfit-errors.hpp"
 
 
 /* ###################################################################
@@ -85,7 +85,7 @@
 
 
 
-using exiterrors::aborterror;
+using utils::aborterror;
 using utils::Vector;
 using utils::Matrix;
 using std::numeric_limits;
@@ -157,6 +157,9 @@ public:
 
   // Setting a parameter point explicitly:
   void set_point(const Vector<double> & xi);
+
+  void reset(const Vector<double> & xi);
+  void reset(void);
 
   bool           point_is_new(const Vector<double> & any);
 
@@ -260,7 +263,7 @@ ChiSqFunc<S,T,U> :: ChiSqFunc(){
   mReportFuncPointer = 0;
   mbarrier_scale = 1.0;
   muse_scales = false;
-  mstatus_X   = updated;
+  mstatus_X   = expired;
   mstatus_MDY = expired;
   mstatus_f   = expired;
   mstatus_J   = expired;
@@ -293,7 +296,7 @@ ChiSqFunc<S,T,U> :: ChiSqFunc(const S & P,
   mReportFuncPointer = 0;
   mbarrier_scale = 1.0;
   muse_scales = false;
-  mstatus_X   = updated;
+  mstatus_X   = expired;
   mstatus_MDY = expired;
   mstatus_f   = expired;
   mstatus_J   = expired;
@@ -384,6 +387,7 @@ double ChiSqFunc<S,T,U> ::operator()(void){
 
 template <typename S, typename T, typename U>
 double ChiSqFunc<S,T,U> ::operator()(const Vector<double> & xi){
+
   if (point_is_new(xi)){
     mParam.Xupdate(xi);
     mstatus_X   = updated;
@@ -403,6 +407,8 @@ template <typename S, typename T, typename U>
 bool ChiSqFunc<S,T,U> ::point_is_new(const Vector<double> & any){
 
   if (any.size()==0) return false;
+
+  if (mstatus_X == expired) return true;
 
   return ( nonfree_parameters_part_is_new( nonfree_parameters_part(any) )
 	   || free_parameters_part_is_new( free_parameters_part(any) ) );
@@ -700,6 +706,31 @@ void ChiSqFunc<S,T,U> ::set_point(const Vector<double> & xi){
     mstatus_J   = expired;
   }
 }
+
+// Use this after catching an exception. This resets the point to being a new
+// point, so things are recalculated to make sure the internal state is good.
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::reset(const Vector<double> & xi){
+  mstatus_X   = expired;
+  mstatus_MDY = expired;
+  mstatus_f   = expired;
+  mstatus_J   = expired;
+  mParam.Xupdate(xi);
+  mstatus_X   = updated;
+  mstatus_MDY = expired;
+  mstatus_f   = expired;
+  mstatus_J   = expired;
+}
+
+
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::reset(void){
+  mstatus_X   = expired;
+  mstatus_MDY = expired;
+  mstatus_f   = expired;
+  mstatus_J   = expired;
+}
+
 
 
 

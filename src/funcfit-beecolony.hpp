@@ -21,13 +21,14 @@
 #include "utils-math.hpp"
 #include "utils-vector.hpp"
 #include "utils-string.hpp"
+#include "utils-errors.hpp"
 
 #include "param.hpp"
 
 #include "mtwister.hpp"
 
 #include "funcfit-basics.hpp"
-#include "funcfit-exceptions.hpp"
+#include "funcfit-errors.hpp"
 
 
 
@@ -182,39 +183,52 @@ namespace funcfit {
 
       niter = 0;
       
+
+
+
+
       // --------------------------------------------------------------
       // --------------------------------------------------------------
-      // Create initial population vectors
+      // Create initial population vectors and values
       // --------------------------------------------------------------
       // --------------------------------------------------------------
       if (debug) 
 	cout << prefix_report_debug
 	     << methodstring << ": "
-	     << "Creating initial population ... " << endl;
+	     << "Creating initial population vectors and values ... " << endl;
       for (i=0; i<NP; ++i){
-	// configuration of individual
-	for (j=0; j<D; ++j){
+	cout << methodstring << ": "
+	     << "Agent " << i+1 << " of " << NP << endl;
 
-	  x[i][j] = xmin[j] + mtwister.unif() * (xmax[j] - xmin[j]);
-	  if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
-	  if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
-	  
+	// **************************************************************
+	while (true){
+	  try {
+	    for (j=0; j<D; ++j){
+	      x[i][j] = xmin[j] + mtwister.unif() * (xmax[j] - xmin[j]);
+	      if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
+	      if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
+	    }
+	    fx[i] = func(x[i]);
+	    fitness[i] = 1.0/(1.0 + fx[i]);
+	  }
+	  catch (funcfit::bad_point & err_bad_point){
+	    func.reset();
+	    cout << "Warning: Bad point " << x[i] << ". Recreating point ..." << endl;
+	    cout << "Recommendation: Restate parameter limits and start over." << endl;
+	    continue;
+	  }
+	  break;
 	}
-      }
+	// **************************************************************
 
-      // --------------------------------------------------------------
-      // --------------------------------------------------------------
-      // Create initial population values
-      // --------------------------------------------------------------
-      // --------------------------------------------------------------
-      if (debug)
-	cout << prefix_report_debug
-	     << methodstring << ": "
-	     << "Getting merit function values for initial population ... " << endl;
-      for (i=0; i<NP; ++i){
-	fx[i] = func(x[i]);
-	fitness[i] = 1.0/(1.0 + fx[i]);
+	if (i==0 || (i>0 && fxglobmin>fx[i])){ ixglobmin = i; fxglobmin = fx[i]; }
+	if (i==0 || (i>0 && fxglobmax<fx[i])){ ixglobmax = i; fxglobmax = fx[i]; }
       }
+      xglobmin = x[ixglobmin];
+      xglobmax = x[ixglobmax];
+      fmin = fxglobmin;
+
+
 
       dumpfile = "points-BC-iter" + tostring(niter) + ".out";
       fout.open(dumpfile.c_str());
@@ -226,21 +240,6 @@ namespace funcfit {
       fout.close();
 
 
-      // ###################################################################
-      // Determine best
-      // ###################################################################
-      if (debug)
-	cout << prefix_report_debug
-	     << methodstring << ": "
-	     << "Determining best ... " << endl;
-	
-      for (i=0; i<NP; ++i){
-	if (i==0 || (i>0 && fxglobmin>fx[i])){ ixglobmin = i; fxglobmin = fx[i]; }
-	if (i==0 || (i>0 && fxglobmax<fx[i])){ ixglobmax = i; fxglobmax = fx[i]; }
-      }
-      xglobmin = x[ixglobmin];
-      xglobmax = x[ixglobmax];
-      fmin = fxglobmin;
 
 
 
@@ -412,21 +411,34 @@ namespace funcfit {
 	       << "Scout phase ... " << endl;
 	
 	for (i=0; i<NP; ++i){
+	  cout << methodstring << ": "
+	       << "Agent " << i+1 << " of " << NP << endl;
+
 	  if (trials[i]>=limit){
 	    // Replace
-	    for (j=0; j<D; ++j){
 
-	      x[i][j] = xmin[j] + mtwister.unif() * (xmax[j] - xmin[j]);
-	      if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
-	      if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
-	      
+	    // **************************************************************
+	    while (true){
+	      try {
+		for (j=0; j<D; ++j){
+		  x[i][j] = xmin[j] + mtwister.unif() * (xmax[j] - xmin[j]);
+		  if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
+		  if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
+		}
+		fx[i] = func(x[i]);
+	      }
+	      catch (funcfit::bad_point & err_bad_point){
+		func.reset();
+		cout << "Warning: Bad point " << x[i] << ". Recreating point ..." << endl;
+		cout << "Recommendation: Restate parameter limits and start over." << endl;
+		continue;
+	      }
+	      break;
 	    }
-	    fx[i] = func(x[i]);
 	    fitness[i] = 1.0/(1.0 + fx[i]);
 	    trials[i]=0;
 	  }
 	}
-
 
 
 

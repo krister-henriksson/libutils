@@ -1,8 +1,8 @@
 
-# Comment
-
-# Ignore object files in cd and recursively:
+# Ignore some directories:
 obj/
+bin/
+
 
 # Ignore object files in cd and recursively:
 ./**/*.o

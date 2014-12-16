@@ -15,13 +15,14 @@
 #include "utils.hpp"
 #include "utils-math.hpp"
 #include "utils-vector.hpp"
+#include "utils-errors.hpp"
 
 #include "param.hpp"
 
 #include "mtwister.hpp"
 
 #include "funcfit-basics.hpp"
-#include "funcfit-exceptions.hpp"
+#include "funcfit-errors.hpp"
 
 
 
@@ -135,43 +136,55 @@ namespace funcfit {
 	}
       }
 
+      int ihi, ilo, inhi;
 
 
 
       p.resize(ndim+1, ndim);
-      for (i=0; i<ndim+1; ++i){ // i is for vertex
-	for (j=0; j<ndim; ++j)  // j is for parameter
-	  p.elem(i,j) = point[j];
-
-	if (i > 0){
-	  j = i-1;
-	  // p.elem(i, i-1) += xch[i-1];
-
-	  p.elem(i,j) = xmin[j] + mtwister.unif() * (xmax[j]-xmin[j]);
-	  if (p.elem(i,j) < xmin[j]) p.elem(i,j) = xmin[j];
-	  if (p.elem(i,j) > xmax[j]) p.elem(i,j) = xmax[j];
-
-	}
-      }
-
-      int ihi, ilo, inhi;
-      mpts = p.nrows();
-      ndim = p.ncols();
+      mpts = ndim+1;
       Vector<double> psum(ndim, 0), pmin(ndim, 0), x(ndim, 0);
       y.resize(mpts);
 
-      for (i=0; i<mpts; ++i){
-	for (j=0; j<ndim; ++j)
-	  x[j] = p.elem(i,j);
-
-	if (debug) 
-	  cout << prefix_report_debug
-		    << methodstring << ": "
-	       << "Getting merit function value at vertex " << i << " " << x << "... " << endl;
-	y[i] = func(x);
 
 
+      if (debug) 
+	cout << prefix_report_debug
+	     << methodstring << ": "
+	     << "Getting vertices and merit function values ... " << endl;
 
+      for (i=0; i<ndim+1; ++i){ // i is for vertex
+	cout << methodstring << ": "
+	     << "Vertex " << i+1 << " of " << mpts << endl;
+
+	// **************************************************************
+	while (true){
+	  try {
+
+	    for (j=0; j<ndim; ++j)  // j is for parameter
+	      p.elem(i,j) = point[j];
+
+	    if (i > 0){
+	      j = i-1;
+	      // p.elem(i, i-1) += xch[i-1];
+
+	      p.elem(i,j) = xmin[j] + mtwister.unif() * (xmax[j]-xmin[j]);
+	      if (p.elem(i,j) < xmin[j]) p.elem(i,j) = xmin[j];
+	      if (p.elem(i,j) > xmax[j]) p.elem(i,j) = xmax[j];
+	    }
+
+	    for (j=0; j<ndim; ++j)
+	      x[j] = p.elem(i,j);
+
+	    y[i] = func(x);
+	  }
+	  catch (funcfit::bad_point & err_bad_point){
+	    func.reset();
+	    cout << "Warning: Bad point " << x << ". Recreating point ..." << endl;
+	    cout << "Recommendation: Restate parameter limits and start over." << endl;
+	    continue;
+	  }
+	  break;
+	}
 
       }
       fp = y[0];
@@ -442,6 +455,7 @@ namespace funcfit {
 
       string prefix_report_debug = cond_debug.prefix_debug_fit_level1;
 
+
       for (j=0; j<ndim; ++j){
 	ptry[j] = psum[j] * fac1 - p.elem(ihi, j) * fac2;
 
@@ -465,6 +479,8 @@ namespace funcfit {
 	  ytry = func(ptry);
 	}
 	catch (funcfit::bad_point & e1){
+	  func.reset();
+
 	  // Went to far. Try again with smaller step.
 	  if (cond_print.report_warn)
 	    cout << cond_print.prefix_report_warn

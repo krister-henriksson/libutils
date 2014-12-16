@@ -6,16 +6,16 @@
 #include <string>
 
 
-#include "exiterrors.hpp"
+#include "utils-errors.hpp"
 
 
-exiterrors::bad_input::bad_input(std::string s){
+utils::bad_input::bad_input(std::string s){
   std::cout << "Unexpected input: Did not expect '" << s << "'"
 	    << "Aborting." << std::endl;
 }
 
 
-void exiterrors::aborterror(const std::string s){
+void utils::aborterror(const std::string s){
   std::cout << s << std::endl;
   exit(EXIT_FAILURE);
 }

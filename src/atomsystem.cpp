@@ -26,7 +26,7 @@
 
 #include "atomsystem.hpp"
 #include "constants.hpp"
-#include "exiterrors.hpp"
+#include "utils-errors.hpp"
 
 
 using std::string;
@@ -46,7 +46,7 @@ using utils::get_line;
 using utils::get_substrings;
 using utils::tostring;
 using utils::tostring_fmt;
-using exiterrors::aborterror;
+using utils::aborterror;
 
 
 

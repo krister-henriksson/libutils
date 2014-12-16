@@ -18,7 +18,7 @@
 #include "utils-math.hpp"
 #include "utils-vector.hpp"
 #include "utils-matrix.hpp"
-#include "exiterrors.hpp"
+#include "utils-errors.hpp"
 
 #include "param.hpp"
 

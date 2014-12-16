@@ -268,7 +268,7 @@ namespace funcfit {
 	// Trial step
 
 	while (true){
-
+	  int nerr=0;
 
 
 	  try {
@@ -298,7 +298,8 @@ namespace funcfit {
 	    f_trial = func.f(p_trial);
 	    // ------------------------------------------------------------------
 	  }
-	  catch (funcfit::bad_value & e1){
+	  catch (funcfit::bad_point & e1){
+	    func.reset();
 	    // Went too far. Retry with smaller step.
 	    if (report_warn)
 	      cout << cond_print.prefix_report_warn

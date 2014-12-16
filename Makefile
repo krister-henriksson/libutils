@@ -26,7 +26,7 @@ LDFLAGS        =  -lrt -lm
 LDFLAGS_STATIC =  $(LDFLAGS) -static 
 
 
-SRC = atomsystem.cpp exiterrors.cpp param.cpp mtwister.cpp \
+SRC = atomsystem.cpp utils-errors.cpp param.cpp mtwister.cpp \
 	utils-string.cpp utils-streamio.cpp funcfit-basics.cpp \
 	omp-basics.cpp
 
@@ -46,13 +46,14 @@ TARGET_STATIC  = $(LIBFILE).a
 # --------------------------------------------------------------------------
 # Rules:
 
-all: dirs dynamic2 static2
+all: dirs dynamic static
 	@echo "export LIBDIR="$(LIBDIR)"" > bashsettings.text
 
 
 dynamic: dynamic2
 	# strip -s $(LIBFILE).so
 	chmod a+rx $(LIBFILE).so
+	cp $(LIBFILE).so bin/
 
 dynamic2: $(OBJECTS)
 	$(CC) $(STD) $(WARN) $(DEBUG) $(OPT) $(OPENMP) -shared -o $(LIBFILE).so  $(OBJECTS)  $(LINK)
@@ -61,6 +62,7 @@ dynamic2: $(OBJECTS)
 static: static2
 	# strip -s $(LIBFILE).a
 	chmod a+rx $(LIBFILE).a
+	cp $(LIBFILE).a bin/
 
 static2: $(OBJECTS)
 	ar rcsvf $(LIBFILE).a  $(OBJECTS)
@@ -83,9 +85,10 @@ dirs:
 	-mkdir -p $(INCDIR)
 	cp src/*.hpp $(INCDIR)/
 	-mkdir -p $(LIBDIR)
+	-mkdir bin
 
 clean:
-	-rm obj/*.o $(TARGET_DYNAMIC) $(TARGET_STATIC)
+	-rm obj/*.o bin/*
 
 
 

@@ -21,13 +21,14 @@
 #include "utils-math.hpp"
 #include "utils-vector.hpp"
 #include "utils-string.hpp"
+#include "utils-errors.hpp"
 
 #include "param.hpp"
 
 #include "mtwister.hpp"
 
 #include "funcfit-basics.hpp"
-#include "funcfit-exceptions.hpp"
+#include "funcfit-errors.hpp"
 
 
 
@@ -179,39 +180,39 @@ namespace funcfit {
       
       // --------------------------------------------------------------
       // --------------------------------------------------------------
-      // Create initial population vectors
+      // Create initial population vectors and values
       // --------------------------------------------------------------
       // --------------------------------------------------------------
       if (debug) 
 	cout << prefix_report_debug
 	     << methodstring << ": "
-	     << "Creating initial population ... " << endl;
+	     << "Creating initial population vectors and values ... " << endl;
       for (i=0; i<NP; ++i){
-	// configuration of individual
-	for (j=0; j<D; ++j){
+	cout << methodstring << ": "
+	     << "Agent " << i+1 << " of " << NP << endl;
 
-	  x[i][j] = xmin[j] + mtwister.unif() * (xmax[j] - xmin[j]);
-	  if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
-	  if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
+	// **************************************************************
+	while (true){
+	  try {
+	    // configuration of individual
+	    for (j=0; j<D; ++j){
+	      x[i][j] = xmin[j] + mtwister.unif() * (xmax[j] - xmin[j]);
+	      if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
+	      if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
 
-	  v[i][j] = 0.5*(xmax[j]-xmin[j]) * (2 * mtwister.unif() - 1);
+	      v[i][j] = 0.5*(xmax[j]-xmin[j]) * (2 * mtwister.unif() - 1);
+	    }
+	    fx[i] = func(x[i]);
+	  }
+	  catch (funcfit::bad_point & err_bad_point){
+	    func.reset();
+	    cout << "Warning: Bad point " << x[i] << ". Recreating point ..." << endl;
+	    cout << "Recommendation: Restate parameter limits and start over." << endl;
+	    continue;
+	  }
+	  break;
 	}
-
-      }
-
-
-
-      // --------------------------------------------------------------
-      // --------------------------------------------------------------
-      // Create initial population values
-      // --------------------------------------------------------------
-      // --------------------------------------------------------------
-      if (debug)
-	cout << prefix_report_debug
-	     << methodstring << ": "
-	     << "Getting merit function values for initial population ... " << endl;
-      for (i=0; i<NP; ++i){
-	fx[i] = func(x[i]);
+	// **************************************************************
 
 	for (j=0; j<D; ++j){
 	  xindmin[i][j] = x[i][j];
@@ -324,25 +325,40 @@ namespace funcfit {
 	       << "Getting merit function values for initial population ... " << endl;
 
 	for (i=0; i<NP; ++i){
+	  cout << methodstring << ": "
+	       << "Agent " << i+1 << " of " << NP << endl;
 
-	  for (j=0; j<D; ++j){
-	    v[i][j] = w * v[i][j]
-	      + c1 * mtwister.unif() * (xindmin[i][j] - x[i][j])
-	      + c2 * mtwister.unif() * (xglobmin[j]   - x[i][j]);
+	  // **************************************************************
+	  while (true){
+	    try {
+	      for (j=0; j<D; ++j){
+		v[i][j] = w * v[i][j]
+		  + c1 * mtwister.unif() * (xindmin[i][j] - x[i][j])
+		  + c2 * mtwister.unif() * (xglobmin[j]   - x[i][j]);
 	    
-	    vmax = 0.5*(xmax[j]-xmin[j]);
-	    if (v[i][j]> vmax) v[i][j] =  vmax;
-	    if (v[i][j]<-vmax) v[i][j] = -vmax;
-	  }
+		vmax = 0.5*(xmax[j]-xmin[j]);
+		if (v[i][j]> vmax) v[i][j] =  vmax;
+		if (v[i][j]<-vmax) v[i][j] = -vmax;
+	      }
 
-	  for (j=0; j<D; ++j){
-	    x[i][j] = x[i][j] + v[i][j];
+	      for (j=0; j<D; ++j){
+		x[i][j] = x[i][j] + v[i][j];
 
-	    if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
-	    if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
-	  }
+		if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
+		if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
+	      }
 	  
-	  fx[i] = func(x[i]);
+	      fx[i] = func(x[i]);
+	    }
+	    catch (funcfit::bad_point & err_bad_point){
+	      func.reset();
+	      cout << "Warning: Bad point " << x[i] << ". Recreating point ..." << endl;
+	      cout << "Recommendation: Restate parameter limits and start over." << endl;
+	      continue;
+	    }
+	    break;
+	  }
+	  // **************************************************************
 
 	  if (fxindmin[i]>fx[i]){
 	    for (j=0; j<D; ++j) xindmin[i][j] = x[i][j];

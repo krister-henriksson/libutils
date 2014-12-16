@@ -12,13 +12,15 @@
 
 #include "utils.hpp"
 #include "utils-math.hpp"
+#include "utils-errors.hpp"
+
 #include "nr-golden.hpp"
 #include "nr-f1dim.hpp"
 
 #include "param.hpp"
 
 #include "funcfit-basics.hpp"
-#include "funcfit-exceptions.hpp"
+#include "funcfit-errors.hpp"
 
 
 using std::cout;
@@ -162,6 +164,8 @@ namespace nr {
 	  status.funcmin = golden.fmin;
 	}
 	catch (funcfit::bad_point & e1){
+	  func.reset();
+
 	  // Went too far in the minimization. Restart with smaller limits.
 	  if (debug)
 	    cout << "Line minimization: Starting value xx " << xx << " too large. Retrying." << endl;

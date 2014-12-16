@@ -22,13 +22,14 @@
 #include "utils-math.hpp"
 #include "utils-vector.hpp"
 #include "utils-string.hpp"
+#include "utils-errors.hpp"
 
 #include "param.hpp"
 
 #include "mtwister.hpp"
 
 #include "funcfit-basics.hpp"
-#include "funcfit-exceptions.hpp"
+#include "funcfit-errors.hpp"
 
 
 
@@ -222,18 +223,32 @@ namespace funcfit {
 	     << methodstring << ": "
 	     << "Creating agents ... " << endl;
       for (i=0; i<NP; ++i){
-	for (j=0; j<D; ++j){
+	cout << methodstring << ": "
+	     << "Agent " << i+1 << " of " << NP << endl;
 
-	  x[i][j] = xmin[j] + mtwister.unif() * (xmax[j] - xmin[j]);
-	  if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
-	  if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
-	  
+	// **************************************************************
+	while (true){
+	  try {
+	    for (j=0; j<D; ++j){
+	      x[i][j] = xmin[j] + mtwister.unif() * (xmax[j] - xmin[j]);
+	      if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
+	      if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
+	    }
+	    fx[i] = func(x[i]);
+	    if ( ! isfinite( fx[i] ) ){
+	      i--;
+	      continue;
+	    }
+	  }
+	  catch (funcfit::bad_point & err_bad_point){
+	    func.reset();
+	    cout << "Warning: Bad point " << x[i] << ". Recreating point ..." << endl;
+	    cout << "Recommendation: Restate parameter limits and start over." << endl;
+	    continue;
+	  }
+	  break;
 	}
-	fx[i] = func(x[i]);
-	if ( ! isfinite( fx[i] ) ){
-	  i--;
-	  continue;
-	}
+	// **************************************************************
 
 	for (j=0; j<D; ++j){
 	  xindmin[i][j] = x[i][j];
@@ -384,50 +399,48 @@ namespace funcfit {
 
 	// ###################################################################
 	// Update of velocities and positions
-	// ###################################################################
-	if (debug)
-	  cout << prefix_report_debug
-	       << methodstring << ": "
-	       << "Updating positions ... " << endl;
-	for (i=0; i<NP; ++i){
-	  td1 = 0.0;
-	  for (k=0; k<D; ++k){
-	    v[i][k] = mtwister.unif() * v[i][k] + f[i][k]/mass[i];
-	    vmax = 0.5*(xmax[k] - xmin[k]);
-	    if (v[i][k]<-vmax) v[i][k] = -vmax;
-	    if (v[i][k]> vmax) v[i][k] =  vmax;
-
-	    td2 = x[i][k];
-	    x[i][k] = x[i][k] + v[i][k];
-
-	    if (x[i][k] < xmin[k]) x[i][k] = xmin[k];
-	    if (x[i][k] > xmax[k]) x[i][k] = xmax[k];
-	    td1 += (x[i][k] - td2)*(x[i][k] - td2);
-	  }
-	  td2 = sqrt(td2);
-	  if (debug) cout << "step taken for agent " << i << " is " << td2 << endl;
-	}
-
-
-
-	// ###################################################################
 	// Function values
 	// ###################################################################
 	if (debug)
 	  cout << prefix_report_debug
 	       << methodstring << ": "
-	       << "Getting merit function values for agents ... " << endl;
+	       << "Updating positions and getting merit function values for agents ... " << endl;
 	for (i=0; i<NP; ++i){
-	  fx[i] = func(x[i]);
-	  if ( ! isfinite( fx[i] ) ){
-	    for (k=0; k<D; ++k){
-	      x[i][k] *= 0.01;
-	      if (x[i][k] < xmin[k]) x[i][k] = xmin[k];
-	      if (x[i][k] > xmax[k]) x[i][k] = xmax[k];
+	  cout << methodstring << ": "
+	       << "Agent " << i+1 << " of " << NP << endl;
+
+	  // **************************************************************
+	  while (true){
+	    try {
+
+	      td1 = 0.0;
+	      for (k=0; k<D; ++k){
+		v[i][k] = mtwister.unif() * v[i][k] + f[i][k]/mass[i];
+		vmax = 0.5*(xmax[k] - xmin[k]);
+		if (v[i][k]<-vmax) v[i][k] = -vmax;
+		if (v[i][k]> vmax) v[i][k] =  vmax;
+
+		td2 = x[i][k];
+		x[i][k] = x[i][k] + v[i][k];
+
+		if (x[i][k] < xmin[k]) x[i][k] = xmin[k];
+		if (x[i][k] > xmax[k]) x[i][k] = xmax[k];
+		td1 += (x[i][k] - td2)*(x[i][k] - td2);
+	      }
+	      td1 = sqrt(td1);
+	      if (debug) cout << "step taken for agent " << i << " is " << td1 << endl;
+	
+	      fx[i] = func(x[i]);
 	    }
-	    i--;
-	    continue;
+	    catch (funcfit::bad_point & err_bad_point){
+	      func.reset();
+	      cout << "Warning: Bad point " << x[i] << ". Recreating point ..." << endl;
+	      cout << "Recommendation: Restate parameter limits and start over." << endl;
+	      continue;
+	    }
+	    break;
 	  }
+	  // **************************************************************
 
 	  for (j=0; j<D; ++j){
 	    xindmin[i][j] = x[i][j];

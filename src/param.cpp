@@ -4,10 +4,11 @@
 #include "utils.hpp"
 #include "utils-math.hpp"
 #include "utils-vector.hpp"
+#include "utils-errors.hpp"
 
 #include "param.hpp"
 
-#include "funcfit-exceptions.hpp"
+#include "funcfit-errors.hpp"
 
 
 /* ##############################################################################
