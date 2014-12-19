@@ -1,5 +1,7 @@
 
 
+#include <iostream>
+#include <boost/format.hpp>
 
 #include "utils.hpp"
 #include "utils-math.hpp"
@@ -9,6 +11,10 @@
 #include "param.hpp"
 
 #include "funcfit-errors.hpp"
+
+
+using namespace std;
+using boost::format;
 
 
 /* ##############################################################################
@@ -229,7 +235,21 @@ utils::Vector<double> Param::Xupdate(const utils::Vector<double> & xi){
   }
 
   funcfit::bad_point ebp;
-  if (! Xfree_is_good()) throw ebp;
+  if (! Xfree_is_good()){
+
+    for (int i=0; i<mX.size(); ++i){
+      if ( mXtype[i] == PARAM_FREE_WITH_LIMITS &&
+	   (mX[i]<mXmin[i] || mX[i]>mXmax[i]) ){
+	cout << "Parameter x[" << i << "/" << NXfree() << "] is "
+	     << format("%20.10e") % mX[i] << ". "
+	     << "Limits: "
+	     << format("%20.10e") % mXmin[i] << ", "
+	     << format("%20.10e") % mXmax[i] << endl;
+      }
+    }
+    
+    throw ebp;
+  }
 
   return mX;
 }

@@ -111,8 +111,12 @@ namespace funcfit {
       if (debug)
 	cout << prefix_report_debug
 		  << methodstring << ": "
-		  << "Getting auxiliary data for merit function gradient ... " << endl;
+		  << "Getting auxiliary data for merit function gradient (f)... " << endl;
       f = func.f(p);
+      if (debug)
+	cout << prefix_report_debug
+		  << methodstring << ": "
+		  << "Getting auxiliary data for merit function gradient (J)... " << endl;
       J = func.J(p);
       if (debug) 
 	cout << prefix_report_debug
@@ -239,8 +243,8 @@ namespace funcfit {
 
 	    if (debug)
 	      cout << prefix_report_debug
-			<< methodstring << ": "
-			<< "Getting trial auxiliary data for merit function gradient ... " << endl;
+		   << methodstring << ": "
+		   << "Getting trial auxiliary data for merit function gradient ... " << endl;
 	    f_trial = func.f(p_trial);
 	    // ------------------------------------------------------------------
 	  }

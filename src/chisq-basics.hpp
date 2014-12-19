@@ -911,6 +911,11 @@ void ChiSqFunc<S,T,U> ::finalize_setup(){
 
 
 
+
+
+
+
+
   double eps = std::numeric_limits<double>::epsilon();
 
   mDataScaleY.resize( mDataY.size() );
@@ -1104,8 +1109,9 @@ double ChiSqFunc<S,T,U> ::value_barrier(void){
     ci /= si;
 
     if (ci<=0.0){
-      std::cout << "chisq-basics: Warning: Parameter value is " << xi
-		<< " i.e. outside limit. Attempting to correct ..." << std::endl;
+      std::cout << "chisq-basics: Warning: Parameter value " << xi
+		<< " is outside limits (" << ai << ", " << bi << ")."
+		<< " Throwing exception." << std::endl;
       throw ebp;
     }
 

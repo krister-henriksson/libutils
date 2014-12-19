@@ -123,7 +123,8 @@ namespace funcfit {
     //#####################################################################
   public:
     double fmin;
-    T & func;
+    //T & func;
+    T func;
     Minimization_Status status;
 
 
@@ -133,7 +134,8 @@ namespace funcfit {
     //#####################################################################
     // NB:  Use constructor to set functor. Point and direction are set by
     // NB:  minimize() method.
-    DiffEvol(T & funcd)
+    //DiffEvol(T & funcd)
+    DiffEvol(T funcd)
       :
       func(funcd)
     {}
