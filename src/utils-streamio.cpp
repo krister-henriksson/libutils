@@ -17,8 +17,8 @@
 */
 
 int utils::get_line( std::istream & fin,
-		      std::string  & line
-		      ){
+		     std::string  & line
+		     ){
   int ch;
   int nc=0;
 

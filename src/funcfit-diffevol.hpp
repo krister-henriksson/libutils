@@ -123,8 +123,7 @@ namespace funcfit {
     //#####################################################################
   public:
     double fmin;
-    //T & func;
-    T func;
+    T & func;
     Minimization_Status status;
 
 
@@ -134,11 +133,11 @@ namespace funcfit {
     //#####################################################################
     // NB:  Use constructor to set functor. Point and direction are set by
     // NB:  minimize() method.
-    //DiffEvol(T & funcd)
-    DiffEvol(T funcd)
+    DiffEvol(T & funcd)
       :
       func(funcd)
     {}
+
 
 
 
@@ -160,7 +159,7 @@ namespace funcfit {
       // Purpose: minimize function, input point will not be changed
       //double eps = numeric_limits<double>::epsilon();
       string methodstring("differential-evolution");
-      int niter=0, i,j,k, i1,i2,i3,i4,i5, rj,rni;
+      int niter=0, i,j,k, i1,i2,i3,i4,i5;
       int ixmin, ixmax;
       int ixamin, ixamax;
       double fxmin, fxmax, absfxmin, absfxmax, oldfxmin, oldfxmax;
@@ -236,6 +235,8 @@ namespace funcfit {
 	     << methodstring << ": "
 	     << "Creating initial population and getting merit function values ... " << endl;
       //dumpfile = "DE-points-iter" + tostring(niter) + ".out";
+
+
       for (i=0; i<NP; ++i){
 	//fout << format("%10ld  ") % i << " : ";
 	cout << methodstring << ": "
@@ -444,16 +445,17 @@ namespace funcfit {
 	  cout << prefix_report_debug
 	       << methodstring << ": "
 	       << "Getting crossovers ... " << endl;
+
+
 	for (i=0; i<NP; ++i){
-	  rni = -1;
+	  int rni = -1;
 	  while (rni<0 || rni>=D) rni = floor(mtwister.unif() * D);
 
 	  for (j=0; j<D; ++j){
-	    rj = mtwister.unif();
+	    double rj = mtwister.unif();
 	    u[i][j] = x[i][j];
 	    if (rj <= CR || j == rni) u[i][j] = v[i][j];
 	  }
-
 
 	  fu[i] = func(u[i]);
 	}
@@ -467,6 +469,8 @@ namespace funcfit {
 	  cout << prefix_report_debug
 	       << methodstring << ": "
 	       << "Getting selections ... " << endl;
+
+
 	for (i=0; i<NP; ++i){
 	  if (fu[i] < fx[i]){
 	    x_new[i] = u[i];

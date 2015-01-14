@@ -29,6 +29,10 @@ namespace utils {
 		       std::vector<std::string> & substr,
 		       const std::string & delims );
 
+  bool bool_in_string(string arg);
+
+
+
   
 
   template <typename T>
@@ -50,6 +54,10 @@ namespace utils {
     strbuf << format(fmt) % input;
     return strbuf.str();
   }
+
+
+
+
 
 
     

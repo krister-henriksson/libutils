@@ -38,3 +38,13 @@ int utils::get_substrings( const std::string & in,
 
 
 
+bool utils::bool_in_string(const string arg){
+  char c = arg[0];
+
+  if (c=='y' || c=='Y' || c=='t' || c=='T' || c=='1') return true;
+  if (c!='n' && c!='N' && c!='f' && c!='F' && c!='0') return true;
+
+  return false;
+}
+
+
