@@ -122,23 +122,20 @@ namespace funcfit {
       // ###################################################################
       while(true){
 
-	if (niter==0){
-	  if (report_iter){
+	if (report_iter){
+	  if (niter==0){
 	    printf("%s%s: Iter %4d  Func %15.8e                 Grad %15.8e\n",
 		   cond_print.prefix_report_iter.c_str(),
 		   methodstring.c_str(), niter, fp, gmagn);
-	    func.report_on_parameters_and_data();
 	  }
-	}
-	else {
-	  if (report_iter){
+	  else {
 	    printf("%s%s: Iter %4d  Func %15.8e  Change %15.8e  Grad %15.8e "
 		   "Step %15.8e\n", 
 		   cond_print.prefix_report_iter.c_str(),
 		   methodstring.c_str(), niter, fp, fp-fp_old, gmagn,
 		   hmagn);
-	    func.report_on_parameters_and_data();
 	  }
+	  func.report_on_parameters_and_data();
 	}
 
 

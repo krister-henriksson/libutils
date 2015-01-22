@@ -254,7 +254,6 @@ namespace funcfit {
 	    cout << cond_print.prefix_report_error
 		      << methodstring << ": "
 		      << "Too small step " << xi.magn() << ". Quitting." << endl;
-	  //func.restore();
 	  p  = p_orig;
 	  fp = fp_orig;
 	  return func.all_parameters(p);

@@ -237,6 +237,7 @@ namespace funcfit {
       while (true){ // Start of loop over iterations
 
 
+	func.set_point(x);
 
 
 	if (debug){
@@ -431,6 +432,8 @@ namespace funcfit {
 
 	}
 
+
+	
 
 	// Go to next iteration.
       }

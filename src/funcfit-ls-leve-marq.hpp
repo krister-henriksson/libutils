@@ -284,6 +284,7 @@ namespace funcfit {
 	  p = p_trial;
 	  f = f_trial;
 	  J = J_trial;
+	  func.set_point(p);
 	  if (debug) 
 	    cout << prefix_report_debug
 		      << methodstring << ": "
@@ -303,6 +304,7 @@ namespace funcfit {
 	  choice = "step accepted";
 	}
 	else {
+	  func.set_point(p);
 	  mu = mu * nu;
 	  nu = 2 * nu;
 	  choice = "step failed";

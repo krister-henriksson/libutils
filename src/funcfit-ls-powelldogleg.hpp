@@ -323,12 +323,6 @@ namespace funcfit {
 
 
 
-
-
-
-
-
-
 	tmp1 = fp - fp_trial;
 	if (stepmeth=="GN")
 	  tmp2 = fp;
@@ -346,6 +340,7 @@ namespace funcfit {
 	  p = p_trial;
 	  f = f_trial;
 	  fp = fp_trial;
+	  func.set_point(p);
 
 	  if (debug) 
 	    cout << prefix_report_debug
@@ -362,6 +357,7 @@ namespace funcfit {
 	  choice = "step accepted";
 	}
 	else {
+	  func.set_point(p);
 	  choice = "step failed";
 	}	
 	

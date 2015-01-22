@@ -1,16 +1,11 @@
 
-# Ignore some directories:
-obj/
-bin/
+# Ignore contents of some directories:
+./obj/
 
 
-# Ignore object files in cd and recursively:
+# Ignore stuff in current directory and recursively down:
 ./**/*.o
-
-
-# Ignore emacs autosave files in cd and recursively:
-./**/*~
-
-# Ignore test binaries in cd and recursively:
+./**/*.so
+./**/*.a
 ./**/a.out
 
