@@ -135,6 +135,7 @@ namespace utils {
   template <typename T, typename S>
   Matrix<T> operator/(const Matrix<T> & a, const S & b);
 
+
   // Handle printing of Matrix<T> objects:
   template <typename T, typename U>
   U & operator<<(U & os, const Matrix<T> & sv);

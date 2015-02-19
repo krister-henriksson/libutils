@@ -12,6 +12,8 @@
 #include <cmath>
 
 
+
+
 namespace utils {
 
 
@@ -123,6 +125,13 @@ namespace utils {
 
 
 
+  template <typename T>
+  bool fp_is_small_tol(const T & x, const T eps){
+    T absx = (x > 0 ? x : -x);
+
+    if (absx < eps) return true;
+    else            return false;
+  }
 
 
 

@@ -26,12 +26,15 @@ LDFLAGS        =  -lrt -lm
 LDFLAGS_STATIC =  $(LDFLAGS) -static 
 
 
-SRC = atomsystem.cpp utils-errors.cpp param.cpp mtwister.cpp \
-	utils-string.cpp utils-streamio.cpp funcfit-basics.cpp \
-	omp-basics.cpp
+# SRC = atomsystem.cpp utils-errors.cpp param.cpp mtwister.cpp \
+#	utils-string.cpp utils-streamio.cpp funcfit-basics.cpp \
+#	omp-basics.cpp
+# SOURCES = $(addprefix src/,$(SRC))
 
-SOURCES = $(addprefix src/,$(SRC))
+SRC    := $(wildcard src/*.cpp)
+SOURCES = $(SRC)
 OBJECTS = $(SOURCES:src/%.cpp=obj/%.o)
+
 
 
 #OBJECTS = $(subst src/,obj/,$(TMP))
@@ -40,6 +43,7 @@ OBJECTS = $(SOURCES:src/%.cpp=obj/%.o)
 TARGET_DYNAMIC = $(LIBFILE).so
 TARGET_STATIC  = $(LIBFILE).a
 
+REBUILDABLES = $(TARGET_DYNAMIC) $(TARGET_STATIC)
 
 
 # --------------------------------------------------------------------------
@@ -48,6 +52,7 @@ TARGET_STATIC  = $(LIBFILE).a
 
 all: dirs dynamic static
 	@echo "export LIBDIR="$(LIBDIR)"" > bashsettings.text
+
 
 
 dynamic: dynamic2
@@ -72,8 +77,12 @@ static2: $(OBJECTS)
 # --------------------------------------------------------------------------
 # Pattern rules:
 
+
+#$(OBJECTS): $(SOURCES)
 obj/%.o: src/%.cpp
 	$(CC) $(STD) $(WARN) $(DEBUG) $(OPT) $(INC) $(OPENMP) -c -fpic $< -o $@
+
+
 
 
 # --------------------------------------------------------------------------
@@ -88,7 +97,7 @@ dirs:
 	-mkdir bin
 
 clean:
-	-rm obj/*.o bin/*
+	-rm -f obj/*.o bin/* $(REBUILDABLES)
 
 
 

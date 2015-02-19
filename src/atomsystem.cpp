@@ -1,6 +1,5 @@
 
 
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -57,6 +56,9 @@ AtomSystem::AtomSystem()
   rcut(0.0),
   drcut(0.0),
   skint(0.0),
+  vol(-1.0),
+  dr_min(-1.0),
+  vol_atom(-1.0),
   iframe(0),
   isCart(true),
   boxlen(3,0.0),
@@ -196,20 +198,6 @@ int AtomSystem::add_atom(){
   neighborcollection.resize(nat);
   return nat-1;
 }
-
-
-
-
-#include "atomsystem-box.cppinc"
-
-#include "atomsystem-dist.cppinc"
-
-#include "atomsystem-nbor.cppinc"
-
-#include "atomsystem-frame.cppinc"
-
-
-
 
 
 

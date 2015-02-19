@@ -1,0 +1,133 @@
+
+
+
+#include "utils-rototrans.hpp"
+
+
+using utils::Vector;
+using utils::Matrix;
+
+
+using utils::RotoTransOperand;
+using utils::RotoTransMatrix;
+
+
+
+utils::RotoTransOperand::RotoTransOperand(){
+  v  = Vector<double>(3, 0.0);
+  OB = Vector<double>(3, 0.0);
+
+  mmat.resize(4, 2);
+  for (int i=0; i<4; ++i){
+    for (int j=0; j<2; ++j){
+      mmat.elem(i,j) = 0.0;
+    }
+  }
+}
+
+
+utils::RotoTransOperand::RotoTransOperand(const Vector<double> & iv,
+					  const Vector<double> & iOB){
+  v = iv;
+  OB = iOB;
+}
+
+
+Vector<double> & utils::RotoTransOperand::vector(void){ return v; }
+
+Vector<double> & utils::RotoTransOperand::vectorpoint(void){ return OB; }
+
+
+
+
+
+
+utils::RotoTransMatrix::RotoTransMatrix(){
+  R  = Matrix<double>(3,3, 0.0);
+  R.elem(0,0) = R.elem(1,1) = R.elem(2,2) = 1.0;
+  T  = Vector<double>(3, 0.0);
+  n  = Vector<double>(3, 0.0);
+  OA = Vector<double>(3, 0.0);
+
+  mmat.resize(4, 6);
+  for (int i=0; i<4; ++i){
+    for (int j=0; j<6; ++j){
+      mmat.elem(i,j) = 0.0;
+    }
+  }
+  for (int i=0; i<3; ++i){
+    for (int j=0; j<3; ++j){
+      mmat.elem(i,j) = R.elem(i,j);
+    }
+  }
+}
+
+
+utils::RotoTransMatrix::RotoTransMatrix(const Matrix<double> & iR,
+					const Vector<double> & in,
+					const Vector<double> & iOA
+					){
+  R = iR;
+  n = in;
+  OA = iOA;
+}
+
+
+utils::RotoTransMatrix::RotoTransMatrix(const Vector<double> & iT){
+  T = iT;
+}
+
+
+Matrix<double> & utils::RotoTransMatrix::rotationmatrix(void){ return R; }
+Vector<double> & utils::RotoTransMatrix::rotationaxis(void){ return n; }
+Vector<double> & utils::RotoTransMatrix::axispoint(void){ return OA; }
+Vector<double> & utils::RotoTransMatrix::translation(void){ return T; }
+
+
+
+
+utils::RotoTransOperand utils::operator*(RotoTransMatrix & opR,
+					 RotoTransOperand & opv
+					 ){
+
+  Matrix<double> Rrot = opR.rotationmatrix();
+  Vector<double> axis = opR.rotationaxis();
+  Vector<double> axisP = opR.axispoint();
+  Vector<double> shift = opR.translation();
+
+  Vector<double> vec = opv.vector();
+  Vector<double> vecP = opv.vectorpoint();
+
+  RotoTransOperand opv_out;
+
+  Vector<double> vec_rot(3,0);
+  vec_rot = Rrot * vec;
+
+  Vector<double> vecP_rot(3,0);
+
+  axis.normalize();
+
+  Vector<double> OA(3,0), OB(3,0), AB(3,0), AD(3,0), DB(3,0), DB_rot(3,0), OB_rot(3,0);
+  OA = axisP;
+  OB = vecP;
+
+  // Vector from point on axis:
+  AB = OB - OA;
+  // Projection onto axis:
+  AD = scalarproduct(AB, axis) * axis;
+  // The rejection part:
+  DB = AB - AD;
+  // Rotate vector:
+  DB_rot = Rrot * DB;
+  OB_rot = OA + AD + DB_rot;
+  vecP_rot = OB_rot;
+
+  opv_out.vector() = vec_rot;
+  opv_out.vectorpoint() = vecP_rot;
+
+  return opv_out;
+}
+
+
+
+

@@ -15,6 +15,8 @@
 
 
 #include "utils.hpp"
+#include "utils-string.hpp"
+#include "utils-errors.hpp"
 
 
 
@@ -128,15 +130,15 @@ namespace utils {
 
 
 
+
   // Handle a * b, scalar product:
   template <typename T>
   T scalarproduct(const Vector<T> & a, const Vector<T> & b);
 
-  /*
-  // Handle a * b, vector product:
+  // Handle a x b, vector product:
   template <typename T>
-  vec<T> vectorproduct(const vec<T> & a, const vec<T> & b);
-*/
+  void vectorproduct(const Vector<T> & a, const Vector<T> & b, Vector<T> & c);
+
   
 }
 
@@ -599,11 +601,38 @@ U & utils::operator << (U & os, const utils::Vector<T> & sv){
 
 
 
+
+
+
 // Handle a * b, scalar product:
 template <typename T>
 T utils::scalarproduct(const utils::Vector<T> & a, const utils::Vector<T> & b){
   return utils::operator*(a, b);
 }
+
+
+
+
+// Handle a x b, vector product:
+template <typename T>
+void utils::vectorproduct(const utils::Vector<T> & a,
+			  const utils::Vector<T> & b,
+			  utils::Vector<T> & c){
+  if (a.size() != b.size()){
+    utils::aborterror("Cannot vector multiply vectors of different dimensions: "
+		      + utils::tostring(a.size()) + " and "
+		      + utils::tostring(b.size()) );
+  }
+  if (c.size() != a.size()) c.resize(a.size());
+
+  c[2] = a[0] * b[1] - a[1] * b[0];
+  c[0] = a[1] * b[2] - a[2] * b[1];
+  c[1] = a[2] * b[0] - a[0] * b[2];
+}
+
+
+
+
 
 
 /*

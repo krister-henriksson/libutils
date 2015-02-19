@@ -41,8 +41,12 @@ public:
   double rcut;
   double drcut;
   double skint;
+  double vol;
+  double dr_min;
+  double vol_atom;
   int iframe;
   bool isCart;
+
 
   Vector<double> boxlen;
   Matrix<double> boxdir;
@@ -100,6 +104,11 @@ public:
   // Normalize the box direction vectors and build the Bravais matrix and its inverse:
   void update_box_geometry();
 
+  void calc_volume(void);
+
+  void calc_closepacked_volume(void);
+
+
   // ##################################################################################
   // ##################################################################################
 
@@ -129,11 +138,14 @@ public:
 				      double f2,
 				      double f3);
 
+  void handle_pbc_of_positions(const double lowlim=-1);
+
+
   // ##################################################################################
   // ##################################################################################
 
   // Build all neighbor collections:
-  void get_all_neighborcollections(void);
+  void get_all_neighborcollections(bool debug=false);
 
   // ##################################################################################
   // ##################################################################################

@@ -1,6 +1,6 @@
 
 # Ignore contents of some directories:
-./obj/
+obj/
 
 
 # Ignore stuff in current directory and recursively down:
