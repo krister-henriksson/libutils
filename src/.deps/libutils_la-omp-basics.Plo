@@ -1,0 +1,8 @@
+libutils_la-omp-basics.lo: omp-basics.cpp /usr/include/stdc-predef.h \
+ omp-basics.hpp /usr/lib/gcc/x86_64-linux-gnu/4.8/include/omp.h
+
+/usr/include/stdc-predef.h:
+
+omp-basics.hpp:
+
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include/omp.h:

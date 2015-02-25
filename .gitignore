@@ -4,6 +4,7 @@ obj/
 
 
 # Ignore stuff in current directory and recursively down:
+./**/*~
 ./**/*.o
 ./**/*.so
 ./**/*.a

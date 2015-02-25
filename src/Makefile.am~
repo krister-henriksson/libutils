@@ -1,0 +1,112 @@
+
+
+# http://www.jezuk.co.uk/cgi-bin/view/articles/autoconfiscation-part-two
+# https://www.lrde.epita.fr/~adl/dl/autotools-handout-4.pdf
+
+# AM_CPPFLAGS = -I$(top_srcdir)/include
+# $top_srcdir is a predefined autoconf variable, which is the relative path to the top-level source directory.
+
+
+AUTOMAKE_OPTIONS = foreign
+
+
+
+lib_LTLIBRARIES = libutils.la
+lib_LIBRARIES = libutils.a
+
+
+# May actually need a static list here:
+libutils_la_SOURCES = atomsystem-box.cpp \
+atomsystem.cpp \
+atomsystem-dist.cpp \
+atomsystem-frame.cpp \
+atomsystem-nbor.cpp \
+funcfit-basics.cpp \
+mtwister.cpp \
+omp-basics.cpp \
+param.cpp \
+utils-errors.cpp \
+utils-rototrans.cpp \
+utils-streamio.cpp \
+utils-string.cpp \
+utils-vecalg.cpp
+
+libutils_a_SOURCES = atomsystem-box.cpp \
+atomsystem.cpp \
+atomsystem-dist.cpp \
+atomsystem-frame.cpp \
+atomsystem-nbor.cpp \
+funcfit-basics.cpp \
+mtwister.cpp \
+omp-basics.cpp \
+param.cpp \
+utils-errors.cpp \
+utils-rototrans.cpp \
+utils-streamio.cpp \
+utils-string.cpp \
+utils-vecalg.cpp
+
+include_HEADERS = atomsystem.hpp \
+chisq-basics.hpp \
+constants.hpp \
+funcfit-basics.hpp \
+funcfit-beecolony.hpp \
+funcfit-conjgrad.hpp \
+funcfit-deriv.hpp \
+funcfit-diffevol.hpp \
+funcfit-errors.hpp \
+funcfit-gravsearch.hpp \
+funcfit-ls-gauss-newton.hpp \
+funcfit-ls-leve-marq.hpp \
+funcfit-ls-powelldogleg.hpp \
+funcfit-partswarm.hpp \
+funcfit-powell.hpp \
+funcfit-simann.hpp \
+funcfit-simplexfit.hpp \
+mtwister.hpp \
+nr-f1dim.hpp \
+nr-golden.hpp \
+nr-linemethod.hpp \
+omp-basics.hpp \
+param.hpp \
+utils-errors.hpp \
+utils.hpp \
+utils-math.hpp \
+utils-matrix3.hpp \
+utils-matrix-Choleskydecomp.hpp \
+utils-matrix.hpp \
+utils-matrix-LUdecomp.hpp \
+utils-matrix-QRdecomp.hpp \
+utils-rototrans.hpp \
+utils-streamio.hpp \
+utils-string.hpp \
+utils-vecalg.hpp \
+utils-vector.hpp
+
+
+ma_inc  = -I$(srcdir)
+ma_warn = -Wall -Wextra -Wstrict-aliasing
+ma_std  = -ansi -pedantic -std=c++98
+ma_opt  = -O3
+ma_dbg  = -g
+ma_omp  = -fopenmp
+
+
+libutils_la_CPPFLAGS = $(ma_inc) $(ma_warn) $(ma_std) $(ma_opt) $(ma_dbg) $(ma_omp) -fpic
+libutils_a_CPPFLAGS  = $(ma_inc) $(ma_warn) $(ma_std) $(ma_opt) $(ma_dbg) $(ma_omp)
+
+libutils_la_LDFLAGS = -rpath '$(libdir)' -lrt -lm -shared 
+
+
+# foo_LDADD if foo is a program or a shared library
+# foo_LIBADD if foo is a static library
+
+
+libutils_a_AR = ar rcsvf
+
+
+#libutils_so_LDFLAGS = -shared
+
+#all: $(lib_LIBRARIES)
+
+
