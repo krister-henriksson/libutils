@@ -234,13 +234,14 @@ utils::Vector<double> Param::Xupdate(const utils::Vector<double> & xi){
     }
   }
 
+  // Test the current point:
   funcfit::bad_point ebp;
   if (! Xfree_is_good()){
 
     for (int i=0; i<mX.size(); ++i){
       if ( mXtype[i] == PARAM_FREE_WITH_LIMITS &&
 	   (mX[i]<mXmin[i] || mX[i]>mXmax[i]) ){
-	cout << "Parameter x[" << i << "/" << NXfree() << "] is "
+	cout << "Parameter x[" << i+1 << "/" << NXfree() << "] is "
 	     << format("%20.10e") % mX[i] << ". "
 	     << "Limits: "
 	     << format("%20.10e") % mXmin[i] << ", "

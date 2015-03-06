@@ -63,16 +63,16 @@ namespace utils {
 
     eps = (tol > 0 ? tol : eps);
 
-    if (absx <= eps && absy <= eps) return true;
+    if (absx < eps && absy < eps) return true;
 
-    if (x>=0 && y>=0 &&
-	( ( x <= y*(1+eps) && x >= y*(1-eps) ) ||
-	  ( y <= x*(1+eps) && y >= x*(1-eps) ) ) ) return true;
+    if (x>0 && y>0 &&
+	( ( x < y*(1+eps) && x > y*(1-eps) ) ||
+	  ( y < x*(1+eps) && y > x*(1-eps) ) ) ) return true;
 
-    if (x<=0 && y<=0 &&
-	( ( absx <= absy*(1+eps) && absx >= absy*(1-eps) ) ||
-	  ( absy <= absx*(1+eps) && absy >= absx*(1-eps) ) ) ) return true;
-
+    if ( x<0 && y<0 &&
+	 ( (x < y + absy*eps) && (x > y - absy*eps) ) ||
+	 ( (y < x + absx*eps) && (y > x - absx*eps) ) ) return true;
+    
     return false;
 
     /*
@@ -88,6 +88,55 @@ namespace utils {
       return false;
     */
   }
+
+
+
+  // #####################################################################
+  // Check if floating point value A is less than or equal to B:
+  // #####################################################################
+  template <typename T>
+  bool fp_is_leq_than(const T & x, const T & y, const T & tol=-1){
+    T eps = std::numeric_limits<T>::epsilon();
+    T absx = (x > 0 ? x : -x);
+    T absy = (y > 0 ? y : -y);
+
+    eps = (tol > 0 ? tol : eps);
+
+
+    if (x<0 && y>0) return true;
+
+    if (x>0 && y>0 && (x < y*(1-eps)) && (x*(1+eps) < y)) return true;
+
+    if (x<0 && y<0 && (x < y*(1+eps)) && (x*(1-eps) < y)) return true;
+
+    return false;
+  }
+
+
+  // #####################################################################
+  // Check if floating point value A is greater than or equal to B:
+  // #####################################################################
+  template <typename T>
+  bool fp_is_geq_than(const T & y, const T & x, const T & tol=-1){
+    T eps = std::numeric_limits<T>::epsilon();
+    T absx = (x > 0 ? x : -x);
+    T absy = (y > 0 ? y : -y);
+
+    eps = (tol > 0 ? tol : eps);
+
+
+    if (x<0 && y>0) return true;
+
+    if (x>0 && y>0 && (x < y*(1-eps)) && (x*(1+eps) < y)) return true;
+
+    if (x<0 && y<0 && (x < y*(1+eps)) && (x*(1-eps) < y)) return true;
+
+    return false;
+  }
+
+
+
+
 
 
   /*

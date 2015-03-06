@@ -1,0 +1,59 @@
+
+
+    bool do_neg_inc=true, do_pos_inc=true;
+
+    // Positive perturbation in parameter:
+    try {
+      Xf[ix] = bakxi + dx;
+      mParam.Xupdate(Xf); // *** FAILS IF Xf[ix] CLOSE TO UPPER LIMIT !!! ***
+    }
+    catch (bad_point & e1){
+      do_pos_inc = false;
+      Xf[ix] = bakxi;
+      mParam.Xupdate(Xf);
+    }
+    if (do_pos_inc) MDataY1 = (mModelFuncPointer)(mParam, mDataX);
+
+    // Negative perturbation in parameter:
+    try {
+      Xf[ix] = bakxi - dx;
+      mParam.Xupdate(Xf); // *** FAILS IF Xf[ix] CLOSE TO LOWER LIMIT !!! ***
+    }
+    catch (bad_point & e1){
+      do_neg_inc = false;
+      Xf[ix] = bakxi;
+      mParam.Xupdate(Xf);
+    }
+    if (do_neg_inc) MDataY2 = (mModelFuncPointer)(mParam, mDataX);
+
+    // Reset:
+    Xf[ix] = bakxi;
+    mParam.Xupdate(Xf);
+
+
+    for (int i=0; i<N; ++i){
+      double td = mDataWeightY[i];
+      if (mDataWeightY[i]<0.0) td = 1.0/mDataUncertaintyY[i];
+
+      double den, num;
+      if        ( do_neg_inc &&  do_pos_inc){
+	den = double( MDataY1[i] - MDataY2[i] );
+	num = double( 2*dx );
+      } else if (!do_neg_inc &&  do_pos_inc){
+	den = double( MDataY1[i] - mDataY[i] );
+	num = double( dx );
+      } else if ( do_neg_inc && !do_pos_inc){
+	den = double( mDataY[i] - mDataY[i] );
+	num = double( dx );
+      } else if (!do_neg_inc && !do_pos_inc){
+	den = double( 0.0 );
+	num = double( dx );
+      }
+
+      mJ.elem(i, ix) = - td
+	* double( den / num ) / double(mDataScaleY[i]);
+
+    }
+
+  }
+

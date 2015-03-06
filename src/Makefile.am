@@ -55,6 +55,7 @@ funcfit-gravsearch.hpp \
 funcfit-ls-gauss-newton.hpp \
 funcfit-ls-leve-marq.hpp \
 funcfit-ls-powelldogleg.hpp \
+funcfit-moldyn.hpp \
 funcfit-partswarm.hpp \
 funcfit-powell.hpp \
 funcfit-simann.hpp \

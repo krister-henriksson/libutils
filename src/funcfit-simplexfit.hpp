@@ -153,8 +153,7 @@ namespace funcfit {
 	     << "Getting vertices and merit function values ... " << endl;
 
       for (i=0; i<ndim+1; ++i){ // i is for vertex
-	cout << methodstring << ": "
-	     << "Vertex " << i+1 << " of " << mpts << endl;
+	// cout << methodstring << ": " << "Vertex " << i+1 << " of " << mpts << endl;
 
 	// **************************************************************
 	while (true){

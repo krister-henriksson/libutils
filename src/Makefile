@@ -85,7 +85,7 @@ build_triplet = x86_64-unknown-linux-gnu
 host_triplet = x86_64-unknown-linux-gnu
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/depcomp $(include_HEADERS)
+	$(top_srcdir)/config/depcomp $(include_HEADERS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -177,7 +177,7 @@ am__v_at_ = $(am__v_at_$(AM_DEFAULT_VERBOSITY))
 am__v_at_0 = @
 am__v_at_1 = 
 DEFAULT_INCLUDES = -I. -I$(top_builddir)
-depcomp = $(SHELL) $(top_srcdir)/depcomp
+depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -226,13 +226,13 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/koehenri/bin/src/code-libutils/missing aclocal-1.14
+ACLOCAL = ${SHELL} /home/koehenri/code/libutils/config/missing aclocal-1.14
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
 AR = ar
-AUTOCONF = ${SHELL} /home/koehenri/bin/src/code-libutils/missing autoconf
-AUTOHEADER = ${SHELL} /home/koehenri/bin/src/code-libutils/missing autoheader
-AUTOMAKE = ${SHELL} /home/koehenri/bin/src/code-libutils/missing automake-1.14
+AUTOCONF = ${SHELL} /home/koehenri/code/libutils/config/missing autoconf
+AUTOHEADER = ${SHELL} /home/koehenri/code/libutils/config/missing autoheader
+AUTOMAKE = ${SHELL} /home/koehenri/code/libutils/config/missing automake-1.14
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -269,7 +269,7 @@ LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/koehenri/bin/src/code-libutils/missing makeinfo
+MAKEINFO = ${SHELL} /home/koehenri/code/libutils/config/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /bin/mkdir -p
 NM = /usr/bin/nm -B
@@ -292,10 +292,10 @@ SET_MAKE =
 SHELL = /bin/bash
 STRIP = strip
 VERSION = 1
-abs_builddir = /home/koehenri/bin/src/code-libutils/src
-abs_srcdir = /home/koehenri/bin/src/code-libutils/src
-abs_top_builddir = /home/koehenri/bin/src/code-libutils
-abs_top_srcdir = /home/koehenri/bin/src/code-libutils
+abs_builddir = /home/koehenri/code/libutils/src
+abs_srcdir = /home/koehenri/code/libutils/src
+abs_top_builddir = /home/koehenri/code/libutils
+abs_top_srcdir = /home/koehenri/code/libutils
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -325,7 +325,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/koehenri/bin/src/code-libutils/install-sh
+install_sh = ${SHELL} /home/koehenri/code/libutils/config/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -391,6 +391,7 @@ funcfit-gravsearch.hpp \
 funcfit-ls-gauss-newton.hpp \
 funcfit-ls-leve-marq.hpp \
 funcfit-ls-powelldogleg.hpp \
+funcfit-moldyn.hpp \
 funcfit-partswarm.hpp \
 funcfit-powell.hpp \
 funcfit-simann.hpp \

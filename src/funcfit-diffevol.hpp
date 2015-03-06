@@ -239,8 +239,7 @@ namespace funcfit {
 
       for (i=0; i<NP; ++i){
 	//fout << format("%10ld  ") % i << " : ";
-	cout << methodstring << ": "
-	     << "Agent " << i+1 << " of " << NP << endl;
+	// cout << methodstring << ": " << "Agent " << i+1 << " of " << NP << endl;
 
 	// **************************************************************
 	while (true){

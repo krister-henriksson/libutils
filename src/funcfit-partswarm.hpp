@@ -188,8 +188,7 @@ namespace funcfit {
 	     << methodstring << ": "
 	     << "Creating initial population vectors and values ... " << endl;
       for (i=0; i<NP; ++i){
-	cout << methodstring << ": "
-	     << "Agent " << i+1 << " of " << NP << endl;
+	// cout << methodstring << ": " << "Agent " << i+1 << " of " << NP << endl;
 
 	// **************************************************************
 	while (true){
@@ -325,8 +324,7 @@ namespace funcfit {
 	       << "Getting merit function values for initial population ... " << endl;
 
 	for (i=0; i<NP; ++i){
-	  cout << methodstring << ": "
-	       << "Agent " << i+1 << " of " << NP << endl;
+	  // cout << methodstring << ": " << "Agent " << i+1 << " of " << NP << endl;
 
 	  // **************************************************************
 	  while (true){

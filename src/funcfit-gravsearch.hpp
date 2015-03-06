@@ -223,8 +223,7 @@ namespace funcfit {
 	     << methodstring << ": "
 	     << "Creating agents ... " << endl;
       for (i=0; i<NP; ++i){
-	cout << methodstring << ": "
-	     << "Agent " << i+1 << " of " << NP << endl;
+	// cout << methodstring << ": " << "Agent " << i+1 << " of " << NP << endl;
 
 	// **************************************************************
 	while (true){
@@ -406,8 +405,7 @@ namespace funcfit {
 	       << methodstring << ": "
 	       << "Updating positions and getting merit function values for agents ... " << endl;
 	for (i=0; i<NP; ++i){
-	  cout << methodstring << ": "
-	       << "Agent " << i+1 << " of " << NP << endl;
+	  // cout << methodstring << ": " << "Agent " << i+1 << " of " << NP << endl;
 
 	  // **************************************************************
 	  while (true){

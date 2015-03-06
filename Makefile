@@ -80,8 +80,14 @@ host_triplet = x86_64-unknown-linux-gnu
 subdir = .
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
-	$(srcdir)/config.h.in INSTALL ar-lib compile config.guess \
-	config.sub depcomp install-sh missing ltmain.sh
+	$(srcdir)/config.h.in README config/ar-lib config/compile \
+	config/config.guess config/config.sub config/depcomp \
+	config/install-sh missing config/missing config/ltmain.sh \
+	$(top_srcdir)/config/ar-lib $(top_srcdir)/config/compile \
+	$(top_srcdir)/config/config.guess \
+	$(top_srcdir)/config/config.sub \
+	$(top_srcdir)/config/install-sh $(top_srcdir)/config/ltmain.sh \
+	$(top_srcdir)/config/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
@@ -194,13 +200,13 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/koehenri/bin/src/code-libutils/missing aclocal-1.14
+ACLOCAL = ${SHELL} /home/koehenri/code/libutils/config/missing aclocal-1.14
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
 AR = ar
-AUTOCONF = ${SHELL} /home/koehenri/bin/src/code-libutils/missing autoconf
-AUTOHEADER = ${SHELL} /home/koehenri/bin/src/code-libutils/missing autoheader
-AUTOMAKE = ${SHELL} /home/koehenri/bin/src/code-libutils/missing automake-1.14
+AUTOCONF = ${SHELL} /home/koehenri/code/libutils/config/missing autoconf
+AUTOHEADER = ${SHELL} /home/koehenri/code/libutils/config/missing autoheader
+AUTOMAKE = ${SHELL} /home/koehenri/code/libutils/config/missing automake-1.14
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -237,7 +243,7 @@ LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/koehenri/bin/src/code-libutils/missing makeinfo
+MAKEINFO = ${SHELL} /home/koehenri/code/libutils/config/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /bin/mkdir -p
 NM = /usr/bin/nm -B
@@ -260,10 +266,10 @@ SET_MAKE =
 SHELL = /bin/bash
 STRIP = strip
 VERSION = 1
-abs_builddir = /home/koehenri/bin/src/code-libutils
-abs_srcdir = /home/koehenri/bin/src/code-libutils
-abs_top_builddir = /home/koehenri/bin/src/code-libutils
-abs_top_srcdir = /home/koehenri/bin/src/code-libutils
+abs_builddir = /home/koehenri/code/libutils
+abs_srcdir = /home/koehenri/code/libutils
+abs_top_builddir = /home/koehenri/code/libutils
+abs_top_srcdir = /home/koehenri/code/libutils
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -293,7 +299,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/koehenri/bin/src/code-libutils/install-sh
+install_sh = ${SHELL} /home/koehenri/code/libutils/config/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -313,6 +319,7 @@ target_alias =
 top_build_prefix = 
 top_builddir = .
 top_srcdir = .
+ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive

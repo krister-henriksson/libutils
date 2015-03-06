@@ -88,8 +88,9 @@
 using utils::aborterror;
 using utils::Vector;
 using utils::Matrix;
+using utils::fp_are_equal;
 using std::numeric_limits;
-
+using funcfit::bad_point;
 
 enum object_status { expired, updated } ;
 
@@ -161,6 +162,9 @@ public:
   void reset(const Vector<double> & xi);
   void reset(void);
 
+  bool           point_is_good(void);
+  bool           point_is_good(const Vector<double> & xi);
+
   bool           point_is_new(const Vector<double> & any);
 
   Vector<double> free_parameters(void);
@@ -175,9 +179,6 @@ public:
 
   Vector<double>        map_vector_as_free_parameters(const Vector<double> & any);
   Vector<parametertype> map_vector_as_free_parameters(const Vector<parametertype> & any);
-
-  bool point_is_good(void);
-  bool point_is_good(const Vector<double> & xi);
 
 
   double & barrier_scale(void);
@@ -488,13 +489,21 @@ bool ChiSqFunc<S,T,U> ::free_parameters_part_is_new(const Vector<double> & xifre
   // Compare old and new free parameters
   // ---------------------------------------------------------------------
   double eps = numeric_limits<double>::epsilon(), td, tdsqsum=0;
+  int nc=0;
   for (int ii=0; ii<NXfree; ++ii){
+    if (fp_are_equal(Xfree[ii], xifree[ii])) nc++;
+    /*
     td = Xfree[ii] - xifree[ii];
     td = (td < 0) ? -td : td;
     tdsqsum += td*td;
+    */
   }
+  /*
   if (tdsqsum > eps) return true;
   else return false;
+  */
+  if (nc==NXfree) return false;
+  else            return true;
 }
 
 
@@ -593,13 +602,21 @@ bool ChiSqFunc<S,T,U> ::nonfree_parameters_part_is_new(const Vector<double> & xi
   // Compare old and new non-free parameters
   // ---------------------------------------------------------------------
   double eps = numeric_limits<double>::epsilon(), td, tdsqsum=0;
+  int nc=0;
   for (int ii=0; ii<NXnonfree; ++ii){
+    if (fp_are_equal(Xnonfree[ii], xinonfree[ii])) nc++;
+    /*
     td = Xnonfree[ii] - xinonfree[ii];
     td = (td < 0) ? -td : td;
     tdsqsum += td*td;
+    */
   }
+  /*
   if (tdsqsum > eps) return true;
   else return false;
+  */
+  if (nc==NXnonfree) return false;
+  else               return true;
 }
 
 
@@ -839,17 +856,17 @@ void ChiSqFunc<S,T,U> ::finalize_setup(){
   if (mDataUncertaintyY.size() == mDataY.size()){
     int neg=0;
     for (int i=0; i<mDataUncertaintyY.size(); ++i){
-      if (mDataUncertaintyY[i]<0.0) neg++;
+      if (mDataUncertaintyY[i]<0) neg++;
     }
     // No negative values:
-    if (neg==0) mDataWeightY = Vector<double>(mDataY.size(), -1.0);
+    if (neg==0) mDataWeightY = Vector<U>(mDataY.size(), -1);
 
     // Negative values means we need the weight vector:
     if (neg>0 && mDataWeightY.size() != mDataY.size()){
       // aborterror("Uncertainty vector OK, but weight vector needed, and not supplied (or of wrong dimension).");
-      mDataWeightY = Vector<double>(mDataY.size(), 1.0);
+      mDataWeightY = Vector<U>(mDataY.size(), 1);
       for (int i=0; i<mDataUncertaintyY.size(); ++i){
-	if (mDataUncertaintyY[i]<0.0) mDataWeightY[i]=1.0;
+	if (mDataUncertaintyY[i]<0) mDataWeightY[i]=U(1);
       }
     }
 
@@ -857,8 +874,8 @@ void ChiSqFunc<S,T,U> ::finalize_setup(){
     if (neg>0 && mDataWeightY.size() == mDataY.size()){
       int notOK1=0, notOK2=0;
       for (int i=0; i<mDataUncertaintyY.size(); ++i){
-	if (mDataUncertaintyY[i]<0.0 && mDataWeightY[i]<0.0) notOK1++;
-	if (mDataUncertaintyY[i]>0.0 && mDataWeightY[i]>0.0) notOK2++;
+	if (mDataUncertaintyY[i]<0 && mDataWeightY[i]<0) notOK1++;
+	if (mDataUncertaintyY[i]>0 && mDataWeightY[i]>0) notOK2++;
       }
       if (notOK1>0 || notOK2>0)
 	aborterror("Uncertainty and weight vectors OK, but weight vector elements not consistent with uncertainty elements.");
@@ -871,17 +888,17 @@ void ChiSqFunc<S,T,U> ::finalize_setup(){
   if (mDataWeightY.size() == mDataY.size()){
     int neg=0;
     for (int i=0; i<mDataWeightY.size(); ++i){
-      if (mDataWeightY[i]<0.0) neg++;
+      if (mDataWeightY[i]<0) neg++;
     }
     // No negative values:
-    if (neg==0) mDataUncertaintyY = Vector<double>(mDataY.size(), -1.0);
+    if (neg==0) mDataUncertaintyY = Vector<U>(mDataY.size(), -1);
 
     // Negative values means we need the uncertainty vector:
     if (neg>0 && mDataUncertaintyY.size() != mDataY.size()){
       // aborterror("Weight vector OK, but uncertainty vector needed, and not supplied (or of wrong dimension).");
-      mDataUncertaintyY = Vector<double>(mDataY.size(), 1.0);
+      mDataUncertaintyY = Vector<U>(mDataY.size(), 1);
       for (int i=0; i<mDataWeightY.size(); ++i){
-	if (mDataWeightY[i]<0.0) mDataUncertaintyY[i]=1.0;
+	if (mDataWeightY[i]<0) mDataUncertaintyY[i]=U(1);
       }
     }      
 
@@ -889,8 +906,8 @@ void ChiSqFunc<S,T,U> ::finalize_setup(){
     if (neg>0 && mDataUncertaintyY.size() == mDataY.size()){
       int notOK1=0, notOK2=0;
       for (int i=0; i<mDataWeightY.size(); ++i){
-	if (mDataWeightY[i]<0.0 && mDataUncertaintyY[i]<0.0) notOK1++;
-	if (mDataWeightY[i]>0.0 && mDataUncertaintyY[i]>0.0) notOK2++;
+	if (mDataWeightY[i]<0 && mDataUncertaintyY[i]<0) notOK1++;
+	if (mDataWeightY[i]>0 && mDataUncertaintyY[i]>0) notOK2++;
       }
       if (notOK1>0 || notOK2>0)
 	aborterror("Weight and uncertainty vectors OK, but uncertainty vector elements not consistent with weight elements.");
@@ -904,10 +921,10 @@ void ChiSqFunc<S,T,U> ::finalize_setup(){
   // Normalize weights:
   double tmp=0.0;
   for (int i=0; i<mDataWeightY.size(); ++i)
-    if (mDataWeightY[i]>0.0) tmp += mDataWeightY[i]*mDataWeightY[i];
+    if (mDataWeightY[i]>0) tmp += double(mDataWeightY[i])*double(mDataWeightY[i]);
   tmp = 1.0/sqrt(tmp);
   for (int i=0; i<mDataWeightY.size(); ++i)
-    if (mDataWeightY[i]>0.0) mDataWeightY[i] *= tmp;
+    if (mDataWeightY[i]>0) mDataWeightY[i] = U(tmp * double(mDataWeightY[i]));
 
 
 
@@ -920,14 +937,14 @@ void ChiSqFunc<S,T,U> ::finalize_setup(){
 
   mDataScaleY.resize( mDataY.size() );
   for (int i=0; i<mDataY.size(); ++i)
-    mDataScaleY[i] = 1.0;
+    mDataScaleY[i] = U(1);
 
   if (muse_scales){
     // Set scales of DataY
     for (int i=0; i<mDataY.size(); ++i){
       mDataScaleY[i] = ((mDataY[i] < 0) ? -1 : 1) * mDataY[i];
-      if (mDataScaleY[i] < eps)
-	mDataScaleY[i] = eps;
+      if (double(mDataScaleY[i]) < eps)
+	mDataScaleY[i] = U(eps);
     }
   }
 
@@ -1003,12 +1020,10 @@ void ChiSqFunc<S,T,U> ::calc_f(void){
 
 
   for (int i=0; i!=N; ++i){
-    double td = mDataWeightY[i];
-    if (mDataWeightY[i]<0.0) td = 1.0/mDataUncertaintyY[i];
+    double td = double(mDataWeightY[i]);
+    if (mDataWeightY[i]<0) td = 1.0/double(mDataUncertaintyY[i]);
     
-    mf[i] = td
-      * (double(mDataY[i]) - double(mModelDataY[i]))
-      / double(mDataScaleY[i]);
+    mf[i] = td * (double(mDataY[i]) - double(mModelDataY[i])) / double(mDataScaleY[i]);
     
     /*
       cout << "data point " << i << "  uncert " << double(mDataUncertaintyY[i])
@@ -1181,15 +1196,26 @@ void ChiSqFunc<S,T,U> ::calc_df_dx(void){
     dx = pow(eps, 1.0/3.0);
     if (tmpx>eps) dx = tmpx * dx;
 
-    // Positive perturbation in parameter:
-    Xf[ix] = bakxi + dx;
-    mParam.Xupdate(Xf);
-    MDataY1 = (mModelFuncPointer)(mParam, mDataX);
 
+    bool do_inc1=true, do_inc2=true;
+
+    // Positive perturbation in parameter:
+    try {
+      Xf[ix] = bakxi + dx; mParam.Xupdate(Xf); // *** FAILS IF Xf[ix] CLOSE TO UPPER LIMIT !!! ***
+    } catch (bad_point & e1){
+      do_inc1 = false; Xf[ix] = bakxi; mParam.Xupdate(Xf);
+    }
+    if (do_inc1) MDataY1 = (mModelFuncPointer)(mParam, mDataX);
+    else MDataY1 = ModelDataY();
+    
     // Negative perturbation in parameter:
-    Xf[ix] = bakxi - dx;
-    mParam.Xupdate(Xf);
-    MDataY2 = (mModelFuncPointer)(mParam, mDataX);
+    try {
+      Xf[ix] = bakxi - dx; mParam.Xupdate(Xf); // *** FAILS IF Xf[ix] CLOSE TO LOWER LIMIT !!! ***
+    } catch (bad_point & e1){
+      do_inc2 = false; Xf[ix] = bakxi; mParam.Xupdate(Xf);
+    }
+    if (do_inc2) MDataY2 = (mModelFuncPointer)(mParam, mDataX);
+    else MDataY2 = ModelDataY();
 
     // Reset:
     Xf[ix] = bakxi;
@@ -1200,9 +1226,13 @@ void ChiSqFunc<S,T,U> ::calc_df_dx(void){
       double td = mDataWeightY[i];
       if (mDataWeightY[i]<0.0) td = 1.0/mDataUncertaintyY[i];
 
-      mJ.elem(i, ix) = - td
-	* double( (MDataY1[i] - MDataY2[i])/U(2*dx) )
-	/ double(mDataScaleY[i]);
+      double den, num;
+      den = double(MDataY1[i]) - double(MDataY2[i]);
+
+      if   (do_inc1 && do_inc2) num = 2*dx;
+      else num = dx;
+
+      mJ.elem(i, ix) = - td * (den / num) / double(mDataScaleY[i]);
     }
 
   }
@@ -1268,6 +1298,11 @@ Vector < Matrix<double> > ChiSqFunc<S,T,U> ::d2f_dx1dx2(void){
   Vector<U> MDataY1, MDataY2, MDataY3, MDataY4;
   double eps = utils::eps_d();
 
+  bool do_pt1, do_pt2;
+  bool do_inc1, do_inc2, do_inc3, do_inc4;
+  bool ok_pos_step1=true, ok_pos_step2=true;
+  bool ok_neg_step1=true, ok_neg_step2=true;
+
 
   fpp_x1x2.resize(N);
   for (int i=0; i<N; ++i)
@@ -1291,54 +1326,112 @@ Vector < Matrix<double> > ChiSqFunc<S,T,U> ::d2f_dx1dx2(void){
       dx2 = pow(eps, 1.0/3.0);
       if (tmpx2>eps) dx2 = tmpx2 * dx2;
       
+
+      ok_pos_step1=true; ok_pos_step2=true;
+      ok_neg_step1=true; ok_neg_step2=true;
+
+      // -------------------------------------------------------------------------------
       // Perturbation 1 in parameters:
-      Xf[i] = bakx1 + dx1;
-      Xf[j] = bakx2 + dx2;
-      mParam.Xupdate(Xf);
-      MDataY1 = (mModelFuncPointer)(mParam, mDataX);
+      do_pt1 = do_pt2 = true;
+      try {
+	Xf[i] = bakx1 + dx1; mParam.Xupdate(Xf);
+      } catch (bad_point & e1){
+	do_pt1 = false; Xf[i] = bakx1; mParam.Xupdate(Xf); ok_pos_step1=false;
+      }
+      try {
+	Xf[j] = bakx2 + dx2; mParam.Xupdate(Xf);
+      } catch (bad_point & e1){
+	do_pt2 = false; Xf[j] = bakx2; mParam.Xupdate(Xf); ok_pos_step2=false;
+      }
+      if (do_pt1 && do_pt2) do_inc1=true; else do_inc1=false;
+      if (!do_inc1) MDataY1 = ModelDataY();
+      else MDataY1 = (mModelFuncPointer)(mParam, mDataX);
 
+
+      // -------------------------------------------------------------------------------
       // Perturbation 2 in parameters:
-      Xf[i] = bakx1 + dx1;
-      Xf[j] = bakx2 - dx2;
-      mParam.Xupdate(Xf);
-      MDataY2 = (mModelFuncPointer)(mParam, mDataX);
+      do_pt1 = do_pt2 = true;
+      try {
+	Xf[i] = bakx1 + dx1; mParam.Xupdate(Xf);
+      } catch (bad_point & e1){
+	do_pt1 = false; Xf[i] = bakx1; mParam.Xupdate(Xf); ok_pos_step1=false;
+      }
+      try {
+	Xf[j] = bakx2 - dx2; mParam.Xupdate(Xf);
+      } catch (bad_point & e1){
+	do_pt2 = false; Xf[j] = bakx2; mParam.Xupdate(Xf); ok_neg_step2=false;
+      }
+      if (do_pt1 && do_pt2) do_inc2=true; else do_inc2=false;
+      if (!do_inc2) MDataY2 = ModelDataY();
+      else MDataY2 = (mModelFuncPointer)(mParam, mDataX);
 
+
+      // -------------------------------------------------------------------------------
       // Perturbation 3 in parameters:
-      Xf[i] = bakx1 - dx1;
-      Xf[j] = bakx2 + dx2;
-      mParam.Xupdate(Xf);
-      MDataY3 = (mModelFuncPointer)(mParam, mDataX);
+      do_pt1 = do_pt2 = true;
+      try {
+	Xf[i] = bakx1 - dx1; mParam.Xupdate(Xf);
+      } catch (bad_point & e1){
+	do_pt1 = false; Xf[i] = bakx1; mParam.Xupdate(Xf); ok_neg_step1=false;
+      }
+      try {
+	Xf[j] = bakx2 + dx2; mParam.Xupdate(Xf);
+      } catch (bad_point & e1){
+	do_pt2 = false; Xf[j] = bakx2; mParam.Xupdate(Xf); ok_pos_step2=false;
+      }
+      if (do_pt1 && do_pt2) do_inc3=true; else do_inc3=false;
+      if (!do_inc3) MDataY3 = ModelDataY();
+      else MDataY3 = (mModelFuncPointer)(mParam, mDataX);
 
+
+      // -------------------------------------------------------------------------------
       // Perturbation 4 in parameters:
-      Xf[i] = bakx1 - dx1;
-      Xf[j] = bakx2 - dx2;
-      mParam.Xupdate(Xf);
-      MDataY4 = (mModelFuncPointer)(mParam, mDataX);
+      do_pt1 = do_pt2 = true;
+      try {
+	Xf[i] = bakx1 - dx1; mParam.Xupdate(Xf);
+      } catch (bad_point & e1){
+	do_pt1 = false; Xf[i] = bakx1; mParam.Xupdate(Xf); ok_neg_step1=false;
+      }
+      try {
+	Xf[j] = bakx2 - dx2; mParam.Xupdate(Xf);
+      } catch (bad_point & e1){
+	do_pt2 = false; Xf[j] = bakx2; mParam.Xupdate(Xf); ok_neg_step2=false;
+      }
+      if (do_pt1 && do_pt2) do_inc4=true; else do_inc4=false;
+      if (!do_inc4) MDataY4 = ModelDataY();
+      else MDataY4 = (mModelFuncPointer)(mParam, mDataX);
+
+
+      // -------------------------------------------------------------------------------
 
       // Reset:
       Xf[i] = bakx1;
       Xf[j] = bakx2;
       mParam.Xupdate(Xf);
 
-
-
       for (int k=0; k!=N; ++k){
-	double td = mDataWeightY[k];
-	if (mDataWeightY[k]<0.0) td = 1.0/mDataUncertaintyY[k];
-	
-	fpp_x1x2[k].elem(i,j) = - td
-	    * ( double( (MDataY1[k] - MDataY2[k] - MDataY3[k] + MDataY4[k]) )
-		/ U(4.0*dx1*dx2) )
-	    / double(mDataScaleY[k]);
+	double td = double(mDataWeightY[k]);
+	if (mDataWeightY[k]<0) td = 1.0/double(mDataUncertaintyY[k]);
+
+	double num1=1, num2=1;
+	double den, num;
+
+	if (ok_pos_step1 && ok_neg_step1) num1 = 2.0*dx1;
+	else num1 = dx1;
+	if (ok_pos_step2 && ok_neg_step2) num2 = 2.0*dx2;
+	else num2 = dx2;
+	num = num1*num2;
+
+	den = double(MDataY1[k]) - double(MDataY2[k]) - double(MDataY3[k]) + double(MDataY4[k]);
+
+	fpp_x1x2[k].elem(i,j) = - td * ( den / num ) / double(mDataScaleY[k]);
 	  
 	// Symmetry:
 	fpp_x1x2[k].elem(j,i) = fpp_x1x2[k].elem(i,j);
       }
 
-
     }
   }
-
 
   mModelDataY = ModelDataY();
 
@@ -1350,32 +1443,103 @@ Vector < Matrix<double> > ChiSqFunc<S,T,U> ::d2f_dx1dx2(void){
 
     dx1 = pow(eps, 1.0/3.0);
     if (tmpx1>eps) dx1 = tmpx1 * dx1;
-      
-    // Perturbation 1 in parameters:
-    Xf[i] = bakx1 + 2.0 * dx1;
-    mParam.Xupdate(Xf);
-    MDataY1 = (mModelFuncPointer)(mParam, mDataX);
 
-    // Perturbation 2 in parameters:
-    Xf[i] = bakx1 - 2.0 * dx1;
-    mParam.Xupdate(Xf);
-    MDataY2 = (mModelFuncPointer)(mParam, mDataX);
+
+    bool do_pdx1, do_pdx2, do_ndx1, do_ndx2;
+
+    do_pdx1=true;
+    try {
+      Xf[i] = bakx1 + dx1; mParam.Xupdate(Xf);
+    } catch (bad_point & e1){
+      do_pdx1 = false; Xf[i] = bakx1; mParam.Xupdate(Xf);
+    }
+    do_pdx2=true;
+    try {
+      Xf[i] = bakx1 + 2*dx1; mParam.Xupdate(Xf);
+    } catch (bad_point & e1){
+      do_pdx2 = false; Xf[i] = bakx1; mParam.Xupdate(Xf);
+    }
+    do_ndx1=true;
+    try {
+      Xf[i] = bakx1 - dx1; mParam.Xupdate(Xf);
+    } catch (bad_point & e1){
+      do_ndx1 = false; Xf[i] = bakx1; mParam.Xupdate(Xf);
+    }
+    do_ndx2=true;
+    try {
+      Xf[i] = bakx1 - 2*dx1; mParam.Xupdate(Xf);
+    } catch (bad_point & e1){
+      do_ndx2 = false; Xf[i] = bakx1; mParam.Xupdate(Xf);
+    }
+
+    
+    if (do_pdx1 && do_pdx2 && do_ndx1 && do_ndx2){
+      Xf[i] = bakx1 + 2.0 * dx1; mParam.Xupdate(Xf);
+      MDataY1 = (mModelFuncPointer)(mParam, mDataX);
+      MDataY2 = ModelDataY();
+      MDataY3 = ModelDataY();
+      Xf[i] = bakx1 - 2.0 * dx1; mParam.Xupdate(Xf);
+      MDataY4 = (mModelFuncPointer)(mParam, mDataX);
+    }
+    else if (do_pdx1 && do_pdx2 && do_ndx1 && !do_ndx2){
+      Xf[i] = bakx1 + 2.0 * dx1; mParam.Xupdate(Xf);
+      MDataY1 = (mModelFuncPointer)(mParam, mDataX);
+      MDataY2 = ModelDataY();
+      Xf[i] = bakx1 + 1.0 * dx1; mParam.Xupdate(Xf);
+      MDataY3 = (mModelFuncPointer)(mParam, mDataX);
+      Xf[i] = bakx1 - 2.0 * dx1; mParam.Xupdate(Xf);
+      MDataY4 = (mModelFuncPointer)(mParam, mDataX);
+    }
+    else if (do_pdx1 && !do_pdx2 && do_ndx1 && do_ndx2){
+      Xf[i] = bakx1 + 1.0 * dx1; mParam.Xupdate(Xf);
+      MDataY1 = (mModelFuncPointer)(mParam, mDataX);
+      Xf[i] = bakx1 - 1.0 * dx1; mParam.Xupdate(Xf);
+      MDataY2 = (mModelFuncPointer)(mParam, mDataX);
+      MDataY3 = ModelDataY();
+      Xf[i] = bakx1 - 2.0 * dx1; mParam.Xupdate(Xf);
+      MDataY4 = (mModelFuncPointer)(mParam, mDataX);
+    }
+    else if (do_pdx1 && do_pdx2 && !do_ndx1 && !do_ndx2){
+      Xf[i] = bakx1 + 2.0 * dx1; mParam.Xupdate(Xf);
+      MDataY1 = (mModelFuncPointer)(mParam, mDataX);
+      Xf[i] = bakx1 + 1.0 * dx1; mParam.Xupdate(Xf);
+      MDataY2 = (mModelFuncPointer)(mParam, mDataX);
+      MDataY3 = MDataY2;
+      MDataY4 = ModelDataY();
+    }
+    else if (!do_pdx1 && !do_pdx2 && do_ndx1 && do_ndx2){
+      MDataY1 = ModelDataY();
+      Xf[i] = bakx1 - 1.0 * dx1; mParam.Xupdate(Xf);
+      MDataY2 = (mModelFuncPointer)(mParam, mDataX);
+      MDataY3 = MDataY2;
+      Xf[i] = bakx1 - 2.0 * dx1; mParam.Xupdate(Xf);
+      MDataY4 = (mModelFuncPointer)(mParam, mDataX);
+    }
+    else {
+      MDataY1 = ModelDataY();
+      MDataY2 = ModelDataY();
+      MDataY3 = ModelDataY();
+      MDataY4 = ModelDataY();
+    }
 
     // Reset:
     Xf[i] = bakx1;
     mParam.Xupdate(Xf);
 
-
     for (int k=0; k!=N; ++k){
-      double td = mDataWeightY[k];
-      if (mDataWeightY[k]<0.0) td = 1.0/mDataUncertaintyY[k];
+      double td = double(mDataWeightY[k]);
+      if (mDataWeightY[k]<0) td = 1.0/double(mDataUncertaintyY[k]);
 
-      fpp_x1x2[k].elem(i,i) = - td
-	* ( double( (MDataY1[k] - 2.0 * mModelDataY[k] + MDataY2[k]) )
-	    / U(4.0*dx1*dx1) )
-	/ double(mDataScaleY[k]);
+      double den, num;
+      den = double(MDataY1[k]) - double(MDataY2[k]) - double(MDataY3[k]) + double(MDataY4[k]);
+      num = 4.0 * dx1 * dx1;
+      if      ( do_pdx1 &&  do_pdx2 &&  do_ndx1 && !do_ndx2) num = 2.0*dx1*dx1;
+      else if ( do_pdx1 && !do_pdx2 &&  do_ndx1 &&  do_ndx2) num = 2.0*dx1*dx1;
+      else if ( do_pdx1 &&  do_pdx2 && !do_ndx1 && !do_ndx2) num = 2.0*dx1*dx1;
+      else if (!do_pdx1 && !do_pdx2 &&  do_ndx1 &&  do_ndx2) num = 2.0*dx1*dx1;
+
+      fpp_x1x2[k].elem(i,i) = - td * ( den / num ) / double(mDataScaleY[k]);
     }
-
   }
 
   return fpp_x1x2;
