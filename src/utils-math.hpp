@@ -66,12 +66,12 @@ namespace utils {
     if (absx < eps && absy < eps) return true;
 
     if (x>0 && y>0 &&
-	( ( x < y*(1+eps) && x > y*(1-eps) ) ||
-	  ( y < x*(1+eps) && y > x*(1-eps) ) ) ) return true;
+	( ( (x < y*(1+eps)) && (x > y*(1-eps)) ) ||
+	  ( (y < x*(1+eps)) && (y > x*(1-eps)) ) ) ) return true;
 
     if ( x<0 && y<0 &&
-	 ( (x < y + absy*eps) && (x > y - absy*eps) ) ||
-	 ( (y < x + absx*eps) && (y > x - absx*eps) ) ) return true;
+	 ( ( (x < y + absy*eps) && (x > y - absy*eps) ) ||
+	   ( (y < x + absx*eps) && (y > x - absx*eps) ) ) ) return true;
     
     return false;
 

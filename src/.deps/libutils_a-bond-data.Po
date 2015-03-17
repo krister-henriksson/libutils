@@ -1,0 +1,6 @@
+libutils_a-bond-data.o: bond-data.cpp /usr/include/stdc-predef.h \
+ bond-data.hpp
+
+/usr/include/stdc-predef.h:
+
+bond-data.hpp:

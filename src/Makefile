@@ -137,7 +137,7 @@ am_libutils_a_OBJECTS = libutils_a-atomsystem-box.$(OBJEXT) \
 	libutils_a-atomsystem.$(OBJEXT) \
 	libutils_a-atomsystem-dist.$(OBJEXT) \
 	libutils_a-atomsystem-frame.$(OBJEXT) \
-	libutils_a-atomsystem-nbor.$(OBJEXT) \
+	libutils_a-atomsystem-nbor.$(OBJEXT) libutils_a-bond.$(OBJEXT) \
 	libutils_a-funcfit-basics.$(OBJEXT) \
 	libutils_a-mtwister.$(OBJEXT) libutils_a-omp-basics.$(OBJEXT) \
 	libutils_a-param.$(OBJEXT) libutils_a-utils-errors.$(OBJEXT) \
@@ -151,11 +151,11 @@ libutils_la_LIBADD =
 am_libutils_la_OBJECTS = libutils_la-atomsystem-box.lo \
 	libutils_la-atomsystem.lo libutils_la-atomsystem-dist.lo \
 	libutils_la-atomsystem-frame.lo libutils_la-atomsystem-nbor.lo \
-	libutils_la-funcfit-basics.lo libutils_la-mtwister.lo \
-	libutils_la-omp-basics.lo libutils_la-param.lo \
-	libutils_la-utils-errors.lo libutils_la-utils-rototrans.lo \
-	libutils_la-utils-streamio.lo libutils_la-utils-string.lo \
-	libutils_la-utils-vecalg.lo
+	libutils_la-bond.lo libutils_la-funcfit-basics.lo \
+	libutils_la-mtwister.lo libutils_la-omp-basics.lo \
+	libutils_la-param.lo libutils_la-utils-errors.lo \
+	libutils_la-utils-rototrans.lo libutils_la-utils-streamio.lo \
+	libutils_la-utils-string.lo libutils_la-utils-vecalg.lo
 libutils_la_OBJECTS = $(am_libutils_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -353,6 +353,7 @@ atomsystem.cpp \
 atomsystem-dist.cpp \
 atomsystem-frame.cpp \
 atomsystem-nbor.cpp \
+bond.cpp \
 funcfit-basics.cpp \
 mtwister.cpp \
 omp-basics.cpp \
@@ -368,6 +369,7 @@ atomsystem.cpp \
 atomsystem-dist.cpp \
 atomsystem-frame.cpp \
 atomsystem-nbor.cpp \
+bond.cpp \
 funcfit-basics.cpp \
 mtwister.cpp \
 omp-basics.cpp \
@@ -379,6 +381,7 @@ utils-string.cpp \
 utils-vecalg.cpp
 
 include_HEADERS = atomsystem.hpp \
+bond.hpp \
 chisq-basics.hpp \
 constants.hpp \
 funcfit-basics.hpp \
@@ -546,6 +549,7 @@ include ./$(DEPDIR)/libutils_a-atomsystem-dist.Po
 include ./$(DEPDIR)/libutils_a-atomsystem-frame.Po
 include ./$(DEPDIR)/libutils_a-atomsystem-nbor.Po
 include ./$(DEPDIR)/libutils_a-atomsystem.Po
+include ./$(DEPDIR)/libutils_a-bond.Po
 include ./$(DEPDIR)/libutils_a-funcfit-basics.Po
 include ./$(DEPDIR)/libutils_a-mtwister.Po
 include ./$(DEPDIR)/libutils_a-omp-basics.Po
@@ -560,6 +564,7 @@ include ./$(DEPDIR)/libutils_la-atomsystem-dist.Plo
 include ./$(DEPDIR)/libutils_la-atomsystem-frame.Plo
 include ./$(DEPDIR)/libutils_la-atomsystem-nbor.Plo
 include ./$(DEPDIR)/libutils_la-atomsystem.Plo
+include ./$(DEPDIR)/libutils_la-bond.Plo
 include ./$(DEPDIR)/libutils_la-funcfit-basics.Plo
 include ./$(DEPDIR)/libutils_la-mtwister.Plo
 include ./$(DEPDIR)/libutils_la-omp-basics.Plo
@@ -660,6 +665,20 @@ libutils_a-atomsystem-nbor.obj: atomsystem-nbor.cpp
 #	$(AM_V_CXX)source='atomsystem-nbor.cpp' object='libutils_a-atomsystem-nbor.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-nbor.obj `if test -f 'atomsystem-nbor.cpp'; then $(CYGPATH_W) 'atomsystem-nbor.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-nbor.cpp'; fi`
+
+libutils_a-bond.o: bond.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-bond.o -MD -MP -MF $(DEPDIR)/libutils_a-bond.Tpo -c -o libutils_a-bond.o `test -f 'bond.cpp' || echo '$(srcdir)/'`bond.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-bond.Tpo $(DEPDIR)/libutils_a-bond.Po
+#	$(AM_V_CXX)source='bond.cpp' object='libutils_a-bond.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-bond.o `test -f 'bond.cpp' || echo '$(srcdir)/'`bond.cpp
+
+libutils_a-bond.obj: bond.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-bond.obj -MD -MP -MF $(DEPDIR)/libutils_a-bond.Tpo -c -o libutils_a-bond.obj `if test -f 'bond.cpp'; then $(CYGPATH_W) 'bond.cpp'; else $(CYGPATH_W) '$(srcdir)/bond.cpp'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-bond.Tpo $(DEPDIR)/libutils_a-bond.Po
+#	$(AM_V_CXX)source='bond.cpp' object='libutils_a-bond.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-bond.obj `if test -f 'bond.cpp'; then $(CYGPATH_W) 'bond.cpp'; else $(CYGPATH_W) '$(srcdir)/bond.cpp'; fi`
 
 libutils_a-funcfit-basics.o: funcfit-basics.cpp
 	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-funcfit-basics.o -MD -MP -MF $(DEPDIR)/libutils_a-funcfit-basics.Tpo -c -o libutils_a-funcfit-basics.o `test -f 'funcfit-basics.cpp' || echo '$(srcdir)/'`funcfit-basics.cpp
@@ -821,6 +840,13 @@ libutils_la-atomsystem-nbor.lo: atomsystem-nbor.cpp
 #	$(AM_V_CXX)source='atomsystem-nbor.cpp' object='libutils_la-atomsystem-nbor.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-atomsystem-nbor.lo `test -f 'atomsystem-nbor.cpp' || echo '$(srcdir)/'`atomsystem-nbor.cpp
+
+libutils_la-bond.lo: bond.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-bond.lo -MD -MP -MF $(DEPDIR)/libutils_la-bond.Tpo -c -o libutils_la-bond.lo `test -f 'bond.cpp' || echo '$(srcdir)/'`bond.cpp
+	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-bond.Tpo $(DEPDIR)/libutils_la-bond.Plo
+#	$(AM_V_CXX)source='bond.cpp' object='libutils_la-bond.lo' libtool=yes \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-bond.lo `test -f 'bond.cpp' || echo '$(srcdir)/'`bond.cpp
 
 libutils_la-funcfit-basics.lo: funcfit-basics.cpp
 	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-funcfit-basics.lo -MD -MP -MF $(DEPDIR)/libutils_la-funcfit-basics.Tpo -c -o libutils_la-funcfit-basics.lo `test -f 'funcfit-basics.cpp' || echo '$(srcdir)/'`funcfit-basics.cpp

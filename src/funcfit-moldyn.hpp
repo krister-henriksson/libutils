@@ -141,23 +141,29 @@ namespace funcfit {
       // ###################################################################
       while(true){
 
-	// Report
 	if (report_iter){
+	  double vb = func.value_barrier();
+	  Vector<double> gb = func.gradient_barrier();
+	  double gbmagn = gb.magn();
+
 	  if (niter==0){
-	    printf("%s%s: Iter %4d  Func %15.8e                 Grad %15.8e\n",
+	    printf("%s%s: Iter %4d   Func %15.8e Func_barrier %15.8e   "
+		   "Grad %15.8e Grad_barrier %15.8e\n",
 		   cond_print.prefix_report_iter.c_str(),
-		   methodstring.c_str(), niter, fx, gmagn);
-	    printf("Par.index  Param.  Gradient:\n");
-	    for (i=0; i<nx; ++i)
-	      printf("%5d  %20.10f  %20.10e\n", i, x[i], g[i]);
+		   methodstring.c_str(), niter, fx, vb, gmagn, gbmagn);
+	    printf("Par.index  Param.  Gradient  Gradient_barrier:\n");
+	    for (int i=0; i<nx; ++i)
+	      printf("%5d  %20.10f  %20.10e  %20.10e\n", i, x[i], g[i], gb[i]);
 	  }
 	  else {
-	    printf("%s%s: Iter %4d  Func %15.8e  Change %15.8e  Grad %15.8e\n",
+	    printf("%s%s: Iter %4d   Func %15.8e Change %15.8e   "
+		   "Func_barrier %15.8e   Grad %15.8e Grad_barrier %15.8e\n"
 		   cond_print.prefix_report_iter.c_str(),
-		   methodstring.c_str(), niter, fx, fx-fx_old, gmagn);
-	    printf("Par.index  Param.  Gradient  Step:\n");
+		   methodstring.c_str(), niter, fx, fx-fx_old,
+		   vb, gmagn, gbmagn);
+	    printf("Par.index  Param.  Gradient  Gradient_barrier  Step:\n");
 	    for (int i=0; i<nx; ++i)
-	      printf("%5d  %20.10f  %20.10e  %20.10e\n", i, x[i], g[i], h[i]);
+	      printf("%5d  %20.10f  %20.10e  %20.10e  %20.10e\n", i, x[i], g[i], gb[i], h[i]);
 	  }
 	  cout << "Reporting on parameters and data ..." << endl;
 	  func.report_on_parameters_and_data();

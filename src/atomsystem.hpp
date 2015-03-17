@@ -14,6 +14,8 @@
 #include "utils-vector.hpp"
 #include "utils-matrix.hpp"
 
+#include "bond.hpp"
+
 #include "omp-basics.hpp"
 
 using std::string;
@@ -54,6 +56,7 @@ public:
   Vector<bool> pbc;
 
   // Atom-related properties:
+  Vector<int> sitetype;
   Vector<int> type;
   Vector<int> idx;
   Vector<string> matter;
@@ -157,6 +160,21 @@ public:
   // ##################################################################################
   // ##################################################################################
 
+
+  void get_bond_list(Vector<BondData> & bond_list,
+		     string & name1,
+		     string & name2,
+		     int & nat_with_bonds,
+		     double rc12
+		     );
+
+  void get_bond_angle_list(Vector<BondAngleData> & bondangle_list,
+			   string & name1,
+			   string & name2,
+			   double rc11,
+			   double rc22,
+			   double rc12
+			   );
 
 
 

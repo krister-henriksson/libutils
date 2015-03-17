@@ -75,7 +75,9 @@ namespace funcfit {
       Vector<double> p, f, af, ag;
       Vector<double> h_gn, h_sd, h, a, b, tmpv1;
       Vector<double> p_trial, f_trial;
+
       Matrix<double> J, JTJ, JTJ_inv;
+
       double c, a_sq, ba_sq, tmp1, tmp2;
       double fp, fp_old, gmagn, hmagn;
       double alpha, beta, gain;
@@ -112,22 +114,27 @@ namespace funcfit {
 
       if (debug)
 	cout << prefix_report_debug
-		  << methodstring << ": "
-		  << "Getting auxiliary data for merit function gradient ... " << endl;
+	     << methodstring << ": "
+	     << "Getting auxiliary data for merit function gradient ... " << endl;
       f = func.f(p);
+      //cout << "made it here 001" << endl;
       J = func.J(p);
+      //cout << "made it here 002" << endl;
       if (debug)
 	cout << prefix_report_debug
-		  << methodstring << ": "
+	     << methodstring << ": "
 		  << "Getting merit function gradient ... " << endl;
+      //cout << "made it here 003" << endl;
       ag = -1.0 * func.gradient();//-1.0 * J.transpose() * f;
+      //cout << "made it here 004" << endl;
       gmagn = ag.magn();
       if (debug) 
 	cout << prefix_report_debug
 		  << methodstring << ": "
 		  << "Getting merit function value ... " << endl;
+      //cout << "made it here 005" << endl;
       fp = func.value();//0.5 * f * f;
-
+      //cout << "made it here 006" << endl;
 
 
 
@@ -142,33 +149,63 @@ namespace funcfit {
       while(true){
 
 
+	if (report_iter){
+	  double vb = func.value_barrier();
+	  Vector<double> gb = func.gradient_barrier();
+	  double gbmagn = gb.magn();
+	  
+	  if (niter==0){
+	    printf("%s%s: Iter %4d   Func %15.8e Func_barrier %15.8e   "
+		   "Grad %15.8e Grad_barrier %15.8e\n",
+		   cond_print.prefix_report_iter.c_str(),
+		   methodstring.c_str(), niter, fp, vb, gmagn, gbmagn);
+	    printf("Par.index  Param.  Gradient  Gradient_barrier:\n");
+	    for (int i=0; i<p.size(); ++i)
+	      printf("%5d  %20.10f  %20.10e  %20.10e\n", i, p[i], -1.0*ag[i], gb[i]);
+	  }
+	  else {
+	    printf("%s%s: Iter %4d   Func %15.8e Change %15.8e   "
+		   "Func_barrier %15.8e   Grad %15.8e Grad_barrier %15.8e   "
+		   "Step %15.8e  Radius %15.8e   %s %s\n",
+		   cond_print.prefix_report_iter.c_str(),
+		   methodstring.c_str(), niter, fp, fp-fp_old,
+		   vb, gmagn, gbmagn,
+		   hmagn, rt, stepmeth.c_str(), choice.c_str());
+	    printf("Par.index  Param.  Gradient  Gradient_barrier  Step:\n");
+	    for (int i=0; i<p.size(); ++i)
+	      printf("%5d  %20.10f  %20.10e  %20.10e  %20.10e\n", i, p[i], -1.0*ag[i], gb[i], h[i]);
+	  }
+	  func.report_on_parameters_and_data();
+	}
 
 
-	// Report
+	/*
 	if (report_iter){
 	  if (niter==0){
-	    printf("%s%s: Iter %4d  Func %15.8e                 Grad %15.8e\n",
+	    printf("%s%s: Iter %4d   Func %15.8e    "
+		   "Grad %15.8e\n",
 		   cond_print.prefix_report_iter.c_str(),
 		   methodstring.c_str(), niter, fp, gmagn);
-	    printf("Par.index  Param.  Gradient:\n");
-	    for (int i=0; i<ag.size(); ++i)
+	    printf("Par.index  Param.  Gradient  Gradient_barrier:\n");
+	    for (int i=0; i<p.size(); ++i)
 	      printf("%5d  %20.10f  %20.10e\n", i, p[i], -1.0*ag[i]);
 	  }
 	  else {
-	    printf("%s%s: Iter %4d  Func %15.8e  Change %15.8e  Grad %15.8e "
-		   "Step %15.8e  Radius %15.8e   %s %s\n", 
+	    printf("%s%s: Iter %4d   Func %15.8e Change %15.8e   "
+		   "Grad %15.8e    "
+		   "Step %15.8e  Radius %15.8e   %s %s\n",
 		   cond_print.prefix_report_iter.c_str(),
-		   methodstring.c_str(), niter, fp, fp-fp_old, gmagn,
+		   methodstring.c_str(), niter, fp, fp-fp_old,
+		   gmagn,
 		   hmagn, rt, stepmeth.c_str(), choice.c_str());
-	    //cout << "Chi^2 components: " << func.f() << endl;
-	    //cout << "DataY: " << func.DataY() << endl;
-	    //cout << "ModelDataY: " << func.ModelDataY() << endl;
-	    printf("Par.index  Param.  Gradient  Step:\n");
-	    for (int i=0; i<ag.size(); ++i)
+	    printf("Par.index  Param.  Gradient  Gradient_barrier  Step:\n");
+	    for (int i=0; i<p.size(); ++i)
 	      printf("%5d  %20.10f  %20.10e  %20.10e\n", i, p[i], -1.0*ag[i], h[i]);
 	  }
 	  func.report_on_parameters_and_data();
 	}
+	*/
+
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Check for convergence

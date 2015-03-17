@@ -253,21 +253,27 @@ namespace funcfit {
 	// Report
 	// *******************************************************************
 	if (report_iter){
+	  double vb = func.value_barrier();
+	  
 	  if (niter==0){
 	    printf("%s%s: Iter %4d  Func opt %15.8e now %15.8e               "
+		   "Func_barrier %15.8e "
 		   "Te %15.8e                             "
 		   "Nred %4d  Nfail %4d\n",
 		   cond_print.prefix_report_iter.c_str(),
 		   methodstring.c_str(), niter, fp_opt, fp,
+		   vb,
 		   Te,
 		   Nred, Nfail);
 	  }
 	  else {
 	    printf("%s%s: Iter %4d  Func opt %15.8e now %15.8e change %15.8e "
+		   "Func_barrier %15.8e "
 		   "Te %15.8e stepsize %15.8e step: %12s  "
 		   "Nred %4d  Nfail %4d\n",
 		   cond_print.prefix_report_iter.c_str(),
 		   methodstring.c_str(), niter, fp_opt, fp, fp-fp_old,
+		   vb,
 		   Te, hmagn, steptype.c_str(),
 		   Nred, Nfail);
 	  }

@@ -821,8 +821,8 @@ Vector<U> & ChiSqFunc<S,T,U> ::ModelDataY(void){
 // Removes DataX, DataY, DataUncertainty, DataWeightY, DataScaleY, ModelDataY
 template <typename S, typename T, typename U>
 void ChiSqFunc<S,T,U> ::clear_data(void){
-  mbarrier_scale = 1.0;
-  muse_scales = false;
+  // mbarrier_scale = 1.0;
+  // muse_scales = false;
   mDataX.resize(0);
   mDataY.resize(0);
   mDataUncertaintyY.resize(0);
@@ -1070,7 +1070,9 @@ double ChiSqFunc<S,T,U> ::value(void){
     chisq += mf[i] * mf[i];
 
   double eps = std::numeric_limits<double>::epsilon();
-  if (mbarrier_scale < eps || -mbarrier_scale < eps)
+  double tbs = mbarrier_scale;
+  if (tbs < 0.0) tbs *= -1.0; 
+  if (tbs < eps)
     return 0.5*chisq;
   else
     return 0.5*chisq + value_barrier();
@@ -1103,7 +1105,9 @@ double ChiSqFunc<S,T,U> ::value_barrier(void){
   funcfit::bad_point ebp;
 
   double eps = std::numeric_limits<double>::epsilon();
-  if (mbarrier_scale < eps || -mbarrier_scale < eps)
+  double tbs = mbarrier_scale;
+  if (tbs < 0.0) tbs *= -1.0; 
+  if (tbs < eps)
     return 0.0;
 
 
@@ -1647,7 +1651,9 @@ Vector<double> ChiSqFunc<S,T,U> ::gradient(void){
   mJ = J();
 
   double eps = std::numeric_limits<double>::epsilon();
-  if (mbarrier_scale < eps || -mbarrier_scale < eps)
+  double tbs = mbarrier_scale;
+  if (tbs < 0.0) tbs *= -1.0; 
+  if (tbs < eps)
     return mJ.transpose() * mf;
   else
     return mJ.transpose() * mf + gradient_barrier();
@@ -1680,7 +1686,9 @@ Vector<double> ChiSqFunc<S,T,U> ::gradient_barrier(void){
   int n=0;
 
   double eps = std::numeric_limits<double>::epsilon();
-  if (mbarrier_scale < eps || -mbarrier_scale < eps)
+  double tbs = mbarrier_scale;
+  if (tbs < 0.0) tbs *= -1.0; 
+  if (tbs < eps)
     return Xt;
 
 

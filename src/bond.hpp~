@@ -1,0 +1,36 @@
+
+
+
+#ifndef BOND_HPP
+#define BOND_HPP
+
+
+
+class BondData {
+public:
+  double dist;
+  int nbonds;
+
+  BondData();
+} ;
+
+
+
+
+class BondAngleData {
+public:
+  double angle;
+  double cosangle;
+  int nangles;
+  char typei;
+  char typej;
+  char typek;
+
+  BondAngleData();
+} ;
+
+
+
+
+#endif
+

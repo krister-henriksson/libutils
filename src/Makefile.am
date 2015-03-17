@@ -17,6 +17,7 @@ atomsystem.cpp \
 atomsystem-dist.cpp \
 atomsystem-frame.cpp \
 atomsystem-nbor.cpp \
+bond.cpp \
 funcfit-basics.cpp \
 mtwister.cpp \
 omp-basics.cpp \
@@ -32,6 +33,7 @@ atomsystem.cpp \
 atomsystem-dist.cpp \
 atomsystem-frame.cpp \
 atomsystem-nbor.cpp \
+bond.cpp \
 funcfit-basics.cpp \
 mtwister.cpp \
 omp-basics.cpp \
@@ -43,6 +45,7 @@ utils-string.cpp \
 utils-vecalg.cpp
 
 include_HEADERS = atomsystem.hpp \
+bond.hpp \
 chisq-basics.hpp \
 constants.hpp \
 funcfit-basics.hpp \

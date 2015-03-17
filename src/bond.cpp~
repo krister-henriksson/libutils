@@ -1,0 +1,29 @@
+
+
+
+#include "bond.hpp"
+
+
+
+BondData::BondData(){
+  dist=0.0;
+  nbonds=0;
+}
+
+
+
+BondAngleData::BondAngleData(){
+  angle = 0.0;
+  cosangle = 0.0;
+  nangles = 0;
+  typei='A';
+  typej='A';
+  typek='A';
+}
+
+
+
+
+
+
+

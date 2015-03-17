@@ -9,7 +9,9 @@
 #include <limits>
 #include <algorithm>
 
-#include <boost/format.hpp>
+//#include <boost/format.hpp>
+//#include <boost/range/algorithm/sort.hpp>
+
 
 #include <cstdio>
 #include <cstdlib>
@@ -17,6 +19,7 @@
 #include <cmath>
 
 #include "utils.hpp"
+#include "utils-math.hpp"
 #include "utils-vector.hpp"
 #include "utils-matrix.hpp"
 #include "utils-matrix-LUdecomp.hpp"
@@ -26,16 +29,16 @@
 #include "atomsystem.hpp"
 #include "constants.hpp"
 #include "utils-errors.hpp"
+//#include "bond.hpp"
 
 
-using std::string;
-using std::vector;
 using std::cout;
 using std::endl;
 using std::ofstream;
+using std::ios;
 using std::ifstream;
 using std::istringstream;
-using std::ios;
+using std::string;
 using std::numeric_limits;
 
 using utils::Vector;
@@ -46,6 +49,8 @@ using utils::get_substrings;
 using utils::tostring;
 using utils::tostring_fmt;
 using utils::aborterror;
+using utils::fp_are_equal;
+
 using namespace constants;
 
 
@@ -273,6 +278,313 @@ void AtomSystem::calc_closepacked_volume(){
 }
 
 
+
+
+
+void AtomSystem::get_bond_list(Vector<BondData> & bond_list,
+			       string & name1,
+			       string & name2,
+			       int & nat_with_bonds,
+			       double rc12
+			       ){
+
+  // Consider A-B and B-A bonds, since they both contribute to the
+  // A-B pair (bond) energy.
+
+  double drsq=0,r,rcutsq;
+  Vector<double> posi(3), posj(3), dr(3);
+  int i,j,ij,nat = natoms(),k;
+  BondData bond;
+
+  bond_list.resize(0);
+
+  rcutsq = rc12 * rc12;
+
+  nat_with_bonds = 0;
+
+
+  for (i=0; i<nat; ++i){
+    if (matter[i] != name1 || matter[i] != name2) continue;
+
+    nat_with_bonds++;
+
+    posi[0] = pos[i][0];
+    posi[1] = pos[i][1];
+    posi[2] = pos[i][2];
+   
+    for (ij=0; ij<neighborcollection[i].size(); ++ij){
+      j = neighborcollection[i][ij];
+      if ( (matter[i] == name1 && matter[j] != name2) ||
+	   (matter[i] == name2 && matter[j] != name1) ) continue;
+      /*
+      bool c1 = ((matter[i] == name1) && (matter[j] == name2));
+      bool c2 = ((matter[j] == name1) && (matter[i] == name2));
+      // If c1 or c2 is true this pair should be investigated.
+      if ( ! (c1 || c2) ) continue;
+      */
+      //if (j<i) continue;
+      posj[0] = pos[j][0];
+      posj[1] = pos[j][1];
+      posj[2] = pos[j][2];
+
+      if (isCart){
+	drsq = 0.0;
+	dr[0] = posi[0] - posj[0];
+	while (pbc[0] && dr[0]<-0.5*boxlen[0]) dr[0] += boxlen[0];
+	while (pbc[0] && dr[0]>=0.5*boxlen[0]) dr[0] -= boxlen[0];
+	drsq += dr[0] * dr[0];
+	dr[1] = posi[1] - posj[1];
+	while (pbc[1] && dr[1]<-0.5*boxlen[1]) dr[1] += boxlen[1];
+	while (pbc[1] && dr[1]>=0.5*boxlen[1]) dr[1] -= boxlen[1];
+	drsq += dr[1] * dr[1];
+	dr[2] = posi[2] - posj[2];
+	while (pbc[2] && dr[2]<-0.5*boxlen[2]) dr[2] += boxlen[2];
+	while (pbc[2] && dr[2]>=0.5*boxlen[2]) dr[2] -= boxlen[2];
+	drsq += dr[2] * dr[2];
+      }
+      else {
+	get_atom_distance_vec(posi, posj, dr);
+	drsq = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2];
+      }
+      if (drsq>=rcutsq) continue;
+
+      r = sqrt(drsq);
+
+      bool is_present=false;
+      for (k=0; k<bond_list.size(); ++k){
+	if (fp_are_equal(bond_list[k].dist, r, 1e-3)){
+	  ++bond_list[k].nbonds;
+	  is_present=true;
+	  break;
+	}
+      }
+      if (!is_present){
+	bond.dist   = r;
+	bond.nbonds = 1;
+	bond_list.push_back(bond);
+      }
+    }
+  }
+
+  bool swapped;
+
+  while (true){
+    swapped = false;
+    for (k=0; k<bond_list.size()-1; ++k){
+      if (bond_list[k].dist > bond_list[k+1].dist){
+	BondData tbd = bond_list[k];
+	bond_list[k]   = bond_list[k+1];
+	bond_list[k+1] = tbd;
+	swapped = true; break;
+      }
+    }
+    if (!swapped) break;
+  }
+
+
+  /*
+  cout << "List of bond distances 12: " << endl;
+  for (k=0; k<bond12_list.size(); ++k) cout << bond12_list[k].dist << endl;
+  cout << "List of bond distances 21: " << endl;
+  for (k=0; k<bond21_list.size(); ++k) cout << bond21_list[k].dist << endl;
+  cout << "List of number of bonds 12: " << endl;
+  for (k=0; k<bond12_list.size(); ++k) cout << bond12_list[k].nbonds << endl;
+  cout << "List of number of bonds 21: " << endl;
+  for (k=0; k<bond21_list.size(); ++k) cout << bond21_list[k].nbonds << endl;
+  */
+
+  /* Error: call to swap() from somewhere inside std::sort()
+     is ambigous. Ambiguity is introduced via
+     using std::ios;
+     using std::iostream;
+     using std::ostream;
+     and possibly other using directives which dumps local swap()
+     names into the global namespace !!!
+  */
+
+  /*
+
+  std::vector<BondData> vecsort(bond12_list.size());
+  for (i=0; i<bond12_list.size(); ++i)
+    vecsort[i] = bond12_list[i];
+  std::sort( vecsort.begin(), vecsort.end(), compare_bonddata );
+
+  */
+
+
+
+
+}
+
+
+#if 1
+
+
+void AtomSystem::get_bond_angle_list(Vector<BondAngleData> & bondangle_list,
+				     string & name1,
+				     string & name2,
+				     double rc11,
+				     double rc22,
+				     double rc12
+				     ){
+  double drsq=0,rcsq;
+  Vector<double> posi(3), posj(3), posk(3), dr(3), drij(3), drik(3);
+  int i,j,k,ij,ik,p,nat = natoms(), it;
+  BondAngleData bondangle;
+  double costheta_ijk;
+
+  bondangle_list.resize(0);
+
+  for (i=0; i<nat; ++i){
+    //if (matter[i] != name1 || matter[i] != name2) continue;
+
+    posi[0] = pos[i][0];
+    posi[1] = pos[i][1];
+    posi[2] = pos[i][2];
+   
+    for (ij=0; ij<neighborcollection[i].size(); ++ij){
+      j = neighborcollection[i][ij];
+      if (i==j) continue;
+
+      rcsq = 0.0;
+      if      (matter[i] == name1 && matter[j] == name1) rcsq = rc11*rc11;
+      else if (matter[i] == name1 && matter[j] == name2) rcsq = rc12*rc12;
+      else if (matter[i] == name2 && matter[j] == name1) rcsq = rc12*rc12;
+      else if (matter[i] == name2 && matter[j] == name2) rcsq = rc22*rc22;
+
+      /*
+      if ( (matter[i] == name1 && matter[j] != name2) ||
+	   (matter[i] == name2 && matter[j] != name1) ) continue;
+      */
+
+      posj[0] = pos[j][0];
+      posj[1] = pos[j][1];
+      posj[2] = pos[j][2];
+      if (isCart){
+	drsq = 0.0;
+	dr[0] = posi[0] - posj[0];
+	while (pbc[0] && dr[0]<-0.5*boxlen[0]) dr[0] += boxlen[0];
+	while (pbc[0] && dr[0]>=0.5*boxlen[0]) dr[0] -= boxlen[0];
+	drsq += dr[0] * dr[0];
+	dr[1] = posi[1] - posj[1];
+	while (pbc[1] && dr[1]<-0.5*boxlen[1]) dr[1] += boxlen[1];
+	while (pbc[1] && dr[1]>=0.5*boxlen[1]) dr[1] -= boxlen[1];
+	drsq += dr[1] * dr[1];
+	dr[2] = posi[2] - posj[2];
+	while (pbc[2] && dr[2]<-0.5*boxlen[2]) dr[2] += boxlen[2];
+	while (pbc[2] && dr[2]>=0.5*boxlen[2]) dr[2] -= boxlen[2];
+	drsq += dr[2] * dr[2];
+      }
+      else {
+	get_atom_distance_vec(posi, posj, dr);
+	drsq = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2];
+      }
+      if (drsq>=rcsq) continue;
+      drij = dr;
+
+
+
+      for (ik=0; ik<neighborcollection[i].size(); ++ik){
+	k = neighborcollection[i][ik];
+	if (i==k) continue;
+	if (j==k) continue;
+
+	rcsq = 0.0;
+	if      (matter[i] == name1 && matter[k] == name1) rcsq = rc11*rc11;
+	else if (matter[i] == name1 && matter[k] == name2) rcsq = rc12*rc12;
+	else if (matter[i] == name2 && matter[k] == name1) rcsq = rc12*rc12;
+	else if (matter[i] == name2 && matter[k] == name2) rcsq = rc22*rc22;
+
+	//if (matter[k] != name1 || matter[k] != name2) continue;
+
+	posk[0] = pos[k][0];
+	posk[1] = pos[k][1];
+	posk[2] = pos[k][2];
+	if (isCart){
+	  drsq = 0.0;
+	  dr[0] = posi[0] - posk[0];
+	  while (pbc[0] && dr[0]<-0.5*boxlen[0]) dr[0] += boxlen[0];
+	  while (pbc[0] && dr[0]>=0.5*boxlen[0]) dr[0] -= boxlen[0];
+	  drsq += dr[0] * dr[0];
+	  dr[1] = posi[1] - posk[1];
+	  while (pbc[1] && dr[1]<-0.5*boxlen[1]) dr[1] += boxlen[1];
+	  while (pbc[1] && dr[1]>=0.5*boxlen[1]) dr[1] -= boxlen[1];
+	  drsq += dr[1] * dr[1];
+	  dr[2] = posi[2] - posk[2];
+	  while (pbc[2] && dr[2]<-0.5*boxlen[2]) dr[2] += boxlen[2];
+	  while (pbc[2] && dr[2]>=0.5*boxlen[2]) dr[2] -= boxlen[2];
+	  drsq += dr[2] * dr[2];
+	}
+	else {
+	  get_atom_distance_vec(posi, posk, dr);
+	  drsq = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2];
+	}
+	if (drsq>=rcsq) continue;
+	drik = dr;
+
+
+
+	costheta_ijk = drij * drik / (drij.magn() * drik.magn());
+
+	it = 0;
+	if      (matter[i]==name1 && matter[j]==name1 && matter[k]==name1) it=0;
+	else if (matter[i]==name1 && matter[j]==name1 && matter[k]==name2) it=1;
+	else if (matter[i]==name1 && matter[j]==name2 && matter[k]==name1) it=2;
+	else if (matter[i]==name1 && matter[j]==name2 && matter[k]==name2) it=3;
+	else if (matter[i]==name2 && matter[j]==name1 && matter[k]==name1) it=4;
+	else if (matter[i]==name2 && matter[j]==name1 && matter[k]==name2) it=5;
+	else if (matter[i]==name2 && matter[j]==name2 && matter[k]==name1) it=6;
+	else if (matter[i]==name2 && matter[j]==name2 && matter[k]==name2) it=7;
+
+	bool is_present=false;
+	for (p=0; p<bondangle_list.size(); ++p){
+	  if (fp_are_equal(bondangle_list[p].costheta_ijk[it], costheta_ijk, 1e-3)){
+	    ++bondangle_list[p].ntheta_ijk[it];
+	    is_present=true;
+	    break;
+	  }
+	}
+	if (!is_present){
+	  bondangle.costheta_ijk[it] = costheta_ijk;
+	  bondangle.ntheta_ijk[it]   = 1;
+	  bondangle.typei[it] = matter[i];
+	  bondangle.typej[it] = matter[j];
+	  bondangle.typek[it] = matter[k];
+	  bondangle_list.push_back(bondangle);
+	}
+
+      }
+    }
+  }
+
+
+  for (it=0; it<8; ++it){
+    if (name1 == name2 && it>=1) break;
+
+    bool swapped;
+    while (true){
+      swapped = false;
+      for (k=0; k<bondangle_list.size()-1; ++k){
+	if (bondangle_list[k].ntheta_ijk[it] < bondangle_list[k+1].ntheta_ijk[it]){
+	  BondAngleData tbd = bondangle_list[k];
+	  bondangle_list[k]   = bondangle_list[k+1];
+	  bondangle_list[k+1] = tbd;
+	  swapped = true; break;
+	}
+      }
+      if (!swapped) break;
+    }
+  }
+
+
+
+
+}
+
+
+
+
+#endif
 
 
 

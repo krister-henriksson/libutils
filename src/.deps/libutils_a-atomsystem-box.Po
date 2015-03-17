@@ -106,7 +106,20 @@ libutils_a-atomsystem-box.o: atomsystem-box.cpp \
  /usr/include/x86_64-linux-gnu/bits/stdlib.h \
  /usr/include/c++/4.8/bits/algorithmfwd.h \
  /usr/include/c++/4.8/bits/stl_heap.h \
- /usr/include/c++/4.8/bits/stl_tempbuf.h /usr/include/boost/format.hpp \
+ /usr/include/c++/4.8/bits/stl_tempbuf.h /usr/include/c++/4.8/cstring \
+ /usr/include/string.h /usr/include/x86_64-linux-gnu/bits/string3.h \
+ /usr/include/c++/4.8/cmath /usr/include/math.h \
+ /usr/include/x86_64-linux-gnu/bits/huge_val.h \
+ /usr/include/x86_64-linux-gnu/bits/huge_valf.h \
+ /usr/include/x86_64-linux-gnu/bits/huge_vall.h \
+ /usr/include/x86_64-linux-gnu/bits/inf.h \
+ /usr/include/x86_64-linux-gnu/bits/nan.h \
+ /usr/include/x86_64-linux-gnu/bits/mathdef.h \
+ /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
+ /usr/include/x86_64-linux-gnu/bits/mathinline.h utils.hpp utils-math.hpp \
+ /usr/include/c++/4.8/cfloat \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/float.h utils-vector.hpp \
+ utils-string.hpp /usr/include/boost/format.hpp \
  /usr/include/boost/detail/workaround.hpp /usr/include/boost/config.hpp \
  /usr/include/boost/config/user.hpp \
  /usr/include/boost/config/select_compiler_config.hpp \
@@ -329,23 +342,10 @@ libutils_a-atomsystem-box.o: atomsystem-box.cpp \
  /usr/include/boost/format/detail/msvc_disambiguater.hpp \
  /usr/include/boost/format/parsing.hpp \
  /usr/include/boost/format/free_funcs.hpp \
- /usr/include/boost/format/detail/unset_macros.hpp \
- /usr/include/c++/4.8/cstring /usr/include/string.h \
- /usr/include/x86_64-linux-gnu/bits/string3.h /usr/include/c++/4.8/cmath \
- /usr/include/math.h /usr/include/x86_64-linux-gnu/bits/huge_val.h \
- /usr/include/x86_64-linux-gnu/bits/huge_valf.h \
- /usr/include/x86_64-linux-gnu/bits/huge_vall.h \
- /usr/include/x86_64-linux-gnu/bits/inf.h \
- /usr/include/x86_64-linux-gnu/bits/nan.h \
- /usr/include/x86_64-linux-gnu/bits/mathdef.h \
- /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
- /usr/include/x86_64-linux-gnu/bits/mathinline.h utils.hpp \
- utils-vector.hpp utils-string.hpp utils-errors.hpp utils-matrix.hpp \
- utils-math.hpp /usr/include/c++/4.8/cfloat \
- /usr/lib/gcc/x86_64-linux-gnu/4.8/include/float.h \
- utils-matrix-LUdecomp.hpp utils-streamio.hpp atomsystem.hpp \
- omp-basics.hpp /usr/lib/gcc/x86_64-linux-gnu/4.8/include/omp.h \
- constants.hpp
+ /usr/include/boost/format/detail/unset_macros.hpp utils-errors.hpp \
+ utils-matrix.hpp utils-matrix-LUdecomp.hpp utils-streamio.hpp \
+ atomsystem.hpp bond.hpp omp-basics.hpp \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/omp.h constants.hpp
 
 /usr/include/stdc-predef.h:
 
@@ -620,6 +620,44 @@ libutils_a-atomsystem-box.o: atomsystem-box.cpp \
 /usr/include/c++/4.8/bits/stl_heap.h:
 
 /usr/include/c++/4.8/bits/stl_tempbuf.h:
+
+/usr/include/c++/4.8/cstring:
+
+/usr/include/string.h:
+
+/usr/include/x86_64-linux-gnu/bits/string3.h:
+
+/usr/include/c++/4.8/cmath:
+
+/usr/include/math.h:
+
+/usr/include/x86_64-linux-gnu/bits/huge_val.h:
+
+/usr/include/x86_64-linux-gnu/bits/huge_valf.h:
+
+/usr/include/x86_64-linux-gnu/bits/huge_vall.h:
+
+/usr/include/x86_64-linux-gnu/bits/inf.h:
+
+/usr/include/x86_64-linux-gnu/bits/nan.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathdef.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathinline.h:
+
+utils.hpp:
+
+utils-math.hpp:
+
+/usr/include/c++/4.8/cfloat:
+
+/usr/lib/gcc/x86_64-linux-gnu/4.8/include/float.h:
+
+utils-vector.hpp:
+
+utils-string.hpp:
 
 /usr/include/boost/format.hpp:
 
@@ -1107,53 +1145,17 @@ libutils_a-atomsystem-box.o: atomsystem-box.cpp \
 
 /usr/include/boost/format/detail/unset_macros.hpp:
 
-/usr/include/c++/4.8/cstring:
-
-/usr/include/string.h:
-
-/usr/include/x86_64-linux-gnu/bits/string3.h:
-
-/usr/include/c++/4.8/cmath:
-
-/usr/include/math.h:
-
-/usr/include/x86_64-linux-gnu/bits/huge_val.h:
-
-/usr/include/x86_64-linux-gnu/bits/huge_valf.h:
-
-/usr/include/x86_64-linux-gnu/bits/huge_vall.h:
-
-/usr/include/x86_64-linux-gnu/bits/inf.h:
-
-/usr/include/x86_64-linux-gnu/bits/nan.h:
-
-/usr/include/x86_64-linux-gnu/bits/mathdef.h:
-
-/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
-
-/usr/include/x86_64-linux-gnu/bits/mathinline.h:
-
-utils.hpp:
-
-utils-vector.hpp:
-
-utils-string.hpp:
-
 utils-errors.hpp:
 
 utils-matrix.hpp:
-
-utils-math.hpp:
-
-/usr/include/c++/4.8/cfloat:
-
-/usr/lib/gcc/x86_64-linux-gnu/4.8/include/float.h:
 
 utils-matrix-LUdecomp.hpp:
 
 utils-streamio.hpp:
 
 atomsystem.hpp:
+
+bond.hpp:
 
 omp-basics.hpp:
 

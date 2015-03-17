@@ -268,6 +268,8 @@ void AtomSystem::getframe(ifstream & fin,
       matter[iat] = tmatter;
       //cout << "made it here gf 00b" << endl;
       pos[iat] = tpos;
+
+      sitetype[iat] = iat;
       type[iat] = ttype;
       idx[iat] = tidx;
       //cout << "made it here gf 01" << endl;

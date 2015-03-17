@@ -74,6 +74,7 @@ AtomSystem::AtomSystem()
   Bravaismatrix_inv.elem(1,1) = 1.0;
   Bravaismatrix_inv.elem(2,2) = 1.0;
 
+  sitetype.cap(100);
   type.cap(100);
   idx.cap(100);
   matter.cap(100);
@@ -106,6 +107,7 @@ AtomSystem::AtomSystem(const AtomSystem & sys){
   Bravaismatrix_inv = sys.Bravaismatrix_inv;
   pbc = sys.pbc;
 
+  sitetype = sys.sitetype;
   type = sys.type;
   idx = sys.idx;
   pos = sys.pos;
@@ -145,6 +147,7 @@ AtomSystem & AtomSystem::operator=(const AtomSystem & sys){
   Bravaismatrix_inv = sys.Bravaismatrix_inv;
   pbc = sys.pbc;
 
+  sitetype = sys.sitetype;
   type = sys.type;
   idx = sys.idx;
   pos = sys.pos;
@@ -168,6 +171,7 @@ AtomSystem & AtomSystem::operator=(const AtomSystem & sys){
 
 // Set the number of atoms in the system to 0.
 void AtomSystem::clear_all_atoms(){
+  sitetype.cap(100);
   type.cap(100);
   idx.cap(100);
   pos.cap(100);
@@ -189,6 +193,7 @@ void AtomSystem::clear_all_atoms(){
 int AtomSystem::add_atom(){
   int nat = pos.size(); nat++;
 
+  sitetype.resize(nat);
   type.resize(nat);
   idx.resize(nat);
   pos.resize(nat);
