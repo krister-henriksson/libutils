@@ -333,7 +333,8 @@ libutils_a-param.o: param.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathinline.h utils-vector.hpp \
  /usr/include/c++/4.8/sstream /usr/include/c++/4.8/bits/sstream.tcc \
- utils-string.hpp utils-errors.hpp param.hpp funcfit-errors.hpp
+ utils-string.hpp utils-errors.hpp utils-vector3.hpp param.hpp \
+ funcfit-errors.hpp
 
 /usr/include/stdc-predef.h:
 
@@ -1106,6 +1107,8 @@ utils-vector.hpp:
 utils-string.hpp:
 
 utils-errors.hpp:
+
+utils-vector3.hpp:
 
 param.hpp:
 

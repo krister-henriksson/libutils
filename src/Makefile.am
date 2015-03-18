@@ -28,6 +28,7 @@ utils-streamio.cpp \
 utils-string.cpp \
 utils-vecalg.cpp
 
+
 libutils_a_SOURCES = atomsystem-box.cpp \
 atomsystem.cpp \
 atomsystem-dist.cpp \
@@ -43,6 +44,7 @@ utils-rototrans.cpp \
 utils-streamio.cpp \
 utils-string.cpp \
 utils-vecalg.cpp
+
 
 include_HEADERS = atomsystem.hpp \
 bond.hpp \
@@ -72,15 +74,17 @@ param.hpp \
 utils-errors.hpp \
 utils.hpp \
 utils-math.hpp \
-utils-matrix3.hpp \
 utils-matrix-Choleskydecomp.hpp \
 utils-matrix.hpp \
+utils-matrixsq3.hpp \
+utils-matrix3.hpp \
 utils-matrix-LUdecomp.hpp \
 utils-matrix-QRdecomp.hpp \
 utils-rototrans.hpp \
 utils-streamio.hpp \
 utils-string.hpp \
 utils-vecalg.hpp \
+utils-vector3.hpp \
 utils-vector.hpp
 
 

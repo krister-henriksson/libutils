@@ -4,14 +4,18 @@
 #include "utils-rototrans.hpp"
 
 
+using utils::Vector;
+using utils::Matrix;
+
+
 using utils::RotoTransOperand;
 using utils::RotoTransOperator;
 
 
 
 utils::RotoTransOperand::RotoTransOperand(){
-  v  = Vector3<double>(0.0);
-  OB = Vector3<double>(0.0);
+  v  = Vector<double>(3, 0.0);
+  OB = Vector<double>(3, 0.0);
 
   mmat.resize(4, 2);
   for (int i=0; i<4; ++i){
@@ -22,16 +26,16 @@ utils::RotoTransOperand::RotoTransOperand(){
 }
 
 
-utils::RotoTransOperand::RotoTransOperand(const Vector3<double> & iv,
-					  const Vector3<double> & iOB){
+utils::RotoTransOperand::RotoTransOperand(const Vector<double> & iv,
+					  const Vector<double> & iOB){
   v = iv;
   OB = iOB;
 }
 
 
-Vector3<double> & utils::RotoTransOperand::vector(void){ return v; }
+Vector<double> & utils::RotoTransOperand::vector(void){ return v; }
 
-Vector3<double> & utils::RotoTransOperand::vectorpoint(void){ return OB; }
+Vector<double> & utils::RotoTransOperand::vectorpoint(void){ return OB; }
 
 
 
@@ -52,7 +56,7 @@ void utils::RotoTransOperator::get_rotation_matrix(void){
   double ny = n[1];
   double nz = n[2];
 
-  MatrixSq3<double> K(0), K2(0), I(0);
+  Matrix<double> K(3,3,0), K2(3,3,0), I(3,3,0);
   K.elem(0,0) =  0.0;
   K.elem(0,1) = -nz;
   K.elem(0,2) =  ny;
@@ -71,11 +75,11 @@ void utils::RotoTransOperator::get_rotation_matrix(void){
 
 
 utils::RotoTransOperator::RotoTransOperator(){
-  R  = MatrixSq3<double>(0.0);
+  R  = Matrix<double>(3,3, 0.0);
   R.elem(0,0) = R.elem(1,1) = R.elem(2,2) = 1.0;
-  T  = Vector3<double>(0.0);
-  n  = Vector3<double>(0.0);
-  OA = Vector3<double>(0.0);
+  T  = Vector<double>(3, 0.0);
+  n  = Vector<double>(3, 0.0);
+  OA = Vector<double>(3, 0.0);
   angle = 0.0;
 
   mmat.resize(4, 6);
@@ -94,9 +98,9 @@ utils::RotoTransOperator::RotoTransOperator(){
 
 
 
-utils::RotoTransOperator::RotoTransOperator(const Vector3<double> & in,
+utils::RotoTransOperator::RotoTransOperator(const Vector<double> & in,
 					    const double theta,
-					    const Vector3<double> & iOA
+					    const Vector<double> & iOA
 					    ){
   n  = in;
   OA = iOA;
@@ -106,37 +110,37 @@ utils::RotoTransOperator::RotoTransOperator(const Vector3<double> & in,
 }
 
 
-utils::RotoTransOperator::RotoTransOperator(const Vector3<double> & iT){
+utils::RotoTransOperator::RotoTransOperator(const Vector<double> & iT){
   T = iT;
 }
 
 
 
 
-MatrixSq3<double> & utils::RotoTransOperator::rotation_matrix(void){ return R; }
-Vector3<double>   & utils::RotoTransOperator::rotation_axis(void){ return n; }
-double            & utils::RotoTransOperator::rotation_angle(void){ return angle; }
-Vector3<double>   & utils::RotoTransOperator::rotation_axispoint(void){ return OA; }
-Vector3<double>   & utils::RotoTransOperator::translation(void){ return T; }
+Matrix<double> & utils::RotoTransOperator::rotation_matrix(void){ return R; }
+Vector<double> & utils::RotoTransOperator::rotation_axis(void){ return n; }
+double         & utils::RotoTransOperator::rotation_angle(void){ return angle; }
+Vector<double> & utils::RotoTransOperator::rotation_axispoint(void){ return OA; }
+Vector<double> & utils::RotoTransOperator::translation(void){ return T; }
 
 
 
 
 
-void utils::RotoTransOperator::rotate_vector(Vector3<double> & v,
-					     Vector3<double> & vrot){
+void utils::RotoTransOperator::rotate_vector(Vector<double> & v,
+					     Vector<double> & vrot){
   vrot = R * v;
 }
 
 
-void utils::RotoTransOperator::rotate_vector_startpoint(Vector3<double> & P,
-							Vector3<double> & Prot){
+void utils::RotoTransOperator::rotate_vector_startpoint(Vector<double> & P,
+							Vector<double> & Prot){
 
-  Vector3<double> OB(0), AB(0), AD(0), DB(0), DB_rot(0), OB_rot(0);
+  Vector<double> OB(3,0), AB(3,0), AD(3,0), DB(3,0), DB_rot(3,0), OB_rot(3,0);
 
   OB = P;
 
-  // Vector3 from point on axis:
+  // Vector from point on axis:
   AB = OB - OA;
   // Projection onto axis:
   AD = scalarproduct(AB, n) * n;
@@ -151,11 +155,11 @@ void utils::RotoTransOperator::rotate_vector_startpoint(Vector3<double> & P,
 
 void utils::RotoTransOperator::rotate(RotoTransOperand & opv,
 				      RotoTransOperand & opv_rot){
-  Vector3<double> vec  = opv.vector();
-  Vector3<double> vecP = opv.vectorpoint();
+  Vector<double> vec  = opv.vector();
+  Vector<double> vecP = opv.vectorpoint();
   
-  Vector3<double> vec_rot(0);
-  Vector3<double> vecP_rot(0);
+  Vector<double> vec_rot(3,0);
+  Vector<double> vecP_rot(3,0);
 
   this->rotate_vector(vec, vec_rot);
 

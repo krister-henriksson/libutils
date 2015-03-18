@@ -5,9 +5,9 @@
 
 
 #include "constants.hpp"
+#include "utils-vecalg.hpp"
 #include "utils-errors.hpp"
 
-#include "utils-vecalg.hpp"
 
 using namespace constants;
 using utils::aborterror;
@@ -23,10 +23,11 @@ using utils::aborterror;
    Rotation axis passes through the origin (0,0,0).
    ###############################################################
  */
-void utils::get_rotation_matrix(MatrixSq3<double> & R,
+void utils::get_rotation_matrix(Matrix<double> & R,
 				const double & th,
 				const int axis
 				){
+  if (R.ncols()!=3 && R.nrows()!=3) R.resize(3,3);
   for (int i=0; i<3; ++i) for (int j=0; j<3; ++j) R.elem(i,j)=0.0;
     
   double c = cos(th);
@@ -78,11 +79,11 @@ void utils::get_rotation_matrix(MatrixSq3<double> & R,
   return;
 }
 
-void utils::get_improper_rotation_matrix(MatrixSq3<double> & R,
+void utils::get_improper_rotation_matrix(Matrix<double> & R,
 					 const double & th,
 					 const int axis
 					 ){
-  MatrixSq3<double> I(0), IR(0);
+  Matrix<double> I(3,3,0), IR(3,3,0);
   I.elem(0,0) = I.elem(1,1) = I.elem(2,2) = -1.0;
 
   utils::get_rotation_matrix(R, th, axis);
@@ -98,9 +99,10 @@ void utils::get_improper_rotation_matrix(MatrixSq3<double> & R,
    The plane passes through the origin (0,0,0).
    ###############################################################
  */
-void utils::get_reflection_matrix(MatrixSq3<double> & R,
+void utils::get_reflection_matrix(Matrix<double> & R,
 				  const int axis
 				  ){
+  if (R.ncols()!=3 && R.nrows()!=3) R.resize(3,3);
   for (int i=0; i<3; ++i) for (int j=0; j<3; ++j) R.elem(i,j)=0.0;
 
   if (axis==0){
@@ -155,13 +157,16 @@ void utils::get_reflection_matrix(MatrixSq3<double> & R,
    Rotation axis passes through the origin (0,0,0).
    ###############################################################
  */
-void utils::get_rotation_matrix_u(MatrixSq3<double> & R,
-				  const Vector3<double> & u,
+void utils::get_rotation_matrix_u(Matrix<double> & R,
+				  const Vector<double> & u,
 				  const double & th
 				  ){
+  if (R.ncols()!=3 && R.nrows()!=3) R.resize(3,3);
   for (int i=0; i<3; ++i) for (int j=0; j<3; ++j) R.elem(i,j)=0.0;
 
-  Vector3<double> n = u;
+  if (u.size()!=3) aborterror("ERROR: get_rotation_matrix vector u does not contain 3 elements!");
+
+  Vector<double> n = u;
   n.normalize();
 
   double c = cos(th);
@@ -170,7 +175,7 @@ void utils::get_rotation_matrix_u(MatrixSq3<double> & R,
   double ny = n[1];
   double nz = n[2];
 
-  MatrixSq3<double> K(0), K2(0), I(0);
+  Matrix<double> K(3,3,0), K2(3,3,0), I(3,3,0);
   K.elem(0,0) =  0.0;
   K.elem(0,1) = -nz;
   K.elem(0,2) =  ny;
@@ -185,7 +190,7 @@ void utils::get_rotation_matrix_u(MatrixSq3<double> & R,
 
 
   R = I + s * K + (1.0 - c) * K2;
-  Vector3<double> tmp(0.5);// tmp[0]=tmp[1]=tmp[2]=0.5;
+  Vector<double> tmp(3,0); tmp[0]=tmp[1]=tmp[2]=0.5;
   //cout << "Rotation matrix times (0.5, 0.5, 0.5) = " << R * tmp << endl;
 
   return;
@@ -194,12 +199,12 @@ void utils::get_rotation_matrix_u(MatrixSq3<double> & R,
 
 
 
-void utils::get_improper_rotation_matrix_u(MatrixSq3<double> & R,
-					   const Vector3<double> & u,
+void utils::get_improper_rotation_matrix_u(Matrix<double> & R,
+					   const Vector<double> & u,
 					   const double & th
 					   ){
 
-  MatrixSq3<double> I(0), IR(0);
+  Matrix<double> I(3,3,0), IR(3,3,0);
   I.elem(0,0) = I.elem(1,1) = I.elem(2,2) = -1.0;
 
   utils::get_rotation_matrix_u(R, u, th);
@@ -216,24 +221,24 @@ void utils::get_improper_rotation_matrix_u(MatrixSq3<double> & R,
 /* ###############################################################
    Rotation around an axis specified by a direction vector.
    Rotation axis passes through the point A.
-   Vector3 to be rotated starts at the point B.
+   Vector to be rotated starts at the point B.
    Rotated vector starts at the point 'OB_rot'.
    ###############################################################
  */
 
 // 1. Call: get_rotation_matrix_u(R, axis, th) to get R.
 // 2. Call this function using this R:
-void utils::rotate_around_axis_u(const MatrixSq3<double> & R,
-				 const Vector3<double> & axis,
-				 const Vector3<double> & OA, // axis_point
-				 const Vector3<double> & vec,
-				 const Vector3<double> & OB, // vec_point
-				 Vector3<double> & vec_rot,
-				 Vector3<double> & OB_rot
+void utils::rotate_around_axis_u(const Matrix<double> & R,
+				 const Vector<double> & axis,
+				 const Vector<double> & OA, // axis_point
+				 const Vector<double> & vec,
+				 const Vector<double> & OB, // vec_point
+				 Vector<double> & vec_rot,
+				 Vector<double> & OB_rot
 				 ){
 
-  Vector3<double> AB(0), AD(0), DB(0), DB_rot(0);
-  Vector3<double> kvec(axis);
+  Vector<double> AB(3,0), AD(3,0), DB(3,0), DB_rot(3,0);
+  Vector<double> kvec(axis);
 
   // Rotate vector 'vec':
   vec_rot  = R * vec;
@@ -253,17 +258,19 @@ void utils::rotate_around_axis_u(const MatrixSq3<double> & R,
    'nvec' = 'vec' x 'uvec' (vector product).
    The angle is 'th' = acos( 'vec' * 'uvec' / (|'vec'| * |'uvec'|) ).
    The axis 'nvec' passes through point E.
-   Vector3 to be rotated starts at the point B.
+   Vector to be rotated starts at the point B.
    Rotated vector starts at the point 'OB_rot'.
    ###############################################################
  */
 
-void utils::get_matrix_for_rotation_to_coincide_with_axis(MatrixSq3<double> & R,
-							  const Vector3<double> & dir,
-							  const Vector3<double> & vec_to_align
+void utils::get_matrix_for_rotation_to_coincide_with_axis(Matrix<double> & R,
+							  const Vector<double> & dir,
+							  const Vector<double> & vec_to_align
 							  ){
-  Vector3<double> nvec(0);
+  Vector<double> nvec(3,0);
   double th;
+
+  if (R.nrows()!=3 || R.ncols()!=3) R.resize(3,3);
 
   vectorproduct(vec_to_align, dir, nvec);
   nvec.normalize();
@@ -278,19 +285,19 @@ void utils::get_matrix_for_rotation_to_coincide_with_axis(MatrixSq3<double> & R,
 
 // 1. Call: get_matrix_for_rotation_to_coincide_with_axis(R, dir, vec_to_align) to get R.
 // 2. Call this using this R:
-void utils::rotate_to_coincide_with_axis(MatrixSq3<double> & R,
-					 const Vector3<double> & dir,
-					 const Vector3<double> & vec_to_align,
+void utils::rotate_to_coincide_with_axis(Matrix<double> & R,
+					 const Vector<double> & dir,
+					 const Vector<double> & vec_to_align,
 					 // vec_to_align starts at this point:
-					 const Vector3<double> & OB,
+					 const Vector<double> & OB,
 					 // the normal to the plane formed by dir and
 					 // vec_to_align passes through this point:
-					 const Vector3<double> & OA,
+					 const Vector<double> & OA,
 					 // rotated vec_to_align will start at this point:
-					 Vector3<double> & OB_rot
+					 Vector<double> & OB_rot
 					 ){
 
-  Vector3<double> nvec(0);
+  Vector<double> nvec(3,0);
 
   vectorproduct(vec_to_align, dir, nvec);
 
@@ -299,14 +306,14 @@ void utils::rotate_to_coincide_with_axis(MatrixSq3<double> & R,
 
 
 
-void utils::rotate_vec_start_point(const MatrixSq3<double> & R,
-				   const Vector3<double> & axis,
-				   const Vector3<double> & axis_point, // OA,
-				   const Vector3<double> & vec_start,  // OB
-				   Vector3<double> & vec_start_rot     // OB_rot
+void utils::rotate_vec_start_point(const Matrix<double> & R,
+				   const Vector<double> & axis,
+				   const Vector<double> & axis_point, // OA,
+				   const Vector<double> & vec_start,  // OB
+				   Vector<double> & vec_start_rot     // OB_rot
 				   ){
 
-  Vector3<double> nvec(0), OA(0), OB(0), AB(0), AD(0), DB(0), DB_rot(0), OB_rot(0);
+  Vector<double> nvec(3,0), OA(3,0), OB(3,0), AB(3,0), AD(3,0), DB(3,0), DB_rot(3,0), OB_rot(3,0);
 
   nvec = axis;
   nvec.normalize();
@@ -314,7 +321,7 @@ void utils::rotate_vec_start_point(const MatrixSq3<double> & R,
   OA = axis_point;
   OB = vec_start;
 
-  // Vector3 from point on axis:
+  // Vector from point on axis:
   AB = OB - OA;
   // Projection onto axis:
   AD = scalarproduct(AB, nvec) * nvec;

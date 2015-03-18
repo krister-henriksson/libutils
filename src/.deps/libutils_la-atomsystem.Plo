@@ -340,9 +340,9 @@ libutils_la-atomsystem.lo: atomsystem.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathinline.h utils.hpp \
- utils-vector.hpp utils-string.hpp utils-errors.hpp utils-matrix.hpp \
- utils-math.hpp /usr/include/c++/4.8/cfloat \
- /usr/lib/gcc/x86_64-linux-gnu/4.8/include/float.h \
+ utils-vector.hpp utils-string.hpp utils-errors.hpp utils-vector3.hpp \
+ utils-matrix.hpp utils-math.hpp /usr/include/c++/4.8/cfloat \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/float.h utils-matrixsq3.hpp \
  utils-matrix-LUdecomp.hpp utils-streamio.hpp atomsystem.hpp bond.hpp \
  omp-basics.hpp /usr/lib/gcc/x86_64-linux-gnu/4.8/include/omp.h \
  constants.hpp
@@ -1141,6 +1141,8 @@ utils-string.hpp:
 
 utils-errors.hpp:
 
+utils-vector3.hpp:
+
 utils-matrix.hpp:
 
 utils-math.hpp:
@@ -1148,6 +1150,8 @@ utils-math.hpp:
 /usr/include/c++/4.8/cfloat:
 
 /usr/lib/gcc/x86_64-linux-gnu/4.8/include/float.h:
+
+utils-matrixsq3.hpp:
 
 utils-matrix-LUdecomp.hpp:
 

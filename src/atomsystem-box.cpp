@@ -21,7 +21,9 @@
 #include "utils.hpp"
 #include "utils-math.hpp"
 #include "utils-vector.hpp"
+#include "utils-vector3.hpp"
 #include "utils-matrix.hpp"
+#include "utils-matrixsq3.hpp"
 #include "utils-matrix-LUdecomp.hpp"
 #include "utils-string.hpp"
 #include "utils-streamio.hpp"
@@ -42,7 +44,9 @@ using std::string;
 using std::numeric_limits;
 
 using utils::Vector;
+using utils::Vector3;
 using utils::Matrix;
+using utils::MatrixSq3;
 using utils::LUdecomp;
 using utils::get_line;
 using utils::get_substrings;
@@ -64,13 +68,13 @@ void AtomSystem::set_boxdir(const int idir,
 			    const double & py,
 			    const double & pz
 			    ){
-  if (boxdir.nrows()<3 || boxdir.ncols()<3) boxdir.resize(3,3);
+  //  if (boxdir.nrows()<3 || boxdir.ncols()<3) boxdir.resize(3,3);
   if (idir<0 || idir>=3){
     cout << "Index " << idir << " is out of range. Allowed: 0 to 2." << endl;
     exit(EXIT_FAILURE);
   }
 
-  Vector<double> tmpv(3,0.0);
+  Vector3<double> tmpv(0.0);
   tmpv[0]=px;
   tmpv[1]=py;
   tmpv[2]=pz;
@@ -79,9 +83,9 @@ void AtomSystem::set_boxdir(const int idir,
 }
 
 
-void AtomSystem::set_boxdir(const int idir, Vector<double> & p){
+void AtomSystem::set_boxdir(const int idir, Vector3<double> & p){
 
-  if (boxdir.nrows()<3 || boxdir.ncols()<3) boxdir.resize(3,3);
+  //  if (boxdir.nrows()<3 || boxdir.ncols()<3) boxdir.resize(3,3);
   if (idir<0 || idir>=3){
     cout << "Index " << idir << " is out of range. Allowed: 0 to 2." << endl;
     exit(EXIT_FAILURE);
@@ -95,11 +99,13 @@ void AtomSystem::set_boxdir(const int idir, Vector<double> & p){
 
 // Get box direction vectors:
 void AtomSystem::get_boxdir(const int idir,
-			    Vector<double> & v) const {
+			    Vector3<double> & v) const {
+  /*
   if (boxdir.nrows()<3 || boxdir.ncols()<3){
     cout << "Box has not been set yet. Exiting." << endl;
     exit(EXIT_FAILURE);
   }
+  */
   if (idir<0 || idir>=3){
     cout << "Index " << idir << " is out of range. Allowed: 0 to 2." << endl;
     exit(EXIT_FAILURE);
@@ -111,7 +117,7 @@ void AtomSystem::get_boxdir(const int idir,
 
 // Normalize the box direction vectors and build the Bravais matrix and its inverse:
 void AtomSystem::update_box_geometry(){
-  Vector<double> tmpv(3,0);
+  Vector3<double> tmpv(0);
 
   // Normalize:
   tmpv = boxdir.col(0);  tmpv.normalize();  boxdir.col(0, tmpv);
@@ -205,10 +211,10 @@ void AtomSystem::update_box_geometry(){
 
 
 void AtomSystem::calc_volume(void){
-  Vector<double> u = boxdir.col(0);
-  Vector<double> v = boxdir.col(1);
-  Vector<double> w = boxdir.col(2);
-  Vector<double> tv(3);
+  Vector3<double> u = boxdir.col(0);
+  Vector3<double> v = boxdir.col(1);
+  Vector3<double> w = boxdir.col(2);
+  Vector3<double> tv(0);
     
   tv[0] = u[1]*v[2] - u[2]*v[1];
   tv[1] = u[2]*v[0] - u[0]*v[2];
@@ -226,7 +232,7 @@ void AtomSystem::calc_volume(void){
 
 void AtomSystem::calc_closepacked_volume(){
   double drsqmin=100,drsq=0;
-  Vector<double> posi(3), posj(3), dr(3);
+  Vector3<double> posi(0), posj(0), dr(0);
   int i,j,ij,counter=0, nat = natoms();
 
 
@@ -292,7 +298,7 @@ void AtomSystem::get_bond_list(Vector<BondData> & bond_list,
   // A-B pair (bond) energy.
 
   double drsq=0,r,rcutsq;
-  Vector<double> posi(3), posj(3), dr(3);
+  Vector3<double> posi(0), posj(0), dr(0);
   int i,j,ij,nat = natoms(),k;
   BondData bond;
 
@@ -417,7 +423,7 @@ void AtomSystem::get_bond_list(Vector<BondData> & bond_list,
 }
 
 
-#if 1
+
 
 
 void AtomSystem::get_bond_angle_list(Vector<BondAngleData> & bondangle_list,
@@ -428,7 +434,7 @@ void AtomSystem::get_bond_angle_list(Vector<BondAngleData> & bondangle_list,
 				     double rc12
 				     ){
   double drsq=0,rcsq;
-  Vector<double> posi(3), posj(3), posk(3), dr(3), drij(3), drik(3);
+  Vector3<double> posi(0), posj(0), posk(0), dr(0), drij(0), drik(0);
   int i,j,k,ij,ik,p,nat = natoms(), it;
   BondAngleData bondangle;
   double costheta_ijk;
@@ -584,7 +590,7 @@ void AtomSystem::get_bond_angle_list(Vector<BondAngleData> & bondangle_list,
 
 
 
-#endif
+
 
 
 

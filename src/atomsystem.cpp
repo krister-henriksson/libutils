@@ -18,7 +18,9 @@
 
 #include "utils.hpp"
 #include "utils-vector.hpp"
+#include "utils-vector3.hpp"
 #include "utils-matrix.hpp"
+#include "utils-matrixsq3.hpp"
 #include "utils-matrix-LUdecomp.hpp"
 #include "utils-string.hpp"
 #include "utils-streamio.hpp"
@@ -39,7 +41,9 @@ using std::ios;
 using std::numeric_limits;
 
 using utils::Vector;
+using utils::Vector3;
 using utils::Matrix;
+using utils::MatrixSq3;
 using utils::LUdecomp;
 using utils::get_line;
 using utils::get_substrings;
@@ -61,10 +65,10 @@ AtomSystem::AtomSystem()
   vol_atom(-1.0),
   iframe(0),
   isCart(true),
-  boxlen(3,0.0),
-  boxdir(3, 3, 0.0),
-  Bravaismatrix_inv(3, 3, 0.0),
-  pbc(3, true)
+  boxlen(0.0),
+  boxdir(0.0),
+  Bravaismatrix_inv(0.0),
+  pbc(true)
 {
   // Default to Cartesian box:
   boxdir.elem(0,0) = 1.0;
@@ -83,10 +87,8 @@ AtomSystem::AtomSystem()
 
   neighborcollection.cap(100);
 
-
   use_def_xyz_fmt = false;
   def_xyz_fmt = "xyz";
-
 }
 
 
@@ -120,7 +122,6 @@ AtomSystem::AtomSystem(const AtomSystem & sys){
 
   use_def_xyz_fmt = sys.use_def_xyz_fmt;
   def_xyz_fmt = sys.def_xyz_fmt;
-
 }
 
 

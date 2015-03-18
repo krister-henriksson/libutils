@@ -18,7 +18,9 @@
 
 #include "utils.hpp"
 #include "utils-vector.hpp"
+#include "utils-vector3.hpp"
 #include "utils-matrix.hpp"
+#include "utils-matrixsq3.hpp"
 #include "utils-matrix-LUdecomp.hpp"
 #include "utils-string.hpp"
 #include "utils-streamio.hpp"
@@ -39,7 +41,9 @@ using std::ios;
 using std::numeric_limits;
 
 using utils::Vector;
+using utils::Vector3;
 using utils::Matrix;
+using utils::MatrixSq3;
 using utils::LUdecomp;
 using utils::get_line;
 using utils::get_substrings;
@@ -56,9 +60,9 @@ using utils::aborterror;
 // extending between -0.5 * box and 0.5 * box by default. If lowlim>0
 // then a distance of 1.0 * box is added to the calculated values to make
 // them be between 0 and box.
-void AtomSystem::get_atom_distance_vec(const Vector<double> & r1,
-				       const Vector<double> & r2,
-				       Vector<double> & v,
+void AtomSystem::get_atom_distance_vec(const Vector3<double> & r1,
+				       const Vector3<double> & r2,
+				       Vector3<double> & v,
 				       const double lowlim) const {
   double d0,d1,d2;
  
@@ -113,8 +117,8 @@ void AtomSystem::get_atom_distance_vec(const Vector<double> & r1,
 
 
 // Get the skew coordinates when Cartesian coordinates are known.
-void AtomSystem::get_coords_cart2skew(const Vector<double> & drc,
-				      Vector<double> & v,
+void AtomSystem::get_coords_cart2skew(const Vector3<double> & drc,
+				      Vector3<double> & v,
 				      const double lowlim) const {
 
   // Get distance in skew coordinate system, where periodics can be checked:
@@ -149,8 +153,8 @@ void AtomSystem::get_coords_cart2skew(const Vector<double> & drc,
 
 
 // Get the Cartesian coordinates when skew coordinates are known.
-void AtomSystem::get_coords_skew2cart(Vector<double> & drs,
-				      Vector<double> & v,
+void AtomSystem::get_coords_skew2cart(Vector3<double> & drs,
+				      Vector3<double> & v,
 				      const double lowlim) const {
   // Periodics check:
   double pf1=-0.5, pf2=0.5;
@@ -185,11 +189,11 @@ void AtomSystem::get_coords_skew2cart(Vector<double> & drs,
   - f2 in direction b = boxdir.col(0)
   - f3 in direction c = boxdir.col(0)
 */
-void AtomSystem::translate_cartpos_in_skewspace(Vector<double> & pos,
+void AtomSystem::translate_cartpos_in_skewspace(Vector3<double> & pos,
 						double f1,
 						double f2,
 						double f3){
-  Vector<double> d;
+  Vector3<double> d;
 
   // Get coordinates in skew coordinate system:
   d = pos;

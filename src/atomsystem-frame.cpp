@@ -18,7 +18,9 @@
 
 #include "utils.hpp"
 #include "utils-vector.hpp"
+#include "utils-vector3.hpp"
 #include "utils-matrix.hpp"
+#include "utils-matrixsq3.hpp"
 #include "utils-matrix-LUdecomp.hpp"
 #include "utils-string.hpp"
 #include "utils-streamio.hpp"
@@ -39,7 +41,9 @@ using std::ios;
 using std::numeric_limits;
 
 using utils::Vector;
+using utils::Vector3;
 using utils::Matrix;
+using utils::MatrixSq3;
 using utils::LUdecomp;
 using utils::get_line;
 using utils::get_substrings;
@@ -109,7 +113,7 @@ void AtomSystem::dumpframe(ofstream & fout,
 
     string boxstr = "";
     for (int i=0; i<3; ++i){
-      Vector<double> tv(3,0);
+      Vector3<double> tv(0);
       get_boxdir(i, tv);
 
       td = boxlen[i] * tv[0];
@@ -172,7 +176,7 @@ void AtomSystem::getframe(ifstream & fin,
   vector<string> args;
   string line, tmatter, tfield;
   istringstream sstream;
-  Vector<double> tbox(3,0), tpos(3,0);
+  Vector3<double> tbox(0), tpos(0);
 
   atom_counter = 0;
   this->clear_all_atoms();
@@ -242,7 +246,7 @@ void AtomSystem::getframe(ifstream & fin,
 	  sstream.str(args[10+3*i+0]); sstream >> b1; sstream.clear();
 	  sstream.str(args[10+3*i+1]); sstream >> b2; sstream.clear();
 	  sstream.str(args[10+3*i+2]); sstream >> b3; sstream.clear();
-	  Vector<double> p(3,0);
+	  Vector3<double> p(0);
 	  p[0]=b1; p[1]=b2; p[2]=b3;
 	  this->set_boxdir(i, p);
 	  //this->boxdir(i, b1,b2,b3);

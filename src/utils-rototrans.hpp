@@ -4,10 +4,13 @@
 #define UTILS_ROTOTRANS_HPP
 
 
-#include "utils-vector.hpp"
+
+#include "utils-vector3.hpp"
+#include "utils-matrixsq3.hpp"
 #include "utils-matrix.hpp"
 
-using utils::Vector;
+using utils::Vector3;
+using utils::MatrixSq3;
 using utils::Matrix;
 
 
@@ -19,14 +22,14 @@ namespace utils {
     Matrix<double> mmat;
 
   public:
-    Vector<double> v;
-    Vector<double> OB;
+    Vector3<double> v;
+    Vector3<double> OB;
     
     RotoTransOperand();
-    RotoTransOperand(const Vector<double> & iv,
-		     const Vector<double> & iOB = Vector<double>(3,0));
-    Vector<double> & vector(void);
-    Vector<double> & vectorpoint(void);
+    RotoTransOperand(const Vector3<double> & iv,
+		     const Vector3<double> & iOB = Vector3<double>(0));
+    Vector3<double> & vector(void);
+    Vector3<double> & vectorpoint(void);
 
   } ;
 
@@ -43,29 +46,29 @@ namespace utils {
     void get_rotation_matrix(void);
 
   public:
-    Matrix<double> R;
-    Vector<double> T;
-    Vector<double> n;
-    Vector<double> OA;
+    MatrixSq3<double> R;
+    Vector3<double> T;
+    Vector3<double> n;
+    Vector3<double> OA;
     double angle;
     
     RotoTransOperator();
-    RotoTransOperator(const Vector<double> & in,
+    RotoTransOperator(const Vector3<double> & in,
 		      const double th,
-		      const Vector<double> & iOA = Vector<double>(3,0));
-    RotoTransOperator(const Vector<double> & iT);
+		      const Vector3<double> & iOA = Vector3<double>(0));
+    RotoTransOperator(const Vector3<double> & iT);
 
 
-    Matrix<double> & rotation_matrix(void);
-    Vector<double> & rotation_axis(void);
-    double         & rotation_angle(void);
-    Vector<double> & rotation_axispoint(void);
-    Vector<double> & translation(void);
+    MatrixSq3<double> & rotation_matrix(void);
+    Vector3<double>   & rotation_axis(void);
+    double            & rotation_angle(void);
+    Vector3<double>   & rotation_axispoint(void);
+    Vector3<double>   & translation(void);
 
-    void rotate_vector(Vector<double> & v,
-		       Vector<double> & vrot);
-    void rotate_vector_startpoint(Vector<double> & P,
-				  Vector<double> & Prot);
+    void rotate_vector(Vector3<double> & v,
+		       Vector3<double> & vrot);
+    void rotate_vector_startpoint(Vector3<double> & P,
+				  Vector3<double> & Prot);
     void rotate(RotoTransOperand & opv,
 		RotoTransOperand & opv_rot);
 

@@ -408,15 +408,17 @@ param.hpp \
 utils-errors.hpp \
 utils.hpp \
 utils-math.hpp \
-utils-matrix3.hpp \
 utils-matrix-Choleskydecomp.hpp \
 utils-matrix.hpp \
+utils-matrixsq3.hpp \
+utils-matrix3.hpp \
 utils-matrix-LUdecomp.hpp \
 utils-matrix-QRdecomp.hpp \
 utils-rototrans.hpp \
 utils-streamio.hpp \
 utils-string.hpp \
 utils-vecalg.hpp \
+utils-vector3.hpp \
 utils-vector.hpp
 
 ma_inc = -I$(srcdir)

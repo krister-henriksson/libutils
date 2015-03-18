@@ -17,9 +17,11 @@ libutils_a-utils-vecalg.o: utils-vecalg.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/mathdef.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathinline.h constants.hpp \
- utils-vecalg.hpp utils-matrix.hpp /usr/include/c++/4.8/iostream \
- /usr/include/c++/4.8/ostream /usr/include/c++/4.8/ios \
- /usr/include/c++/4.8/iosfwd /usr/include/c++/4.8/bits/stringfwd.h \
+ utils-errors.hpp /usr/include/c++/4.8/exception \
+ /usr/include/c++/4.8/bits/atomic_lockfree_defines.h \
+ /usr/include/c++/4.8/iostream /usr/include/c++/4.8/ostream \
+ /usr/include/c++/4.8/ios /usr/include/c++/4.8/iosfwd \
+ /usr/include/c++/4.8/bits/stringfwd.h \
  /usr/include/c++/4.8/bits/memoryfwd.h \
  /usr/include/c++/4.8/bits/postypes.h /usr/include/c++/4.8/cwchar \
  /usr/include/wchar.h /usr/include/stdio.h \
@@ -27,8 +29,6 @@ libutils_a-utils-vecalg.o: utils-vecalg.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/wchar.h \
  /usr/lib/gcc/x86_64-linux-gnu/4.8/include/stddef.h \
  /usr/include/xlocale.h /usr/include/x86_64-linux-gnu/bits/wchar2.h \
- /usr/include/c++/4.8/exception \
- /usr/include/c++/4.8/bits/atomic_lockfree_defines.h \
  /usr/include/c++/4.8/bits/char_traits.h \
  /usr/include/c++/4.8/bits/stl_algobase.h \
  /usr/include/c++/4.8/bits/functexcept.h \
@@ -82,8 +82,7 @@ libutils_a-utils-vecalg.o: utils-vecalg.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/4.8/bits/locale_facets.tcc \
  /usr/include/c++/4.8/bits/basic_ios.tcc \
  /usr/include/c++/4.8/bits/ostream.tcc /usr/include/c++/4.8/istream \
- /usr/include/c++/4.8/bits/istream.tcc /usr/include/c++/4.8/sstream \
- /usr/include/c++/4.8/bits/sstream.tcc /usr/include/c++/4.8/cstdlib \
+ /usr/include/c++/4.8/bits/istream.tcc /usr/include/c++/4.8/cstdlib \
  /usr/include/stdlib.h /usr/include/x86_64-linux-gnu/bits/waitflags.h \
  /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
  /usr/include/x86_64-linux-gnu/sys/types.h \
@@ -94,11 +93,13 @@ libutils_a-utils-vecalg.o: utils-vecalg.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/sys/sysmacros.h /usr/include/alloca.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
  /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
- /usr/include/x86_64-linux-gnu/bits/stdlib.h utils.hpp utils-math.hpp \
+ /usr/include/x86_64-linux-gnu/bits/stdlib.h utils-vecalg.hpp \
+ utils-matrixsq3.hpp /usr/include/c++/4.8/sstream \
+ /usr/include/c++/4.8/bits/sstream.tcc utils.hpp utils-math.hpp \
  /usr/include/c++/4.8/limits /usr/include/c++/4.8/cfloat \
- /usr/lib/gcc/x86_64-linux-gnu/4.8/include/float.h utils-vector.hpp \
- utils-string.hpp /usr/include/c++/4.8/vector \
- /usr/include/c++/4.8/bits/stl_construct.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/include/float.h utils-vector3.hpp \
+ /usr/include/c++/4.8/stdexcept utils-string.hpp \
+ /usr/include/c++/4.8/vector /usr/include/c++/4.8/bits/stl_construct.h \
  /usr/include/c++/4.8/ext/alloc_traits.h \
  /usr/include/c++/4.8/bits/stl_uninitialized.h \
  /usr/include/c++/4.8/bits/stl_vector.h \
@@ -324,14 +325,14 @@ libutils_a-utils-vecalg.o: utils-vecalg.cpp /usr/include/stdc-predef.h \
  /usr/include/boost/smart_ptr/detail/operator_bool.hpp \
  /usr/include/boost/format/alt_sstream_impl.hpp \
  /usr/include/boost/format/format_class.hpp \
- /usr/include/boost/format/exceptions.hpp /usr/include/c++/4.8/stdexcept \
+ /usr/include/boost/format/exceptions.hpp \
  /usr/include/boost/format/format_implementation.hpp \
  /usr/include/boost/format/group.hpp \
  /usr/include/boost/format/feed_args.hpp \
  /usr/include/boost/format/detail/msvc_disambiguater.hpp \
  /usr/include/boost/format/parsing.hpp \
  /usr/include/boost/format/free_funcs.hpp \
- /usr/include/boost/format/detail/unset_macros.hpp utils-errors.hpp
+ /usr/include/boost/format/detail/unset_macros.hpp
 
 /usr/include/stdc-predef.h:
 
@@ -377,9 +378,11 @@ libutils_a-utils-vecalg.o: utils-vecalg.cpp /usr/include/stdc-predef.h \
 
 constants.hpp:
 
-utils-vecalg.hpp:
+utils-errors.hpp:
 
-utils-matrix.hpp:
+/usr/include/c++/4.8/exception:
+
+/usr/include/c++/4.8/bits/atomic_lockfree_defines.h:
 
 /usr/include/c++/4.8/iostream:
 
@@ -410,10 +413,6 @@ utils-matrix.hpp:
 /usr/include/xlocale.h:
 
 /usr/include/x86_64-linux-gnu/bits/wchar2.h:
-
-/usr/include/c++/4.8/exception:
-
-/usr/include/c++/4.8/bits/atomic_lockfree_defines.h:
 
 /usr/include/c++/4.8/bits/char_traits.h:
 
@@ -547,10 +546,6 @@ utils-matrix.hpp:
 
 /usr/include/c++/4.8/bits/istream.tcc:
 
-/usr/include/c++/4.8/sstream:
-
-/usr/include/c++/4.8/bits/sstream.tcc:
-
 /usr/include/c++/4.8/cstdlib:
 
 /usr/include/stdlib.h:
@@ -579,6 +574,14 @@ utils-matrix.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/stdlib.h:
 
+utils-vecalg.hpp:
+
+utils-matrixsq3.hpp:
+
+/usr/include/c++/4.8/sstream:
+
+/usr/include/c++/4.8/bits/sstream.tcc:
+
 utils.hpp:
 
 utils-math.hpp:
@@ -589,7 +592,9 @@ utils-math.hpp:
 
 /usr/lib/gcc/x86_64-linux-gnu/4.8/include/float.h:
 
-utils-vector.hpp:
+utils-vector3.hpp:
+
+/usr/include/c++/4.8/stdexcept:
 
 utils-string.hpp:
 
@@ -1093,8 +1098,6 @@ utils-string.hpp:
 
 /usr/include/boost/format/exceptions.hpp:
 
-/usr/include/c++/4.8/stdexcept:
-
 /usr/include/boost/format/format_implementation.hpp:
 
 /usr/include/boost/format/group.hpp:
@@ -1108,5 +1111,3 @@ utils-string.hpp:
 /usr/include/boost/format/free_funcs.hpp:
 
 /usr/include/boost/format/detail/unset_macros.hpp:
-
-utils-errors.hpp:

@@ -9,6 +9,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 
 #include <cstdlib>
 #include <cmath>
@@ -17,6 +18,8 @@
 #include "utils.hpp"
 #include "utils-string.hpp"
 #include "utils-errors.hpp"
+
+#include "utils-vector3.hpp"
 
 
 
@@ -60,14 +63,20 @@ namespace utils {
 
     Vector(const int N);
     Vector(const int N, const T & p);
+    Vector(const Vector3<T> & sv); // conversion of Vector3 to Vector
+    Vector(const T * p, int N); // Use array e.g. x, as input.
 
     Vector(const Vector & sv);
+
     Vector & operator=(const Vector & sv);
+    Vector & operator=(const Vector3<T> & sv);
 
     // Operators:
     inline       T & operator[](const int & i);
     inline const T & operator[](const int & i) const;
-    
+    void to_array(T * p);        // explicit conversion of Vector to array
+    Vector3<T> to_Vector3(void); // explicit conversion of Vector to Vector3
+
 
     inline int size() const;      // Get the number of explicitly stored elements.
     void resize(int N);           // Change the number of explicitly stored elements.
@@ -99,6 +108,9 @@ namespace utils {
 
 
   // Nonmembers:
+
+
+
 
   // Handle a + b:
   template <typename T>
@@ -204,10 +216,40 @@ utils::Vector<T>::Vector(const int N, const T & p){
   mNcap = mN + mresfrac * mN;
   if (mNcap>0){
     mvec = new T [mNcap] ();
-    for (int i=0; i<mNcap; ++i) mvec[i] = p;
+    for (int i=0; i<mN; ++i) mvec[i] = p;
   }
 }
 
+
+template <typename T>
+utils::Vector<T>::Vector(const Vector3<T> & sv){
+  mN = 3;
+  mvec = 0;
+  mresfrac = 1.0;
+  mNcap = mN + mresfrac * mN;
+  mvec = new T [mNcap] ();
+  mvec[0] = sv[0];
+  mvec[1] = sv[1];
+  mvec[2] = sv[2];
+}
+
+
+
+template <typename T>
+utils::Vector<T>::Vector(const T * p, int N){
+  mN = N < 0 ? -N : N;
+  mvec = 0;
+  mresfrac = 1.0;
+  mNcap = mN + mresfrac * mN;
+  mvec = new T [mNcap] ();
+  try {
+    for (int i=0; i<mN; ++i) mvec[i] = p[i];
+  }
+  catch (std::runtime_error & re){
+    cout << "Error: Cannot construct Vector from length-deficient array." << endl;
+    exit(EXIT_FAILURE);
+  }
+}
 
 
 
@@ -376,6 +418,31 @@ utils::Vector<T> & utils::Vector<T>::operator=(const utils::Vector<T> & sv){
 
 
 
+template <typename T>
+utils::Vector<T> & utils::Vector<T>::operator=(const utils::Vector3<T> & sv){
+
+  //  if (this==&sv) return *this;
+
+  // Delete destination, if it is allocated
+  if (mvec != 0) delete[] mvec;
+  mvec = 0;
+
+  // Allocate destination and copy
+  mN       = 3;
+  mresfrac = 1.0;
+  mNcap = mN + mresfrac * mN;
+  mvec = new T [mNcap] ();
+
+  mvec[0] = sv[0];
+  mvec[1] = sv[1];
+  mvec[2] = sv[2];
+
+  return *this;
+}
+
+
+
+
 
 
 template <typename T>
@@ -410,6 +477,34 @@ const T & utils::Vector<T>::operator[](const int & i) const {
   }
   */
   return mvec[i];
+}
+
+
+
+template <typename T>
+void utils::Vector<T>::to_array(T * p){
+  try {
+    for (int i=0; i<mN; ++i)
+      p[i] = mvec[i];
+  }
+  catch (std::runtime_error & re){
+    cout << "Error: Cannot copy Vector(" << mN << ") to length-deficient array." << endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+
+template <typename T>
+utils::Vector3<T> utils::Vector<T>::to_Vector3(void){
+  if (size()<3){
+    cout << "Error: Cannot construct Vector3 from length-deficient array." << endl;
+    exit(EXIT_FAILURE);
+  }
+  Vector3<T> r;
+  r[0] = mvec[0];
+  r[1] = mvec[1];
+  r[2] = mvec[2];
+  return r;
 }
 
 
@@ -519,6 +614,27 @@ T * utils::Vector<T>::end() const {
     return 0;
 }
 
+
+
+
+
+#if 0
+// Handle Vector3 a = Vector b:
+
+template <typename T>
+utils::Vector3<T> & utils::operator=(utils::Vector3<T> & a, const utils::Vector<T> & b){
+  if (b.size()>=3){
+    a[0]=b[0];
+    a[1]=b[1];
+    a[2]=b[2];
+  }
+  else {
+    cout << "Error: In assignment Vector3 a = Vector b the size of b is less than 3." << endl;
+    exit(EXIT_FAILURE);
+  }
+  return a;
+}
+#endif
 
 
 

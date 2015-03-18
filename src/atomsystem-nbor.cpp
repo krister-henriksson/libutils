@@ -19,7 +19,9 @@
 
 #include "utils.hpp"
 #include "utils-vector.hpp"
+#include "utils-vector3.hpp"
 #include "utils-matrix.hpp"
+#include "utils-matrixsq3.hpp"
 #include "utils-matrix-LUdecomp.hpp"
 #include "utils-string.hpp"
 #include "utils-streamio.hpp"
@@ -40,7 +42,9 @@ using std::ios;
 using std::numeric_limits;
 
 using utils::Vector;
+using utils::Vector3;
 using utils::Matrix;
+using utils::MatrixSq3;
 using utils::LUdecomp;
 using utils::get_line;
 using utils::get_substrings;
@@ -58,7 +62,7 @@ void AtomSystem:: get_all_neighborcollections(bool debug){
   int *head, *list;
   int Ncells, i, nn_tot, nat=natoms();
   double rm, rmsq, drsq, drsq_min=1e10;
-  Vector<double> rnew(3,0), posi(3,0), posj(3,0), dr(3,0);
+  Vector3<double> rnew(0), posi(0), posj(0), dr(0);
   int counter;
 
   rm = rcut + skint;

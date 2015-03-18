@@ -12,7 +12,9 @@
 
 #include "utils.hpp"
 #include "utils-vector.hpp"
+#include "utils-vector3.hpp"
 #include "utils-matrix.hpp"
+#include "utils-matrixsq3.hpp"
 
 #include "bond.hpp"
 
@@ -26,7 +28,9 @@ using std::ofstream;
 using std::ifstream;
 
 using utils::Vector;
+using utils::Vector3;
 using utils::Matrix;
+using utils::MatrixSq3;
 
 
 
@@ -50,10 +54,10 @@ public:
   bool isCart;
 
 
-  Vector<double> boxlen;
-  Matrix<double> boxdir;
-  Matrix<double> Bravaismatrix_inv;
-  Vector<bool> pbc;
+  Vector3<double> boxlen;
+  MatrixSq3<double> boxdir;
+  MatrixSq3<double> Bravaismatrix_inv;
+  Vector3<bool> pbc;
 
   // Atom-related properties:
   Vector<int> sitetype;
@@ -61,7 +65,7 @@ public:
   Vector<int> idx;
   Vector<string> matter;
   Vector<string> field;
-  Vector< Vector<double> > pos;
+  Vector< Vector3<double> > pos;
   
   Vector< Vector<int> > neighborcollection;
  
@@ -100,9 +104,9 @@ public:
 	      const double & px,
 	      const double & py,
 	      const double & pz);
-  void set_boxdir(const int idir, Vector<double> & p);
+  void set_boxdir(const int idir, Vector3<double> & p);
   // Get box direction vectors:
-  void get_boxdir(const int idir, Vector<double> & v) const;
+  void get_boxdir(const int idir, Vector3<double> & v) const;
 
   // Normalize the box direction vectors and build the Bravais matrix and its inverse:
   void update_box_geometry();
@@ -115,28 +119,28 @@ public:
   // ##################################################################################
   // ##################################################################################
 
-  void get_atom_distance_vec(const Vector<double> & r1,
-			     const Vector<double> & r2,
-			     Vector<double> & v,
+  void get_atom_distance_vec(const Vector3<double> & r1,
+			     const Vector3<double> & r2,
+			     Vector3<double> & v,
 			     const double lowlim=-1) const;
   
-  inline double get_atom_distance(const Vector<double> & r1,
-				  const Vector<double> & r2,
+  inline double get_atom_distance(const Vector3<double> & r1,
+				  const Vector3<double> & r2,
 				  const double lowlim=-1) const {
-    Vector<double> drc(3, 0.0);
+    Vector3<double> drc(0.0);
     get_atom_distance_vec(r1, r2, drc, lowlim);
     return sqrt( drc[0]*drc[0] + drc[1]*drc[1] + drc[2]*drc[2] );
   }
 
-  void get_coords_cart2skew(const Vector<double> & drc,
-			    Vector<double> & v,
+  void get_coords_cart2skew(const Vector3<double> & drc,
+			    Vector3<double> & v,
 			    const double lowlim=-1) const;
 
-  void get_coords_skew2cart(Vector<double> & drs,
-			    Vector<double> & v,
+  void get_coords_skew2cart(Vector3<double> & drs,
+			    Vector3<double> & v,
 			    const double lowlim=-1) const;
   
-  void translate_cartpos_in_skewspace(Vector<double> & pos,
+  void translate_cartpos_in_skewspace(Vector3<double> & pos,
 				      double f1,
 				      double f2,
 				      double f3);
