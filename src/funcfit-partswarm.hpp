@@ -114,6 +114,7 @@ namespace funcfit {
       // gradient method)
       // Purpose: minimize function, input point will not be changed
       double eps = numeric_limits<double>::epsilon();
+      double eps2r = sqrt( numeric_limits<double>::epsilon() );
       string methodstring("particle-swarm");
       int niter=0, i,j,k, ixglobmin, ixglobmax;
       double vmax, w;
@@ -196,8 +197,8 @@ namespace funcfit {
 	    // configuration of individual
 	    for (j=0; j<D; ++j){
 	      x[i][j] = xmin[j] + mtwister.unif() * (xmax[j] - xmin[j]);
-	      if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
-	      if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
+	      if (x[i][j] - eps2r < xmin[j]) x[i][j] = xmin[j] + eps2r;
+	      if (x[i][j] + eps2r > xmax[j]) x[i][j] = xmax[j] - eps2r;
 
 	      v[i][j] = 0.5*(xmax[j]-xmin[j]) * (2 * mtwister.unif() - 1);
 	    }
@@ -335,15 +336,16 @@ namespace funcfit {
 		  + c2 * mtwister.unif() * (xglobmin[j]   - x[i][j]);
 	    
 		vmax = 0.5*(xmax[j]-xmin[j]);
-		if (v[i][j]> vmax) v[i][j] =  vmax;
-		if (v[i][j]<-vmax) v[i][j] = -vmax;
+		if (v[i][j] + eps2r >  vmax) v[i][j] =  vmax - eps2r;
+		if (v[i][j] - eps2r < -vmax) v[i][j] = -vmax + eps2r;
 	      }
 
 	      for (j=0; j<D; ++j){
 		x[i][j] = x[i][j] + v[i][j];
 
-		if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
-		if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
+		if (x[i][j] - eps2r < xmin[j]) x[i][j] = xmin[j] + eps2r;
+		if (x[i][j] + eps2r > xmax[j]) x[i][j] = xmax[j] - eps2r;
+
 	      }
 	  
 	      fx[i] = func(x[i]);

@@ -158,6 +158,7 @@ namespace funcfit {
       // gradient method)
       // Purpose: minimize function, input point will not be changed
       //double eps = numeric_limits<double>::epsilon();
+      double eps2r = sqrt( numeric_limits<double>::epsilon() );
       string methodstring("differential-evolution");
       int niter=0, i,j,k, i1,i2,i3,i4,i5;
       int ixmin, ixmax;
@@ -246,8 +247,8 @@ namespace funcfit {
 	  try {
 	    for (j=0; j<D; ++j){
 	      x[i][j] = xmin[j] + mtwister.unif() * (xmax[j] - xmin[j]);
-	      if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
-	      if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
+	      if (x[i][j] - eps2r < xmin[j]) x[i][j] = xmin[j] + eps2r;
+	      if (x[i][j] + eps2r > xmax[j]) x[i][j] = xmax[j] - eps2r;
 	    }
 	    fx[i] = func(x[i]);
 	  }
@@ -428,8 +429,8 @@ namespace funcfit {
 
 	  // Account for parameter limits:
 	  for (j=0; j<D; ++j){
-	    if (v[i][j] <  xmin[j]) v[i][j] = xmin[j];
-	    if (v[i][j] >  xmax[j]) v[i][j] = xmax[j];
+	    if (v[i][j] - eps2r <  xmin[j]) v[i][j] = xmin[j] + eps2r;
+	    if (v[i][j] + eps2r >  xmax[j]) v[i][j] = xmax[j] - eps2r;
 	  }
 
 	}

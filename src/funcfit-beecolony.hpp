@@ -124,6 +124,7 @@ namespace funcfit {
       // gradient method)
       // Purpose: minimize function, input point will not be changed
       double eps = numeric_limits<double>::epsilon();
+      double eps2r = sqrt( numeric_limits<double>::epsilon() );
       string methodstring("bee-colony");
       int niter=0, i,j,k, i1,i2,i3, ixglobmin, ixglobmax;
       double vmax, w;
@@ -204,8 +205,8 @@ namespace funcfit {
 	  try {
 	    for (j=0; j<D; ++j){
 	      x[i][j] = xmin[j] + mtwister.unif() * (xmax[j] - xmin[j]);
-	      if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
-	      if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
+	      if (x[i][j] - eps2r < xmin[j]) x[i][j] = xmin[j] + eps2r;
+	      if (x[i][j] + eps2r > xmax[j]) x[i][j] = xmax[j] - eps2r;
 	    }
 	    fx[i] = func(x[i]);
 	    fitness[i] = 1.0/(1.0 + fx[i]);
@@ -332,8 +333,8 @@ namespace funcfit {
 	  while (i2==i || i2<0 || i2>=NP) i2 = floor(mtwister.unif() * NP);
 	  v = x[i];
 	  v[i1] = x[i][i1] + (2*mtwister.unif()-1) * (x[i][i1] - x[i2][i1]);
-	  if (v[i1] < xmin[i1]) v[i1] = xmin[i1];
-	  if (v[i1] > xmax[i1]) v[i1] = xmax[i1];
+	  if (v[i1] - eps2r < xmin[i1]) v[i1] = xmin[i1] + eps2r;
+	  if (v[i1] + eps2r > xmax[i1]) v[i1] = xmax[i1] - eps2r;
 	    
 	  fv = func(v);
 	  fi = 1.0/(1+fv);
@@ -378,8 +379,8 @@ namespace funcfit {
 	  while (i2==i || i2<0 || i2>=NP) i2 = floor(mtwister.unif() * NP);
 	  v = x[k];
 	  v[i1] = x[k][i1] + (2*mtwister.unif()-1) * (x[k][i1] - x[i2][i1]);
-	  if (v[i1] < xmin[i1]) v[i1] = xmin[i1];
-	  if (v[i1] > xmax[i1]) v[i1] = xmax[i1];
+	  if (v[i1] - eps2r < xmin[i1]) v[i1] = xmin[i1] + eps2r;
+	  if (v[i1] + eps2r > xmax[i1]) v[i1] = xmax[i1] - eps2r;
 
 	  fv = func(v);
 	  fi = 1.0/(1+fv);
@@ -420,8 +421,8 @@ namespace funcfit {
 	      try {
 		for (j=0; j<D; ++j){
 		  x[i][j] = xmin[j] + mtwister.unif() * (xmax[j] - xmin[j]);
-		  if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
-		  if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
+		  if (x[i][j] - eps2r < xmin[j]) x[i][j] = xmin[j] + eps2r;
+		  if (x[i][j] + eps2r > xmax[j]) x[i][j] = xmax[j] - eps2r;
 		}
 		fx[i] = func(x[i]);
 	      }

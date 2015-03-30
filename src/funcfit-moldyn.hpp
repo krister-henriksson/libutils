@@ -29,6 +29,7 @@ using utils::Vector;
 
 namespace funcfit {
 
+
   
   template <typename T>
   class MolDynFit
@@ -63,6 +64,8 @@ namespace funcfit {
 			    Vector<double>        & par_min,
 			    Vector<double>        & par_max,
 			    Vector<parametertype> & par_type,
+			    double min_dx,
+			    double max_dx,
 			    Cond_Conv  cond_conv  = Cond_Conv(),
 			    Cond_Debug cond_debug = Cond_Debug(),
 			    Cond_Print cond_print = Cond_Print()
@@ -86,7 +89,6 @@ namespace funcfit {
 
       Counters_niter counters_niter = Counters_niter();
 
-
       Vector<double>        x     = func.free_parameters(point_in);
       Vector<double>        xmin  = func.map_vector_as_free_parameters(par_min);
       Vector<double>        xmax  = func.map_vector_as_free_parameters(par_max);
@@ -101,6 +103,7 @@ namespace funcfit {
       Vector<double> xmass(nx, 1.0);
       Vector<double> xacc(nx,  0.0);
       Vector<double> g(nx,  0.0);
+      Vector<double> gn(nx,  0.0);
       double Ep=0, Ek=0, Et=0;
       double t=0, dt=1.0;
 
@@ -119,7 +122,9 @@ namespace funcfit {
 		  << methodstring << ": "
 		  << "Getting merit function gradient ... " << endl;
       g = func.gradient(x);
-      for (i=0; i<nx; ++i) xacc[i] = -1.0 * g[i] / xmass[i];
+      gn = g; gn.normalize();
+
+      for (i=0; i<nx; ++i) xacc[i] = -1.0*gn[i] / xmass[i];
       gmagn = g.magn();
       if (debug) 
 	cout << prefix_report_debug
@@ -157,7 +162,7 @@ namespace funcfit {
 	  }
 	  else {
 	    printf("%s%s: Iter %4d   Func %15.8e Change %15.8e   "
-		   "Func_barrier %15.8e   Grad %15.8e Grad_barrier %15.8e\n"
+		   "Func_barrier %15.8e   Grad %15.8e Grad_barrier %15.8e\n",
 		   cond_print.prefix_report_iter.c_str(),
 		   methodstring.c_str(), niter, fx, fx-fx_old,
 		   vb, gmagn, gbmagn);
@@ -208,11 +213,36 @@ namespace funcfit {
 	bool step_is_ok=false;
 	while ( ! step_is_ok ){
 
+	  // Adjust time step if needed:
+	  while (true){
+	    double step_max, step_min, td;
+
+	    for (i=0; i<nx; ++i){
+	      xvel[i] = 0.0;
+
+	      td = xvel[i] * dt + 0.5 * xacc[i] * dt*dt;
+	      if (td < 0) td *= -1.0;
+	      if (i==0 || (i>0 && td>step_max)) step_max = td;
+	      if (i==0 || (i>0 && td<step_min)) step_min = td;
+	    }
+	    std::cout << "max_dx = " << max_dx
+		      << " step_max = " << step_max
+		      << " step_min = " << step_min
+		      << " dt = " << dt << std::endl;
+
+	    if      (step_max > max_dx) dt *= 0.33333;
+	    else if (step_min < min_dx) dt *= 1.5;
+	    else break;
+	  }
+
 
 	  try {
 
 	    // Predictor
 	    for (i=0; i<nx; ++i){
+	      //xvel[i]=0;
+	      xvel[i] = 0.0;
+
 	      x_trial[i] = x[i] + xvel[i] * dt + 0.5 * xacc[i] * dt*dt;
 	      //if (x_trial[i] < xmin[i]) x_trial[i] = xmin[i];
 	      //if (x_trial[i] > xmax[i]) x_trial[i] = xmax[i];
@@ -220,7 +250,6 @@ namespace funcfit {
 	      xvel_trial[i] = xvel[i] + 0.5 * xacc[i] * dt;
 	    }
 	    for (i=0; i<nx; ++i) h[i] = x_trial[i] - x[i];
-
 	    
 	    // Check if trial point is good:
 	    if (! func.point_is_good( x_trial )){ // may throw exception bad_point
@@ -244,9 +273,8 @@ namespace funcfit {
 	      continue;
 	    }
 
-
 	    step_is_ok = true;
-
+	    
 	  }
 	  catch (funcfit::bad_point & e1){
 	    func.reset();
@@ -267,28 +295,32 @@ namespace funcfit {
 	xvel = xvel_trial;
 
 	// Get force
-	cout << "Before getting function value:" << endl;
-	tv = func.free_parameters(); cout << "Free parameters" << endl;
-	for (i=0; i<nx; ++i) printf("%5d  %20.10f  %20.10e\n", i, tv[i]);
+	//cout << "Before getting function value:" << endl;
+	//tv = func.free_parameters(); cout << "Free parameters" << endl;
+	//for (i=0; i<nx; ++i) printf("%5d  %20.10f  %20.10e\n", i, tv[i]);
 	fx = func(x);
-	cout << "Function value: " << fx << endl;
+	//cout << "Function value: " << fx << endl;
 
-	cout << "Before getting gradient" << endl;
-	tv = func.free_parameters(); cout << "Free parameters" << endl;
-	for (i=0; i<nx; ++i) printf("%5d  %20.10f  %20.10e\n", i, tv[i]);
+	//cout << "Before getting gradient" << endl;
+	//tv = func.free_parameters(); cout << "Free parameters" << endl;
+	//for (i=0; i<nx; ++i) printf("%5d  %20.10f  %20.10e\n", i, tv[i]);
 
 	g = func.gradient(x);
-	cout << "After getting gradient" << endl;
-	tv = func.free_parameters(); cout << "Free parameters" << endl;
-	for (i=0; i<nx; ++i) printf("%5d  %20.10f  %20.10e\n", i, tv[i]);
+	gn = g; gn.normalize();
+
+	//cout << "After getting gradient" << endl;
+	//tv = func.free_parameters(); cout << "Free parameters" << endl;
+	//for (i=0; i<nx; ++i) printf("%5d  %20.10f  %20.10e\n", i, tv[i]);
 
 
-
-	for (i=0; i<nx; ++i) xacc[i] = -1.0 * g[i] / xmass[i];
+	for (i=0; i<nx; ++i) xacc[i] = -1.0*gn[i] / xmass[i];
 	gmagn = g.magn();
 
 	// Corrector
 	for (i=0; i<nx; ++i){
+	  //xvel[i]=0;
+	  xvel[i] = 0.0;
+
 	  xvel[i] = xvel[i] + 0.5 * xacc[i] * dt;
 	}
 

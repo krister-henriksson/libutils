@@ -89,6 +89,7 @@ namespace funcfit {
       // gradient method)
       // Purpose: minimize function, input point will not be changed
       double eps = numeric_limits<double>::epsilon(), fp, fp_old, ytry, ysave;
+      double eps2r = sqrt( numeric_limits<double>::epsilon() );
       string methodstring("simplex");
       int niter=0, i,j;
 
@@ -167,8 +168,8 @@ namespace funcfit {
 	      // p.elem(i, i-1) += xch[i-1];
 
 	      p.elem(i,j) = xmin[j] + mtwister.unif() * (xmax[j]-xmin[j]);
-	      if (p.elem(i,j) < xmin[j]) p.elem(i,j) = xmin[j];
-	      if (p.elem(i,j) > xmax[j]) p.elem(i,j) = xmax[j];
+	      if (p.elem(i,j) - eps2r < xmin[j]) p.elem(i,j) = xmin[j] + eps2r;
+	      if (p.elem(i,j) + eps2r > xmax[j]) p.elem(i,j) = xmax[j] - eps2r;
 	    }
 
 	    for (j=0; j<ndim; ++j)
@@ -363,8 +364,8 @@ namespace funcfit {
 		for (j=0; j<ndim; ++j){
 		  psum[j] = 0.5 * (p.elem(i,j) + p.elem(ilo, j));
 
-		  if (psum[j] < xmin[j]) psum[j] = xmin[j];
-		  if (psum[j] > xmax[j]) psum[j] = xmax[j];
+		  if (psum[j] - eps2r < xmin[j]) psum[j] = xmin[j] + eps2r;
+		  if (psum[j] + eps2r > xmax[j]) psum[j] = xmax[j] - eps2r;
 
 		  p.elem(i,j) = psum[j];
 		}
@@ -454,12 +455,13 @@ namespace funcfit {
 
       string prefix_report_debug = cond_debug.prefix_debug_fit_level1;
 
+      double eps2r = sqrt( numeric_limits<double>::epsilon() );
 
       for (j=0; j<ndim; ++j){
 	ptry[j] = psum[j] * fac1 - p.elem(ihi, j) * fac2;
 
-	if (ptry[j] < xmin[j]) ptry[j] = xmin[j];
-	if (ptry[j] > xmax[j]) ptry[j] = xmax[j];
+	if (ptry[j] - eps2r < xmin[j]) ptry[j] = xmin[j] + eps2r;
+	if (ptry[j] + eps2r > xmax[j]) ptry[j] = xmax[j] - eps2r;
       }
       if (cond_debug.debug_fit_level1)
 	cout << prefix_report_debug
@@ -488,8 +490,8 @@ namespace funcfit {
 	  for (j=0; j<ndim; ++j){
 	    ptry[j] *= 0.90;
 
-	    if (ptry[j] < xmin[j]) ptry[j] = xmin[j];
-	    if (ptry[j] > xmax[j]) ptry[j] = xmax[j];
+	    if (ptry[j] - eps2r < xmin[j]) ptry[j] = xmin[j] + eps2r;
+	    if (ptry[j] + eps2r > xmax[j]) ptry[j] = xmax[j] - eps2r;
 	  }
 	  
 	  if (fp_is_small(ptry.magn())){

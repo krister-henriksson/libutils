@@ -68,20 +68,18 @@ namespace funcfit {
 
   class Cond_SimAnn {
   public:
-    int Nr;
-    int NS;
     int NTe;
-    double c;
     double rTe;
-    double qTe;
+    int anneal_method;
+    double quench_rate;
+    int niter_reset;
 
     Cond_SimAnn(){
-      Nr = -15;  // can edit this
-      NS =  20;  // can edit this
-      NTe = 100; // can edit this: rate of T and ChiSq descent need to be balanced!
-      c = 2;
+      NTe = 4;
       rTe = 0.85;
-      qTe = 0.67;
+      anneal_method = 2;
+      quench_rate = 0.01;
+      niter_reset = 20;
      }
 
   } ;
@@ -124,7 +122,7 @@ namespace funcfit {
 			    Vector<double>        & par_min,
 			    Vector<double>        & par_max,
 			    Vector<parametertype> & par_type,
-			    double simann_delta_rel,
+			    Vector<double> par_charstepsize,
 			    int seed,
 			    Cond_Conv  cond_conv  = Cond_Conv(),
 			    Cond_Debug cond_debug = Cond_Debug(),
@@ -139,49 +137,43 @@ namespace funcfit {
 
       string methodstring("simulated-annealing");
       int niter=0, i,j,k;
+
       int seed2 = seed < 0 ? time(0) : seed;
       rand_mtwister mtwister( seed2 );
 
-      Vector<double>        x     = func.free_parameters(point_in);
+      Vector<double> point   = func.free_parameters(point_in);
       Vector<double>        xmin  = func.map_vector_as_free_parameters(par_min);
       Vector<double>        xmax  = func.map_vector_as_free_parameters(par_max);
       Vector<parametertype> xtype = func.map_vector_as_free_parameters(par_type);
-      int nx = x.size();
-
-      Vector<double> xch_ini(nx,0);
-      for (int i=0; i<nx; ++i){
-	xch_ini[i] = x[i] * simann_delta_rel;
-	if (utils::abs(xch_ini[i])<eps) xch_ini[i] = sqrt(eps);
-	if (xch_ini[i] < 0) xch_ini[i] *= -1.0;
-      }
+      Vector<double> xch_ini = func.map_vector_as_free_parameters(par_charstepsize);
       Vector<double> xch = xch_ini;
 
+      int D  = point.size();
+
+      int NTe     = cond_simann.NTe;
+      double rTe   = cond_simann.rTe;
+      int anneal_method  = cond_simann.anneal_method;
+      double quench_rate = cond_simann.quench_rate;
+      int niter_reset   = cond_simann.niter_reset;
+
+      double Te, Te0, Te_star;
+      //int NT = max((int)100, (int)5*D);
+      int NT = max((int)100, (int)5*D);
+
       status = Minimization_Status();
+
       bool debug         = cond_debug.debug_fit_level0;
       string prefix_report_debug = cond_debug.prefix_debug_fit_level0;
+
       bool report_iter    = cond_print.report_iter;
       bool report_warn    = cond_print.report_warn;
       bool report_error   = cond_print.report_error;
+
       Counters_niter counters_niter = Counters_niter();
-
-      int Nr    = cond_simann.Nr;
-      int NS    = cond_simann.NS;
-      int NTe    = cond_simann.NTe;
-      double cc0 = cond_simann.c;
-      double rTe = cond_simann.rTe;
-      double qTe = cond_simann.qTe;
-      double cool_rate = (1.0 - qTe*rTe)/NTe;
-
-      Vector<double> cc(nx, 0);
-
-      int ci, cj, cm, ch;
-      Vector<int> cn(nx, 0);
-
-      Vector<double> x_try(nx), x_old(nx), h(nx), x_opt(nx), v(nx,0);
-      double fp, fp_try, dfp, fp_opt, fp_old;
-      double Te0, Te1_star, Te2_star, Te;
-
-      double hmagn, td;
+      
+      Vector<double> x(D), x_try(D), x_old(D), h(D), x_opt(D), v(D,0);
+      double fp, fp_try, dfp, fp_opt, fp_old, fp_star, hmagn, td;
+      int ci, ck, cm, ch;
 
       string dumpfile;
       ofstream fout;
@@ -190,16 +182,16 @@ namespace funcfit {
       int Nfail=0, Nred=0, Nstoch=0;
 
       niter = 0;
-      ci=0;
-      cj=0;
-      cm=0;
       ch=0;
-      for (int i=0; i<nx; ++i) cn[i]=0;
+      ci=0;
+      ck=0;
+      cm=0;
+
 
 
       double dmax = sqrt( numeric_limits<double>::max() );
       double dmin = -dmax;
-      for (i=0; i<nx; ++i){
+      for (i=0; i<D; ++i){
 	if (xtype[i]==PARAM_FREE){ // no lower or upper limit
 	  xmin[i] = dmin;
 	  xmax[i] = dmax;
@@ -209,23 +201,22 @@ namespace funcfit {
 
 
 
+      // ###################################################################
+      // Create population
+      // ###################################################################
       if (debug) 
 	cout << prefix_report_debug
 	     << methodstring << ": "
 	     << "Initial point ... " << endl;
-      for (i=0; i<nx; ++i){
+      for (i=0; i<D; ++i){
+	x[i] = point[i];
 	x_opt[i] = x[i];
       }
       fp_opt = fp = func(x);
-
       // Initial temperature:
-      Te0   = abs(fp) / nx; //* 1e-3;
-      //Te0 = sqrt(abs(fp));
-      //Te0   = abs(fp) * nx; //* 1e-3;
-
-      Te1_star = Te0;
-      Te2_star = qTe * Te1_star;
-      Te = Te1_star * (1.0 - cool_rate * cm);
+      Te0 = abs(fp) / D; //* 1e-3;
+      Te = Te0;
+      Te_star = Te0;
 
 
 
@@ -246,15 +237,11 @@ namespace funcfit {
       while (true){ // Start of loop over iterations
 
 
-
-
-
-
 	func.set_point(x);
 
 
 	if (debug){
-	  for (i=0; i<nx; ++i)
+	  for (i=0; i<D; ++i)
 	    cout << "x[" << i << "]= " << x[i] << "  xch[" << i << "]= " << xch[i] << endl;
 
 	}
@@ -290,16 +277,14 @@ namespace funcfit {
 		   Te, hmagn, steptype.c_str(),
 		   Nred, Nfail);
 	  }
-	  func.report_on_parameters_and_data();
 	}
-
 
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Check for convergence
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	if ( check_conv(x, true,fp_old, true,fp, // use old and current function values
-			false,Vector<double>(nx,0), // use gradient
+			false,Vector<double>(h.size(),0), // use gradient
 			true,h,                           // use step taken
 			niter,
 			counters_niter,
@@ -311,25 +296,26 @@ namespace funcfit {
 
 
 
-	x_old  = x;
-	fp_old = fp;      
-	
 
+
+
+
+	fp_old = fp;
+	x_old  = x;
 
 
 	// ###################################################################
 	// Get trial point:
 	// ###################################################################
-	for (ch=0; ch<nx; ++ch){
+	stoch_red = false;
+	for (ch=0; ch<D; ++ch){
 
-	  stoch_red = false;
-	  
 	  // **************************************************************
 	  while (true){
 	    try {
 
 	      // Start with previous point ...
-	      for (i=0; i<nx; ++i) x_try[i] = x[i];
+	      for (i=0; i<D; ++i) x_try[i] = x[i];
 
 	      trial_failed = true;
 	      while (trial_failed){
@@ -356,59 +342,41 @@ namespace funcfit {
 	  
 	  dfp = fp_try - fp;
 
-
-	  // ******************************************************
-	  // Check if new point is to be accepted or not
-	  // ******************************************************
-	  if (dfp < 0.0){
-	    // --------------------------------------------
+	  // Check trial function value:
+	  if (dfp < 0.0 || dfp < eps){
 	    // Reduction successful
-	    // --------------------------------------------
 	    fp = fp_try;
 	    x = x_try;
 	    ci++;
-	    cn[ch]++;
-
 	    //Te = 0.90 * Te;
-	    //xch[ch] *= 1.2;
-
-	    // Check if new function value is better than current best value:
-	    if (fp < fp_opt){
-	      fp_opt = fp;
-	      for (i=0; i<nx; ++i) x_opt[i] = x[i];
-	    }
+	    xch[ch] *= 1.2;
 	  }
 	  else {
-	    // --------------------------------------------
-	    // Stochastic trial acceptance of increased merit function value
-	    // --------------------------------------------
-	    if (Te >= eps && mtwister.unif() < exp( - dfp/Te  ) ){
+	    
+	    if (Te >= eps && mtwister.unif() < exp( - dfp/Te ) ){
 	      // Stochastic try succeeded
 	      stoch_red = true;
 	      fp = fp_try;
 	      x = x_try;
 	      ci++;
-	      cn[ch]++;
-
-	      //xch[ch] *= 0.8;
+	      xch[ch] *= 0.8;
 	    }
 	    else {
-	      stoch_red = false;
 	      //Te *= 1.05;
-	      //xch[ch] *= 0.5;
+	      xch[ch] *= 0.5;
 	    }
+
 	  }
-	
 
-	  
+
+	  // Check if new function value is better than current best value:
+	  if (fp <= fp_opt){
+	    fp_opt = fp;
+	    for (i=0; i<D; ++i) x_opt[i] = x[i];
+	  }
+
+
 	} // End of loop over all directions.
-	ch=0;
-	cj++;
-	// ###################################################################
-	// Trial point obtained
-	// ###################################################################
-
-     
 
 
 	h = x - x_old;
@@ -426,39 +394,9 @@ namespace funcfit {
 
 
 
+	niter++;
+
 	//if (niter>1) Te = Te0 / log(niter);
-
-
-
-
-
-
-	if (NS > 0 && cj >= NS){
-	  // ###################################################################
-	  // Update step vector:
-	  // ###################################################################
-	  Vector<double> xch_new(xch);
-	  for (int u=0; u<nx; ++u){
-	    if      (cn[u] - 0.6*NS > 0.0)
-	      xch_new[u] = xch[u] * (1.0 + cc[u]*(cn[u]*1.0/NS - 0.6)/0.4);
-	    else if (cn[u] - 0.4*NS < 0.0)
-	      xch_new[u] = xch[u] / (1.0 + cc[u]*(0.4 - cn[u]*1.0/NS)/0.4);
-	    else
-	      xch_new[u] = xch[u];
-	  }
-	  xch = xch_new;
-	  cj=0;
-	  for (int i=0; i<nx; ++i) cn[i] = 0;
-
-
-	  /*
-	  if (debug)
-	    cout << "Setting state to optimum (optimum point and function value) ..." << endl;
-	  for (i=0; i<nx; ++i) x[i] = x_opt[i];
-	  for (i=0; i<nx; ++i) xch[i] = xch_ini[i];
-	  fp = fp_opt;
-	  */
-	}
 
 
 
@@ -466,34 +404,39 @@ namespace funcfit {
 	// ###################################################################
 	// Update temperature:
 	// ###################################################################
-	cm++;
-	if (cm >= NTe){
-	  Te1_star = Te2_star;
-	  if (Te1_star < eps){
-	    std::cout << methodstring << ": Temperature has reached 0.0, aborting." << std::endl;
-	    return func.all_parameters(x_opt);
-	  }
-	  Te2_star = qTe * Te1_star;
+	if (anneal_method==1){
+	  if (cm < NTe) continue;
+
+	  Te_star = Te;
+	  fp_star = fp;
+	  
+	  Te = rTe * Te;
+
+	  ck++;
 	  cm=0;
-	  if (Nr < 0){
-	    x  = x_opt;
-	    fp = fp_opt;
-	  }
+	}
+	else if (anneal_method==2){
+	  Te = Te0 * (1.0 - quench_rate * niter);
+	  if (Te<=eps) Te = 0.0;
 	}
 
-	Te = Te1_star * (1.0 - cool_rate * cm);
 
 
-	if (Nr > 0 && niter % Nr == 0){
-	  x  = x_opt;
+
+
+	if (niter % niter_reset == 0){
+
+	  // ###################################################################
+	  // Set x to optimal point:
+	  // ###################################################################
+	  ci++;
+	  if (debug)
+	    cout << "Setting state to optimum (optimum point and function value) ..." << endl;
+	  for (i=0; i<D; ++i) x[i] = x_opt[i];
+	  for (i=0; i<D; ++i) xch[i] = xch_ini[i];
 	  fp = fp_opt;
+
 	}
-
-
-
-
-	niter++;
-
 
 
 	

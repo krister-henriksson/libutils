@@ -146,6 +146,7 @@ namespace funcfit {
       // gradient method)
       // Purpose: minimize function, input point will not be changed
       double eps = numeric_limits<double>::epsilon();
+      double eps2r = sqrt( numeric_limits<double>::epsilon() );
       double small = sqrt(eps);
 
       string methodstring("grav-search");
@@ -230,8 +231,9 @@ namespace funcfit {
 	  try {
 	    for (j=0; j<D; ++j){
 	      x[i][j] = xmin[j] + mtwister.unif() * (xmax[j] - xmin[j]);
-	      if (x[i][j] < xmin[j]) x[i][j] = xmin[j];
-	      if (x[i][j] > xmax[j]) x[i][j] = xmax[j];
+	      if (x[i][j] - eps2r < xmin[j]) x[i][j] = xmin[j] + eps2r;
+	      if (x[i][j] + eps2r > xmax[j]) x[i][j] = xmax[j] - eps2r;
+
 	    }
 	    fx[i] = func(x[i]);
 	    if ( ! isfinite( fx[i] ) ){
@@ -415,14 +417,14 @@ namespace funcfit {
 	      for (k=0; k<D; ++k){
 		v[i][k] = mtwister.unif() * v[i][k] + f[i][k]/mass[i];
 		vmax = 0.5*(xmax[k] - xmin[k]);
-		if (v[i][k]<-vmax) v[i][k] = -vmax;
-		if (v[i][k]> vmax) v[i][k] =  vmax;
+		if (v[i][k] - eps2r < -vmax) v[i][k] = -vmax + eps2r;
+		if (v[i][k] + eps2r >  vmax) v[i][k] =  vmax - eps2r;
 
 		td2 = x[i][k];
 		x[i][k] = x[i][k] + v[i][k];
 
-		if (x[i][k] < xmin[k]) x[i][k] = xmin[k];
-		if (x[i][k] > xmax[k]) x[i][k] = xmax[k];
+		if (x[i][k] - eps2r < xmin[k]) x[i][k] = xmin[k] + eps2r;
+		if (x[i][k] + eps2r > xmax[k]) x[i][k] = xmax[k] - eps2r;
 		td1 += (x[i][k] - td2)*(x[i][k] - td2);
 	      }
 	      td1 = sqrt(td1);
