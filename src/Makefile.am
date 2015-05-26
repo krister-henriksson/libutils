@@ -57,9 +57,9 @@ funcfit-deriv.hpp \
 funcfit-diffevol.hpp \
 funcfit-errors.hpp \
 funcfit-gravsearch.hpp \
-funcfit-ls-gauss-newton.hpp \
-funcfit-ls-leve-marq.hpp \
-funcfit-ls-powelldogleg.hpp \
+funcfit-gauss-newton.hpp \
+funcfit-leve-marq.hpp \
+funcfit-powelldogleg.hpp \
 funcfit-moldyn.hpp \
 funcfit-partswarm.hpp \
 funcfit-powell.hpp \

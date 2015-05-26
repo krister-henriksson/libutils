@@ -1,11 +1,12 @@
 
 
 
-#ifndef FUNCFIT_LEVE_MARQ_HPP
-#define FUNCFIT_LEVE_MARQ_HPP
+#ifndef FUNCFIT_POWELLDOGLEG_HPP
+#define FUNCFIT_POWELLDOGLEG_HPP
 
 
 #include <iostream>
+
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -15,26 +16,21 @@
 #include "utils.hpp"
 #include "utils-math.hpp"
 #include "utils-vector.hpp"
-#include "utils-errors.hpp"
 
 #include "param.hpp"
 
-#include "funcfit-errors.hpp"
 #include "funcfit-basics.hpp"
 
 using std::cout;
 using std::endl;
 using utils::Vector;
-using utils::Matrix;
-using utils::max;
-using utils::abs;
 
 
 namespace funcfit {
 
   
   template <typename T>
-  class LeveMarq
+  class PowellDogLeg
   {
 
 
@@ -52,7 +48,7 @@ namespace funcfit {
     //#####################################################################
     // NB:  Use constructor to set functor. Point and direction are set by
     // NB:  minimize() method.
-    LeveMarq(T & funcd)
+    PowellDogLeg(T & funcd)
       :
       func(funcd)
     {}
@@ -66,6 +62,8 @@ namespace funcfit {
 			    Vector<double>        & par_min,
 			    Vector<double>        & par_max,
 			    Vector<parametertype> & par_type,
+			    double rt,
+			    double rt_min,
 			    Cond_Conv  cond_conv  = Cond_Conv(),
 			    Cond_Debug cond_debug = Cond_Debug(),
 			    Cond_Print cond_print = Cond_Print()
@@ -74,17 +72,18 @@ namespace funcfit {
       // gradient method)
       // Purpose: minimize function, input point will not be changed
 
-      Vector<double> p, f, h, ag;
-      Matrix<double> J, JTJ, A, A_inv;
-      double fp, fp_old, gmagn, hmagn;
-      double tau=1.0, gain, mu, nu=2.0;
+      Vector<double> p, f, af, ag;
+      Vector<double> h_gn, h_sd, h, a, b, tmpv1;
       Vector<double> p_trial, f_trial;
-      Matrix<double> J_trial;
+
+      Matrix<double> J, JTJ, JTJ_inv;
+
+      double c, a_sq, ba_sq, tmp1, tmp2;
+      double fp, fp_old, gmagn, hmagn;
+      double alpha, beta, gain;
       double fp_trial;
-      string methodstring, choice;
-      int n;
+      string methodstring, stepmeth, choice;
       int niter=0;
-      double maxe=1.0, tmp;
 
       status = Minimization_Status();
 
@@ -97,46 +96,48 @@ namespace funcfit {
 
       Counters_niter counters_niter = Counters_niter();
 
-
-
+      int niterrestart = cond_conv.niterrestart;
+      double rt_ini = rt;
 
       p = func.free_parameters(point_in);
       Vector<double>        xmin  = func.map_vector_as_free_parameters(par_min);
       Vector<double>        xmax  = func.map_vector_as_free_parameters(par_max);
       Vector<parametertype> xtype = func.map_vector_as_free_parameters(par_type);
-      n = p.size();
 
-      methodstring = "ls-leve-marq";
+      /*
+      //cout.precision(15);
+      cout.precision(10);
+      cout.setf (ios_base::scientific , ios_base::floatfield);
+      cout.width(20);
+      cout << "cout settings changed" << endl;
+      */
+
+      methodstring = "ls-powelldogleg";
 
       if (debug)
 	cout << prefix_report_debug
-		  << methodstring << ": "
-		  << "Getting auxiliary data for merit function gradient (f)... " << endl;
+	     << methodstring << ": "
+	     << "Getting auxiliary data for merit function gradient ... " << endl;
       f = func.f(p);
+      //cout << "made it here 001" << endl;
+      J = func.J(p);
+      //cout << "made it here 002" << endl;
       if (debug)
 	cout << prefix_report_debug
-		  << methodstring << ": "
-		  << "Getting auxiliary data for merit function gradient (J)... " << endl;
-      J = func.J(p);
-      if (debug) 
-	cout << prefix_report_debug
-		  << methodstring << ": "
+	     << methodstring << ": "
 		  << "Getting merit function gradient ... " << endl;
-      ag = -1.0 * func.gradient();// -1.0 * J.transpose() * f;
+      //cout << "made it here 003" << endl;
+      ag = -1.0 * func.gradient();//-1.0 * J.transpose() * f;
+      //cout << "made it here 004" << endl;
       gmagn = ag.magn();
       if (debug) 
 	cout << prefix_report_debug
 		  << methodstring << ": "
 		  << "Getting merit function value ... " << endl;
+      //cout << "made it here 005" << endl;
       fp = func.value();//0.5 * f * f;
-      JTJ = J.transpose() * J;
+      //cout << "made it here 006" << endl;
 
-      for (int i=0; i!=n; ++i){
-	tmp = abs(JTJ.elem(i,i));
-	if (i==0 || (i>0 && tmp>maxe))
-	  maxe = tmp;
-      }
-      mu = tau * maxe;
 
 
 
@@ -147,13 +148,14 @@ namespace funcfit {
       // ###################################################################
       // ###################################################################
       // ###################################################################
-      while (true){
+      while(true){
+
 
 	if (report_iter){
 	  double vb = func.value_barrier();
 	  Vector<double> gb = func.gradient_barrier();
 	  double gbmagn = gb.magn();
-
+	  
 	  if (niter==0){
 	    printf("%s%s: Iter %4d   Func %15.8e Func_barrier %15.8e   "
 		   "Grad %15.8e Grad_barrier %15.8e\n",
@@ -166,11 +168,11 @@ namespace funcfit {
 	  else {
 	    printf("%s%s: Iter %4d   Func %15.8e Change %15.8e   "
 		   "Func_barrier %15.8e   Grad %15.8e Grad_barrier %15.8e   "
-		   "Step %15.8e\n",
+		   "Step %15.8e  Radius %15.8e   %s %s\n",
 		   cond_print.prefix_report_iter.c_str(),
 		   methodstring.c_str(), niter, fp, fp-fp_old,
 		   vb, gmagn, gbmagn,
-		   hmagn);
+		   hmagn, rt, stepmeth.c_str(), choice.c_str());
 	    printf("Par.index  Param.  Gradient  Gradient_barrier  Step:\n");
 	    for (int i=0; i<p.size(); ++i)
 	      printf("%5d  %20.10f  %20.10e  %20.10e  %20.10e\n", i, p[i], -1.0*ag[i], gb[i], h[i]);
@@ -179,14 +181,41 @@ namespace funcfit {
 	}
 
 
+	/*
+	if (report_iter){
+	  if (niter==0){
+	    printf("%s%s: Iter %4d   Func %15.8e    "
+		   "Grad %15.8e\n",
+		   cond_print.prefix_report_iter.c_str(),
+		   methodstring.c_str(), niter, fp, gmagn);
+	    printf("Par.index  Param.  Gradient  Gradient_barrier:\n");
+	    for (int i=0; i<p.size(); ++i)
+	      printf("%5d  %20.10f  %20.10e\n", i, p[i], -1.0*ag[i]);
+	  }
+	  else {
+	    printf("%s%s: Iter %4d   Func %15.8e Change %15.8e   "
+		   "Grad %15.8e    "
+		   "Step %15.8e  Radius %15.8e   %s %s\n",
+		   cond_print.prefix_report_iter.c_str(),
+		   methodstring.c_str(), niter, fp, fp-fp_old,
+		   gmagn,
+		   hmagn, rt, stepmeth.c_str(), choice.c_str());
+	    printf("Par.index  Param.  Gradient  Gradient_barrier  Step:\n");
+	    for (int i=0; i<p.size(); ++i)
+	      printf("%5d  %20.10f  %20.10e  %20.10e\n", i, p[i], -1.0*ag[i], h[i]);
+	  }
+	  func.report_on_parameters_and_data();
+	}
+	*/
 
 
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	// Check for convergence
 	// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	if ( check_conv(p, true,fp_old, true,fp, // use old and current function values
-			true,ag,                 // use gradient
-			true,h,                  // use step taken
+	if ( check_conv(p,
+			true,fp_old, true,fp, // use old and current function values
+			true,ag,              // use gradient
+			true,h,               // use step taken
 			niter,
 			counters_niter,
 			cond_conv, cond_debug, cond_print,
@@ -194,26 +223,85 @@ namespace funcfit {
 	  return func.all_parameters(p);
 	}
 
+	if (rt < rt_min){
+	  if (report_warn)
+	    cout << cond_print.prefix_report_warn
+		      << methodstring << ": "
+		      << "Trust region radius " << rt << " "
+		      << "has shrunk below smallest allowed value " << rt_min
+		      << endl;
+	  status.trustradius_too_small = true;
+	  return func.all_parameters(p);
+	}
+
+
+	// Should we restart?
+	if (niterrestart > 0 && niter % niterrestart == 0){
+	  rt = rt_ini;
+	}
 
 
 
 	fp_old = fp;
 
-	// *************************************************************************
-	// Solve ((J^T J) + mu I) h = - J^T f for direction h.
-	// *************************************************************************
-	A = JTJ;
-	for (int i=0; i!=n; ++i)
-	  A.elem(i,i) = JTJ.elem(i,i) + mu;
 	
-	if ( A.solve( ag, h, A_inv) == 1 ){
+	tmp1  = ag * ag;
+	tmpv1 = J * ag;
+	tmp2 = tmpv1 * tmpv1;
+	alpha = tmp1 / tmp2;
+
+
+	// *************************************************************************
+	// Gauss-Newton direction
+	// *************************************************************************
+
+	JTJ = J.transpose() * J;
+	if ( JTJ.solve( ag, h_gn, JTJ_inv) == 1 ){
 	  status.singular_matrix = true;
 	  status.fit_OK = false;
 	  return func.all_parameters(p);
 	}
 
 
-	hmagn = h.magn();
+	// af = -1.0 * f;
+	// J.solve( af, h_gn, JTJ_inv);
+
+
+ 	// *************************************************************************
+	// Steepest descent direction
+	// *************************************************************************
+	h_sd = alpha * ag;
+
+
+	// *************************************************************************
+	// Dog-leg step calculation
+	// *************************************************************************
+	if (h_gn.magn() < rt){
+	  h = h_gn;
+	  stepmeth = "GN";
+	}
+	else if (h_sd.magn() >= rt){
+	  h = rt * (h_sd / h_sd.magn());
+	  stepmeth = "SD";
+	}
+	else {
+	  a = h_sd;
+	  b = h_gn;
+	  c = a * (b-a);
+	  ba_sq = (b-a)*(b-a);
+	  a_sq = a*a;
+	  tmp1 = rt*rt - a_sq;
+	  tmp2 = sqrt(c*c + ba_sq * tmp1);
+	  if (c <= 0){
+	    beta = (-c + tmp2)/ba_sq;
+	  }
+	  else {
+	    beta = tmp1 / (c + tmp2);
+	  }
+	  h = h_sd + beta * (h_gn - h_sd);
+	  stepmeth = "DL";
+	}
+
 
 
 
@@ -222,6 +310,8 @@ namespace funcfit {
 	// Trial step
 
 	while (true){
+	  int nerr=0;
+
 
 	  try {
 	    // ------------------------------------------------------------------
@@ -234,7 +324,7 @@ namespace funcfit {
 			    << "Too large step " << h.magn() << ". Halving and retrying." << endl;
 		h = 0.5 * h;
 		
-		if (niter > cond_conv.nitermin && fp_is_small(h.magn())){
+		if (fp_is_small(h.magn())){
 		  status.small_step = true;
 		  if (report_error)
 		    cout << cond_print.prefix_report_error
@@ -247,11 +337,6 @@ namespace funcfit {
 	      break;
 	    }
 
-
-	    if (debug)
-	      cout << prefix_report_debug
-		   << methodstring << ": "
-		   << "Getting trial auxiliary data for merit function gradient ... " << endl;
 	    f_trial = func.f(p_trial);
 	    // ------------------------------------------------------------------
 	  }
@@ -268,15 +353,10 @@ namespace funcfit {
 	  break;
 	}
 
-	if (debug)
+	if (debug) 
 	  cout << prefix_report_debug
 		    << methodstring << ": "
-		    << "Getting trial auxiliary data for merit function gradient ... " << endl;
-	J_trial = func.J(p_trial);
-	if (debug)
-	  cout << prefix_report_debug
-		    << methodstring << ": "
-		    << "Getting trial merit function value ... " << endl;
+		    << "Getting merit function value ... " << endl;
 	fp_trial = func.value();//0.5 * f_trial * f_trial;
 
 	// *************************************************************************
@@ -284,38 +364,53 @@ namespace funcfit {
 
 
 
-	gain = (fp - fp_trial) / (0.5 * h * (mu * h + ag));
+
+	tmp1 = fp - fp_trial;
+	if (stepmeth=="GN")
+	  tmp2 = fp;
+	else if (stepmeth=="SD")
+	  tmp2 = rt * (2.0*h_sd*h_sd - rt)/(2.0*alpha);
+	else
+	  tmp2 = 0.5 * alpha * (1-beta)*(1-beta)*ag*ag
+	    + beta * (2-beta) * fp;
+	
+	gain = tmp1 / tmp2;
+
 
 	if (gain > 0){
-	  // Go to trial point
+	  // Accept step
 	  p = p_trial;
 	  f = f_trial;
-	  J = J_trial;
+	  fp = fp_trial;
 	  func.set_point(p);
+
 	  if (debug) 
 	    cout << prefix_report_debug
 		      << methodstring << ": "
-		      << "Getting merit function gradient ... " << endl;
+		      << "Getting auxiliary data for merit function gradient ... " << endl;	  
+	  J = func.J(p);
+	  if (debug)
+	    cout << prefix_report_debug
+		      << methodstring << ": "
+		      << "Getting function gradient ... " << endl;
 	  ag = -1.0 * func.gradient();//-1.0 * J.transpose() * f;
 	  gmagn = ag.magn();
-	  if (debug) 
-	    cout << prefix_report_debug
-		      << methodstring << ": "
-		      << "Getting merit function value ... " << endl;
-	  fp = fp_trial;
-	  //fp = func.value();//0.5 * f * f;
-	  JTJ = J.transpose() * J;
 	  
-	  mu = mu * max( 1.0/3.0, 1.0 - (2*gain-1)*(2*gain-1)*(2*gain-1));
-	  nu = 2;
 	  choice = "step accepted";
 	}
 	else {
 	  func.set_point(p);
-	  mu = mu * nu;
-	  nu = 2 * nu;
 	  choice = "step failed";
-	}
+	}	
+	
+	if (gain > 0.75)
+	  rt = max(rt, 3.0 * h.magn());
+	else if (gain < 0.25)
+	  rt = 0.5 * rt;
+
+	hmagn = h.magn();
+
+
 
 
 
@@ -327,6 +422,7 @@ namespace funcfit {
       // ###################################################################
       // ###################################################################
       // ###################################################################
+
 
 
       return func.all_parameters(p);

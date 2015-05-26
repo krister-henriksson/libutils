@@ -104,6 +104,7 @@ namespace funcfit {
 
       Counters_niter counters_niter = Counters_niter();
 
+      int niterrestart = cond_conv.niterrestart;
 
       /*
       std::cout << "func.value(p) = " << func.value(p) << std::endl;

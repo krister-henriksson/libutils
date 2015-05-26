@@ -153,6 +153,8 @@ namespace funcfit {
 
       Counters_niter counters_niter = Counters_niter();
 
+      int niterrestart = cond_conv.niterrestart;
+
       double fxglobmin, fxglobmax;
       double fxglobmin_old, fxglobmax_old;
 

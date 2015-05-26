@@ -87,6 +87,7 @@ namespace funcfit {
 
     int nitermin;
     int nitermax;
+    int niterrestart;
     int nitermax_samefuncval;
 
     bool   report_conv; // report convergence type?
@@ -109,6 +110,7 @@ namespace funcfit {
 
       nitermin = 3;
       nitermax = 200;
+      niterrestart = -50;
       nitermax_samefuncval = 10;
 
       report_conv = false;

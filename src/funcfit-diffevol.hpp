@@ -202,6 +202,8 @@ namespace funcfit {
 
       Counters_niter counters_niter = Counters_niter();
 
+      int niterrestart = cond_conv.niterrestart;
+
       Vector<double> diff(D, 0);
       Vector< Vector<double> > x(NP, Vector<double>(D,0));
       Vector< Vector<double> > x_new(NP, Vector<double>(D,0));

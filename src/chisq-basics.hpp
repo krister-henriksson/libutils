@@ -851,7 +851,7 @@ void ChiSqFunc<S,T,U> ::finalize_setup(){
     aborterror("Neither uncertainties nor weights are in use! Please fill any or both vectors.");
   }
 
-  // Suppose uncertainty is set. Check for negative values. If such values found,
+  // 1. Suppose uncertainty is set. Check for negative values. If such values found,
   // then there must be a weight vector of the same size, and with certain properties.
   if (mDataUncertaintyY.size() == mDataY.size()){
     int neg=0;
@@ -883,7 +883,7 @@ void ChiSqFunc<S,T,U> ::finalize_setup(){
   }
 
 
-  // Suppose weight is set. Check for negative values. If such values found,
+  // 2. Suppose weight is set. Check for negative values. If such values found,
   // then there must be an uncertainty vector of the same size, and with certain properties.
   if (mDataWeightY.size() == mDataY.size()){
     int neg=0;
@@ -915,14 +915,11 @@ void ChiSqFunc<S,T,U> ::finalize_setup(){
   }
 
 
-
-
-
-  // Normalize weights:
+  // 3. Normalize weights:
   double tmp=0.0;
   for (int i=0; i<mDataWeightY.size(); ++i)
-    if (mDataWeightY[i]>0) tmp += double(mDataWeightY[i])*double(mDataWeightY[i]);
-  tmp = 1.0/sqrt(tmp);
+    if (mDataWeightY[i]>0) tmp += double(mDataWeightY[i]);
+  tmp = 1.0/tmp;
   for (int i=0; i<mDataWeightY.size(); ++i)
     if (mDataWeightY[i]>0) mDataWeightY[i] = U(tmp * double(mDataWeightY[i]));
 
@@ -950,7 +947,7 @@ void ChiSqFunc<S,T,U> ::finalize_setup(){
 
 
   // Set scales of constraints
-  // do it on the fly, saves save memory
+  // do it on the fly, saves memory
 
 }
 
@@ -1068,14 +1065,16 @@ double ChiSqFunc<S,T,U> ::value(void){
 
   for (int i=0; i<mf.size(); ++i)
     chisq += mf[i] * mf[i];
+  chisq *= 0.5;
+
 
   double eps = std::numeric_limits<double>::epsilon();
   double tbs = mbarrier_scale;
   if (tbs < 0.0) tbs *= -1.0; 
   if (tbs < eps)
-    return 0.5*chisq;
+    return chisq;
   else
-    return 0.5*chisq + value_barrier();
+    return chisq + value_barrier();
 }
 
 

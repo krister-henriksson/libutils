@@ -106,11 +106,9 @@ namespace utils {
   } ;
 
 
-
+  // -----------------------------------
   // Nonmembers:
-
-
-
+  // -----------------------------------
 
   // Handle a + b:
   template <typename T>
@@ -124,23 +122,23 @@ namespace utils {
   template <typename T>
   T operator*(const Vector<T> & a, const Vector<T> & b);
 
-  // Handle a * b, b being nontype:
-  template <typename S, typename T>
-  Vector<T> operator*(const Vector<T> & a, const S & b);
 
-  // Handle a * b, a being nontype:
+  // Handle a * B, B being nontype:
   template <typename S, typename T>
-  Vector<T> operator*(const S & a, const Vector<T> & b);
+  Vector<T> operator*(const Vector<T> & a, const S & B);
 
-  // Handle a / b, b being nontype:
+  // Handle A * b, A being nontype:
   template <typename S, typename T>
-  Vector<T> operator/(const Vector<T> & a, const S & b);
+  Vector<T> operator*(const S & A, const Vector<T> & b);
+
+  // Handle a / B, B being nontype:
+  template <typename S, typename T>
+  Vector<T> operator/(const Vector<T> & a, const S & B);
+
 
   // Handle printing of Vector<T> objects:
   template <typename T, typename U>
   U & operator << (U & os, const Vector<T> & sv);
-
-
 
 
   // Handle a * b, scalar product:
@@ -638,6 +636,11 @@ utils::Vector3<T> & utils::operator=(utils::Vector3<T> & a, const utils::Vector<
 
 
 
+
+// ------------------------------------------------------------
+// Non-members
+// ------------------------------------------------------------
+
 // Handle a + b:
 template <typename T>
 utils::Vector<T> utils::operator+(const utils::Vector<T> & a, const utils::Vector<T> & b){
@@ -676,7 +679,9 @@ T utils::operator*(const utils::Vector<T> & a, const utils::Vector<T> & b){
 }
 
 
-// Handle a * b, b being nontype:
+
+
+// Handle a * B, B being nontype:
 template <typename S, typename T>
 utils::Vector<T> utils::operator*(const utils::Vector<T> & a, const S & b){
   Vector<T> r(a.size(), 0);
@@ -684,7 +689,7 @@ utils::Vector<T> utils::operator*(const utils::Vector<T> & a, const S & b){
   return r;
 }
 
-// Handle a * b, a being nontype:
+// Handle A * b, A being nontype:
 template <typename S, typename T>
 utils::Vector<T> utils::operator*(const S & a, const utils::Vector<T> & b){
   Vector<T> r(b.size(), 0);
@@ -692,7 +697,7 @@ utils::Vector<T> utils::operator*(const S & a, const utils::Vector<T> & b){
   return r;
 }
 
-// Handle a / b, b being nontype:
+// Handle a / B, B being nontype:
 template <typename S, typename T>
 utils::Vector<T> utils::operator/(const utils::Vector<T> & a, const S & b){
   Vector<T> r(a.size(), 0);
@@ -703,7 +708,7 @@ utils::Vector<T> utils::operator/(const utils::Vector<T> & a, const S & b){
 
 
 
-
+// Handle printing of a:
 template <typename T, typename U>
 U & utils::operator << (U & os, const utils::Vector<T> & sv){
   for (int i=0; i<sv.size(); ++i){
@@ -713,10 +718,6 @@ U & utils::operator << (U & os, const utils::Vector<T> & sv){
   os << " ";
   return os;
 }
-
-
-
-
 
 
 

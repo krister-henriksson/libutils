@@ -119,6 +119,8 @@ namespace funcfit {
 
       //Counters_niter counters_niter = Counters_niter();
 
+      int niterrestart = cond_conv.niterrestart;
+
       point = func.free_parameters(point_in);
       Vector<double>        xmin  = func.map_vector_as_free_parameters(par_min);
       Vector<double>        xmax  = func.map_vector_as_free_parameters(par_max);

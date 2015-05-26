@@ -149,6 +149,8 @@ namespace funcfit {
 
       Counters_niter counters_niter = Counters_niter();
 
+      int niterrestart = cond_conv.niterrestart;
+
       Vector< Vector<double> > xindmin(NP, Vector<double>(D,0));
       Vector< Vector<double> > xindmax(NP, Vector<double>(D,0));
       Vector<double> fxindmin(NP, 0);

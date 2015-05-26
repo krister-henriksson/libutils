@@ -137,6 +137,8 @@ namespace funcfit {
 
       Counters_niter counters_niter = Counters_niter();
 
+      int niterrestart = cond_conv.niterrestart;
+
       Vector<double> p_orig;
       double fp_orig;
 
@@ -161,12 +163,11 @@ namespace funcfit {
 	cout << prefix_report_debug
 		  << methodstring << ": "
 		  << "Getting merit function gradient ... " << endl;
-      xi = func.gradient();
-      gmagn = xi.magn();
+      g = func.gradient();
+      gmagn = g.magn();
 
       for (int j=0; j!=n; ++j){
-	g[j] = -xi[j];
-	xi[j] = h[j] = g[j];
+	xi[j] = h[j] = -g[j];
 	dx[j] = 0.0;
       }
       // Step length:
@@ -229,6 +230,22 @@ namespace funcfit {
 	}
 	
 
+	// Should we restart?
+        if (niterrestart > 0 && niter % niterrestart == 0){
+	  g = func.gradient();
+	  gmagn = g.magn();
+
+	  for (int j=0; j!=n; ++j){
+	    xi[j] = h[j] = -g[j];
+	    dx[j] = 0.0;
+	  }
+	  // Step length:
+	  hmagn = dx.magn();
+	}
+
+
+
+
 	fp_old = fp;
 
 	p_orig  = p;
@@ -238,7 +255,7 @@ namespace funcfit {
 
 	
 	// *************************************************************************
-	// Minimize function aint direction xi, starting at point p
+	// Minimize function in direction xi, starting at point p
 	// - uses p, xi, funcd
 	// *************************************************************************
 	if (debug)
@@ -272,9 +289,8 @@ namespace funcfit {
 	  cout << prefix_report_debug
 		    << methodstring << ": "
 		    << "Getting merit function gradient ... " << endl;
-	xi = func.gradient(p);
+	xi = -1.0*func.gradient(p);
 	gmagn = xi.magn();
-
 
 
 
@@ -289,7 +305,7 @@ namespace funcfit {
 	else {
 	  for (int j=0; j!=n; ++j){
 	    gg += g[j]*g[j];
-	    dgg += (xi[j] + g[j]) * xi[j]; // Polak-Ribiere
+	    dgg += (-xi[j] + g[j]) * (-xi[j]); // Polak-Ribiere
 	  }
 	}
 

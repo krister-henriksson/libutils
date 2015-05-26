@@ -149,12 +149,16 @@ namespace funcfit {
       int nx = x.size();
 
       Vector<double> xch_ini(nx,0);
+      Vector<double> xch(nx,0);
+
       for (int i=0; i<nx; ++i){
 	xch_ini[i] = x[i] * simann_delta_rel;
 	if (utils::abs(xch_ini[i])<eps) xch_ini[i] = sqrt(eps);
 	if (xch_ini[i] < 0) xch_ini[i] *= -1.0;
+
+	if (xch_ini[i] > xmax[i] - xmin[i]) xch_ini[i] = xmax[i] - xmin[i];
       }
-      Vector<double> xch = xch_ini;
+      xch = xch_ini;
 
       status = Minimization_Status();
       bool debug         = cond_debug.debug_fit_level0;
@@ -163,7 +167,7 @@ namespace funcfit {
       bool report_warn    = cond_print.report_warn;
       bool report_error   = cond_print.report_error;
       Counters_niter counters_niter = Counters_niter();
-
+      int niterrestart = cond_conv.niterrestart;
       int Nr    = cond_simann.Nr;
       int NS    = cond_simann.NS;
       int NTe    = cond_simann.NTe;
@@ -308,6 +312,20 @@ namespace funcfit {
 	  return func.all_parameters(x);
 	}
 
+
+	// Should we restart?
+        if (niterrestart > 0 && niter % niterrestart == 0){
+
+	  for (int i=0; i<nx; ++i){
+	    xch_ini[i] = x[i] * simann_delta_rel;
+	    if (utils::abs(xch_ini[i])<eps) xch_ini[i] = sqrt(eps);
+	    if (xch_ini[i] < 0) xch_ini[i] *= -1.0;
+
+	    if (xch_ini[i] > xmax[i] - xmin[i]) xch_ini[i] = xmax[i] - xmin[i];
+	  }
+	  xch = xch_ini;
+
+	}
 
 
 
