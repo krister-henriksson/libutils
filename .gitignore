@@ -1,6 +1,12 @@
 
 # Ignore contents of some directories:
 obj/
+config/**
+config.**
+src/.deps/**
+Makefile
+configure
+libtool
 
 
 # Ignore stuff in current directory and recursively down:
