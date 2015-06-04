@@ -3,10 +3,11 @@
 obj/
 config/**
 config.**
-src/.deps/**
 Makefile
 configure
 libtool
+src/.deps/**
+src/Makefile
 
 
 # Ignore stuff in current directory and recursively down:
