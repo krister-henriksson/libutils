@@ -58,8 +58,8 @@ namespace utils {
   template <typename T>
   bool fp_are_equal(const T & x, const T & y, const T & tol=-1){
     T eps = std::numeric_limits<T>::epsilon();
-    T absx = (x > 0 ? x : -x);
-    T absy = (y > 0 ? y : -y);
+    T absx = (x < 0 ? -x : x);
+    T absy = (y < 0 ? -y : y);
 
     eps = (tol > 0 ? tol : eps);
 

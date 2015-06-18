@@ -66,8 +66,13 @@ public:
   Vector<string> matter;
   Vector<string> field;
   Vector< Vector3<double> > pos;
+  // constraints
+  Vector< bool >           atom_is_fixed;
+  Vector< Vector<double> > atom_freedir;
+  Vector< Vector<double> > atom_freeplane;
   
   Vector< Vector<int> > neighborcollection;
+
  
   OMP_Info omp_info;
 
@@ -165,19 +170,21 @@ public:
   // ##################################################################################
 
 
-  void get_bond_list(Vector<BondData> & bond_list,
+  void get_bond_list(BondData & bond_list,
 		     string & name1,
 		     string & name2,
-		     int & nat_with_bonds,
+		     int & nat1,
+		     int & nat2,
+		     int & nbonds,
 		     double rc12
 		     );
 
-  void get_bond_angle_list(Vector<BondAngleData> & bondangle_list,
+  void get_bond_angle_list(BondAngleData & bondangle_list,
 			   string & name1,
 			   string & name2,
 			   double rc11,
 			   double rc22,
-			   double rc12
+			   double rc1221
 			   );
 
 

@@ -31,7 +31,7 @@
 #include "atomsystem.hpp"
 #include "constants.hpp"
 #include "utils-errors.hpp"
-//#include "bond.hpp"
+#include "bond.hpp"
 
 
 using std::cout;
@@ -287,10 +287,12 @@ void AtomSystem::calc_closepacked_volume(){
 
 
 
-void AtomSystem::get_bond_list(Vector<BondData> & bond_list,
+void AtomSystem::get_bond_list(BondData & bond_list,
 			       string & name1,
 			       string & name2,
-			       int & nat_with_bonds,
+			       int & nat1,
+			       int & nat2,
+			       int & nbonds,
 			       double rc12
 			       ){
 
@@ -300,28 +302,40 @@ void AtomSystem::get_bond_list(Vector<BondData> & bond_list,
   double drsq=0,r,rcutsq;
   Vector3<double> posi(0), posj(0), dr(0);
   int i,j,ij,nat = natoms(),k;
-  BondData bond;
-
-  bond_list.resize(0);
+  bool bondOK = false;
 
   rcutsq = rc12 * rc12;
 
-  nat_with_bonds = 0;
-
+  nat1 = nat2 = nbonds = 0;
 
   for (i=0; i<nat; ++i){
-    if (matter[i] != name1 || matter[i] != name2) continue;
-
-    nat_with_bonds++;
-
     posi[0] = pos[i][0];
     posi[1] = pos[i][1];
     posi[2] = pos[i][2];
-   
+    // std::cout << neighborcollection[i] << std::endl;
+
+    if (name1==name2){
+      if (matter[i]==name1) nat1++;
+    }
+    else {
+      if (matter[i]==name1) nat1++;
+      if (matter[i]==name2) nat2++;
+    }
+
+
     for (ij=0; ij<neighborcollection[i].size(); ++ij){
       j = neighborcollection[i][ij];
-      if ( (matter[i] == name1 && matter[j] != name2) ||
-	   (matter[i] == name2 && matter[j] != name1) ) continue;
+      if (i==j) continue;
+
+      // std::cout << "pair ij " << i << " " << j << " types " << matter[i] << " " << matter[j] << std::endl;
+
+      bondOK = false;
+      if ( (matter[i]==name1 && matter[j]==name2) ||
+	   (matter[i]==name2 && matter[j]==name1) ) bondOK = true;
+      if (!bondOK) continue;
+
+
+
       /*
       bool c1 = ((matter[i] == name1) && (matter[j] == name2));
       bool c2 = ((matter[j] == name1) && (matter[i] == name2));
@@ -352,40 +366,60 @@ void AtomSystem::get_bond_list(Vector<BondData> & bond_list,
 	get_atom_distance_vec(posi, posj, dr);
 	drsq = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2];
       }
+
+      // std::cout << "pair ij " << i << " " << j << " drsq " << drsq << std::endl;
+
       if (drsq>=rcutsq) continue;
 
+      nbonds++;
+
+
       r = sqrt(drsq);
+      // std::cout << r << std::endl;
+
+      /*
+      if (name1==name2){
+	if (matter[j]==name1) nbonds11++;
+      }
+      else {
+	if      (matter[i]==name1 && matter[j]==name2) nbonds12++;
+	else if (matter[i]==name2 && matter[j]==name1) nbonds12++;
+      }
+      */
 
       bool is_present=false;
-      for (k=0; k<bond_list.size(); ++k){
-	if (fp_are_equal(bond_list[k].dist, r, 1e-3)){
-	  ++bond_list[k].nbonds;
+      for (k=0; k<bond_list.dist.size(); ++k){
+	if (fp_are_equal(bond_list.dist[k], r, 1e-3)){
+	  ++bond_list.ndist[k];
 	  is_present=true;
 	  break;
 	}
       }
       if (!is_present){
-	bond.dist   = r;
-	bond.nbonds = 1;
-	bond_list.push_back(bond);
+	bond_list.dist.push_back(r);
+	bond_list.ndist.push_back(1);
       }
     }
   }
 
   bool swapped;
-
   while (true){
     swapped = false;
-    for (k=0; k<bond_list.size()-1; ++k){
-      if (bond_list[k].dist > bond_list[k+1].dist){
-	BondData tbd = bond_list[k];
-	bond_list[k]   = bond_list[k+1];
-	bond_list[k+1] = tbd;
-	swapped = true; break;
+    for (k=0; k<bond_list.dist.size()-1; ++k){
+      if (bond_list.dist[k] > bond_list.dist[k+1]){
+	double td = bond_list.dist[k];
+	int    ti = bond_list.ndist[k];
+	bond_list.dist[k]    = bond_list.dist[k+1];
+	bond_list.ndist[k]   = bond_list.ndist[k+1];
+	bond_list.dist[k+1]  = td;
+	bond_list.ndist[k+1] = ti;
+	swapped = true;
+	break;
       }
     }
     if (!swapped) break;
   }
+
 
 
   /*
@@ -426,7 +460,7 @@ void AtomSystem::get_bond_list(Vector<BondData> & bond_list,
 
 
 
-void AtomSystem::get_bond_angle_list(Vector<BondAngleData> & bondangle_list,
+void AtomSystem::get_bond_angle_list(BondAngleData & bondangle_list,
 				     string & name1,
 				     string & name2,
 				     double rc11,
@@ -439,11 +473,9 @@ void AtomSystem::get_bond_angle_list(Vector<BondAngleData> & bondangle_list,
   BondAngleData bondangle;
   double costheta_ijk;
 
-  bondangle_list.resize(0);
+  bondangle_list = BondAngleData();
 
   for (i=0; i<nat; ++i){
-    //if (matter[i] != name1 || matter[i] != name2) continue;
-
     posi[0] = pos[i][0];
     posi[1] = pos[i][1];
     posi[2] = pos[i][2];
@@ -458,10 +490,7 @@ void AtomSystem::get_bond_angle_list(Vector<BondAngleData> & bondangle_list,
       else if (matter[i] == name2 && matter[j] == name1) rcsq = rc12*rc12;
       else if (matter[i] == name2 && matter[j] == name2) rcsq = rc22*rc22;
 
-      /*
-      if ( (matter[i] == name1 && matter[j] != name2) ||
-	   (matter[i] == name2 && matter[j] != name1) ) continue;
-      */
+
 
       posj[0] = pos[j][0];
       posj[1] = pos[j][1];
@@ -501,7 +530,6 @@ void AtomSystem::get_bond_angle_list(Vector<BondAngleData> & bondangle_list,
 	else if (matter[i] == name2 && matter[k] == name1) rcsq = rc12*rc12;
 	else if (matter[i] == name2 && matter[k] == name2) rcsq = rc22*rc22;
 
-	//if (matter[k] != name1 || matter[k] != name2) continue;
 
 	posk[0] = pos[k][0];
 	posk[1] = pos[k][1];
@@ -533,30 +561,29 @@ void AtomSystem::get_bond_angle_list(Vector<BondAngleData> & bondangle_list,
 	costheta_ijk = drij * drik / (drij.magn() * drik.magn());
 
 	it = 0;
-	if      (matter[i]==name1 && matter[j]==name1 && matter[k]==name1) it=0;
-	else if (matter[i]==name1 && matter[j]==name1 && matter[k]==name2) it=1;
-	else if (matter[i]==name1 && matter[j]==name2 && matter[k]==name1) it=2;
-	else if (matter[i]==name1 && matter[j]==name2 && matter[k]==name2) it=3;
-	else if (matter[i]==name2 && matter[j]==name1 && matter[k]==name1) it=4;
-	else if (matter[i]==name2 && matter[j]==name1 && matter[k]==name2) it=5;
-	else if (matter[i]==name2 && matter[j]==name2 && matter[k]==name1) it=6;
-	else if (matter[i]==name2 && matter[j]==name2 && matter[k]==name2) it=7;
+	if      (matter[i]==name1 && matter[j]==name1 && matter[k]==name1) it=0; // AAA
+	else if (matter[i]==name1 && matter[j]==name1 && matter[k]==name2) it=1; // AAB
+	else if (matter[i]==name1 && matter[j]==name2 && matter[k]==name1) it=2; // ABA
+	else if (matter[i]==name2 && matter[j]==name1 && matter[k]==name1) it=3; // BAA
+	else if (matter[i]==name1 && matter[j]==name2 && matter[k]==name2) it=4; // ABB
+	else if (matter[i]==name2 && matter[j]==name1 && matter[k]==name2) it=5; // BAB
+	else if (matter[i]==name2 && matter[j]==name2 && matter[k]==name1) it=6; // BBA
+	else if (matter[i]==name2 && matter[j]==name2 && matter[k]==name2) it=7; // BBB
 
 	bool is_present=false;
-	for (p=0; p<bondangle_list.size(); ++p){
-	  if (fp_are_equal(bondangle_list[p].costheta_ijk[it], costheta_ijk, 1e-3)){
-	    ++bondangle_list[p].ntheta_ijk[it];
+	for (p=0; p<bondangle_list.costheta_ijk[it].size(); ++p){
+	  if (fp_are_equal(bondangle_list.costheta_ijk[it][p], costheta_ijk, 1e-3)){
+	    ++bondangle_list.ncostheta_ijk[it][p];
 	    is_present=true;
 	    break;
 	  }
 	}
 	if (!is_present){
-	  bondangle.costheta_ijk[it] = costheta_ijk;
-	  bondangle.ntheta_ijk[it]   = 1;
-	  bondangle.typei[it] = matter[i];
-	  bondangle.typej[it] = matter[j];
-	  bondangle.typek[it] = matter[k];
-	  bondangle_list.push_back(bondangle);
+	  bondangle_list.costheta_ijk[it].push_back( costheta_ijk );
+	  bondangle_list.ncostheta_ijk[it].push_back( 1 );
+	  bondangle.typei = matter[i];
+	  bondangle.typej = matter[j];
+	  bondangle.typek = matter[k];
 	}
 
       }
@@ -570,12 +597,16 @@ void AtomSystem::get_bond_angle_list(Vector<BondAngleData> & bondangle_list,
     bool swapped;
     while (true){
       swapped = false;
-      for (k=0; k<bondangle_list.size()-1; ++k){
-	if (bondangle_list[k].ntheta_ijk[it] < bondangle_list[k+1].ntheta_ijk[it]){
-	  BondAngleData tbd = bondangle_list[k];
-	  bondangle_list[k]   = bondangle_list[k+1];
-	  bondangle_list[k+1] = tbd;
-	  swapped = true; break;
+      for (k=0; k<bondangle_list.costheta_ijk[it].size()-1; ++k){
+	if (bondangle_list.ncostheta_ijk[it][k] < bondangle_list.ncostheta_ijk[it][k+1]){
+	  double td = bondangle_list.costheta_ijk[it][k];
+	  int    ti = bondangle_list.ncostheta_ijk[it][k];
+	  bondangle_list.costheta_ijk[it][k]   = bondangle_list.costheta_ijk[it][k+1];
+	  bondangle_list.ncostheta_ijk[it][k]     = bondangle_list.ncostheta_ijk[it][k+1];
+	  bondangle_list.costheta_ijk[it][k+1] = td;
+	  bondangle_list.ncostheta_ijk[it][k+1]   = ti;
+	  swapped = true;
+	  break;
 	}
       }
       if (!swapped) break;

@@ -6,12 +6,16 @@
 
 #include <string>
 
+#include "utils-vector.hpp"
+
+using utils::Vector;
+
 
 
 class BondData {
 public:
-  double dist;
-  int nbonds;
+  Vector<double> dist;
+  Vector<int>    ndist;
 
   BondData();
 } ;
@@ -22,14 +26,17 @@ public:
 // ijk: AAA, AAB, ABA, ABB, BAA, BAB, BBA, BBB
 class BondAngleData {
 public:
-  double costheta_ijk[8];
-  int ntheta_ijk[8];
-  std::string typei[8];
-  std::string typej[8];
-  std::string typek[8];
+  Vector< Vector<double> > costheta_ijk;
+  Vector< Vector<int> >    ncostheta_ijk;
+
+  std::string typei;
+  std::string typej;
+  std::string typek;
 
   BondAngleData();
 } ;
+
+
 
 
 

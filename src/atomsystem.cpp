@@ -85,6 +85,10 @@ AtomSystem::AtomSystem()
   field.cap(100);
   pos.cap(100);
 
+  atom_is_fixed.cap(100);
+  atom_freedir.cap(100);
+  atom_freeplane.cap(100);
+
   neighborcollection.cap(100);
 
   use_def_xyz_fmt = false;
@@ -115,6 +119,10 @@ AtomSystem::AtomSystem(const AtomSystem & sys){
   pos = sys.pos;
   matter = sys.matter;
   field = sys.field;
+
+  atom_is_fixed  = sys.atom_is_fixed;
+  atom_freedir   = sys.atom_freedir;
+  atom_freeplane = sys.atom_freeplane;
 
   neighborcollection = sys.neighborcollection;
 
@@ -155,6 +163,10 @@ AtomSystem & AtomSystem::operator=(const AtomSystem & sys){
   matter = sys.matter;
   field = sys.field;
 
+  atom_is_fixed  = sys.atom_is_fixed;
+  atom_freedir   = sys.atom_freedir;
+  atom_freeplane = sys.atom_freeplane;
+
   neighborcollection = sys.neighborcollection;
 
   omp_info = sys.omp_info;
@@ -178,12 +190,18 @@ void AtomSystem::clear_all_atoms(){
   pos.cap(100);
   matter.cap(100);
   field.cap(100);
+  atom_is_fixed.cap(100);
+  atom_freedir.cap(100);
+  atom_freeplane.cap(100);
 
   type.resize(0);
   idx.resize(0);
   pos.resize(0);
   matter.resize(0);
   field.resize(0);
+  atom_is_fixed.resize(0);
+  atom_freedir.resize(0);
+  atom_freeplane.resize(0);
 
   neighborcollection.resize(0);
 }
@@ -201,7 +219,12 @@ int AtomSystem::add_atom(){
   matter.resize(nat);
   field.resize(nat);
 
+  atom_is_fixed.resize(nat);
+  atom_freedir.resize(nat);
+  atom_freeplane.resize(nat);
+
   neighborcollection.resize(nat);
+
   return nat-1;
 }
 
