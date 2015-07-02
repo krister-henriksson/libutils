@@ -162,7 +162,7 @@ am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 libutils_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libutils_la_CXXFLAGS) \
 	$(CXXFLAGS) $(libutils_la_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
@@ -421,14 +421,18 @@ utils-vecalg.hpp \
 utils-vector3.hpp \
 utils-vector.hpp
 
+ma_var = -DLEVEL1_DCACHE_LINESIZE=`getconf LEVEL1_DCACHE_LINESIZE`
 ma_inc = -I$(srcdir)
 ma_warn = -Wall -Wextra -Wstrict-aliasing
 ma_std = -ansi -pedantic -std=c++98
 ma_opt = -O3
 ma_dbg = -g
 ma_omp = -fopenmp
-libutils_la_CPPFLAGS = $(ma_inc) $(ma_warn) $(ma_std) $(ma_opt) $(ma_dbg) $(ma_omp) -fpic
-libutils_a_CPPFLAGS = $(ma_inc) $(ma_warn) $(ma_std) $(ma_opt) $(ma_dbg) $(ma_omp)
+AM_CPPFLAGS = 
+AM_CFLAGS = 
+AM_CXXFLAGS = $(ma_var) $(ma_inc) $(ma_warn) $(ma_std) $(ma_opt) $(ma_dbg) $(ma_omp)
+libutils_la_CXXFLAGS = $(AM_CXXFLAGS) -fpic
+libutils_a_CXXFLAGS = $(AM_CXXFLAGS)
 libutils_la_LDFLAGS = $(ma_omp) -rpath '$(libdir)' -lrt -lm -shared 
 libutils_a_AR = ar rcsvf
 all: all-am
@@ -599,319 +603,319 @@ include ./$(DEPDIR)/libutils_la-utils-vecalg.Plo
 #	$(AM_V_CXX_no)$(LTCXXCOMPILE) -c -o $@ $<
 
 libutils_a-atomsystem-box.o: atomsystem-box.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-box.o -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-box.Tpo -c -o libutils_a-atomsystem-box.o `test -f 'atomsystem-box.cpp' || echo '$(srcdir)/'`atomsystem-box.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-box.o -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-box.Tpo -c -o libutils_a-atomsystem-box.o `test -f 'atomsystem-box.cpp' || echo '$(srcdir)/'`atomsystem-box.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-atomsystem-box.Tpo $(DEPDIR)/libutils_a-atomsystem-box.Po
 #	$(AM_V_CXX)source='atomsystem-box.cpp' object='libutils_a-atomsystem-box.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-box.o `test -f 'atomsystem-box.cpp' || echo '$(srcdir)/'`atomsystem-box.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-box.o `test -f 'atomsystem-box.cpp' || echo '$(srcdir)/'`atomsystem-box.cpp
 
 libutils_a-atomsystem-box.obj: atomsystem-box.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-box.obj -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-box.Tpo -c -o libutils_a-atomsystem-box.obj `if test -f 'atomsystem-box.cpp'; then $(CYGPATH_W) 'atomsystem-box.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-box.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-box.obj -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-box.Tpo -c -o libutils_a-atomsystem-box.obj `if test -f 'atomsystem-box.cpp'; then $(CYGPATH_W) 'atomsystem-box.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-box.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-atomsystem-box.Tpo $(DEPDIR)/libutils_a-atomsystem-box.Po
 #	$(AM_V_CXX)source='atomsystem-box.cpp' object='libutils_a-atomsystem-box.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-box.obj `if test -f 'atomsystem-box.cpp'; then $(CYGPATH_W) 'atomsystem-box.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-box.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-box.obj `if test -f 'atomsystem-box.cpp'; then $(CYGPATH_W) 'atomsystem-box.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-box.cpp'; fi`
 
 libutils_a-atomsystem.o: atomsystem.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem.o -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem.Tpo -c -o libutils_a-atomsystem.o `test -f 'atomsystem.cpp' || echo '$(srcdir)/'`atomsystem.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem.o -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem.Tpo -c -o libutils_a-atomsystem.o `test -f 'atomsystem.cpp' || echo '$(srcdir)/'`atomsystem.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-atomsystem.Tpo $(DEPDIR)/libutils_a-atomsystem.Po
 #	$(AM_V_CXX)source='atomsystem.cpp' object='libutils_a-atomsystem.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem.o `test -f 'atomsystem.cpp' || echo '$(srcdir)/'`atomsystem.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem.o `test -f 'atomsystem.cpp' || echo '$(srcdir)/'`atomsystem.cpp
 
 libutils_a-atomsystem.obj: atomsystem.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem.obj -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem.Tpo -c -o libutils_a-atomsystem.obj `if test -f 'atomsystem.cpp'; then $(CYGPATH_W) 'atomsystem.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem.obj -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem.Tpo -c -o libutils_a-atomsystem.obj `if test -f 'atomsystem.cpp'; then $(CYGPATH_W) 'atomsystem.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-atomsystem.Tpo $(DEPDIR)/libutils_a-atomsystem.Po
 #	$(AM_V_CXX)source='atomsystem.cpp' object='libutils_a-atomsystem.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem.obj `if test -f 'atomsystem.cpp'; then $(CYGPATH_W) 'atomsystem.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem.obj `if test -f 'atomsystem.cpp'; then $(CYGPATH_W) 'atomsystem.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem.cpp'; fi`
 
 libutils_a-atomsystem-dist.o: atomsystem-dist.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-dist.o -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-dist.Tpo -c -o libutils_a-atomsystem-dist.o `test -f 'atomsystem-dist.cpp' || echo '$(srcdir)/'`atomsystem-dist.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-dist.o -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-dist.Tpo -c -o libutils_a-atomsystem-dist.o `test -f 'atomsystem-dist.cpp' || echo '$(srcdir)/'`atomsystem-dist.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-atomsystem-dist.Tpo $(DEPDIR)/libutils_a-atomsystem-dist.Po
 #	$(AM_V_CXX)source='atomsystem-dist.cpp' object='libutils_a-atomsystem-dist.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-dist.o `test -f 'atomsystem-dist.cpp' || echo '$(srcdir)/'`atomsystem-dist.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-dist.o `test -f 'atomsystem-dist.cpp' || echo '$(srcdir)/'`atomsystem-dist.cpp
 
 libutils_a-atomsystem-dist.obj: atomsystem-dist.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-dist.obj -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-dist.Tpo -c -o libutils_a-atomsystem-dist.obj `if test -f 'atomsystem-dist.cpp'; then $(CYGPATH_W) 'atomsystem-dist.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-dist.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-dist.obj -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-dist.Tpo -c -o libutils_a-atomsystem-dist.obj `if test -f 'atomsystem-dist.cpp'; then $(CYGPATH_W) 'atomsystem-dist.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-dist.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-atomsystem-dist.Tpo $(DEPDIR)/libutils_a-atomsystem-dist.Po
 #	$(AM_V_CXX)source='atomsystem-dist.cpp' object='libutils_a-atomsystem-dist.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-dist.obj `if test -f 'atomsystem-dist.cpp'; then $(CYGPATH_W) 'atomsystem-dist.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-dist.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-dist.obj `if test -f 'atomsystem-dist.cpp'; then $(CYGPATH_W) 'atomsystem-dist.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-dist.cpp'; fi`
 
 libutils_a-atomsystem-frame.o: atomsystem-frame.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-frame.o -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-frame.Tpo -c -o libutils_a-atomsystem-frame.o `test -f 'atomsystem-frame.cpp' || echo '$(srcdir)/'`atomsystem-frame.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-frame.o -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-frame.Tpo -c -o libutils_a-atomsystem-frame.o `test -f 'atomsystem-frame.cpp' || echo '$(srcdir)/'`atomsystem-frame.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-atomsystem-frame.Tpo $(DEPDIR)/libutils_a-atomsystem-frame.Po
 #	$(AM_V_CXX)source='atomsystem-frame.cpp' object='libutils_a-atomsystem-frame.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-frame.o `test -f 'atomsystem-frame.cpp' || echo '$(srcdir)/'`atomsystem-frame.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-frame.o `test -f 'atomsystem-frame.cpp' || echo '$(srcdir)/'`atomsystem-frame.cpp
 
 libutils_a-atomsystem-frame.obj: atomsystem-frame.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-frame.obj -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-frame.Tpo -c -o libutils_a-atomsystem-frame.obj `if test -f 'atomsystem-frame.cpp'; then $(CYGPATH_W) 'atomsystem-frame.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-frame.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-frame.obj -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-frame.Tpo -c -o libutils_a-atomsystem-frame.obj `if test -f 'atomsystem-frame.cpp'; then $(CYGPATH_W) 'atomsystem-frame.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-frame.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-atomsystem-frame.Tpo $(DEPDIR)/libutils_a-atomsystem-frame.Po
 #	$(AM_V_CXX)source='atomsystem-frame.cpp' object='libutils_a-atomsystem-frame.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-frame.obj `if test -f 'atomsystem-frame.cpp'; then $(CYGPATH_W) 'atomsystem-frame.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-frame.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-frame.obj `if test -f 'atomsystem-frame.cpp'; then $(CYGPATH_W) 'atomsystem-frame.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-frame.cpp'; fi`
 
 libutils_a-atomsystem-nbor.o: atomsystem-nbor.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-nbor.o -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-nbor.Tpo -c -o libutils_a-atomsystem-nbor.o `test -f 'atomsystem-nbor.cpp' || echo '$(srcdir)/'`atomsystem-nbor.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-nbor.o -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-nbor.Tpo -c -o libutils_a-atomsystem-nbor.o `test -f 'atomsystem-nbor.cpp' || echo '$(srcdir)/'`atomsystem-nbor.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-atomsystem-nbor.Tpo $(DEPDIR)/libutils_a-atomsystem-nbor.Po
 #	$(AM_V_CXX)source='atomsystem-nbor.cpp' object='libutils_a-atomsystem-nbor.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-nbor.o `test -f 'atomsystem-nbor.cpp' || echo '$(srcdir)/'`atomsystem-nbor.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-nbor.o `test -f 'atomsystem-nbor.cpp' || echo '$(srcdir)/'`atomsystem-nbor.cpp
 
 libutils_a-atomsystem-nbor.obj: atomsystem-nbor.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-nbor.obj -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-nbor.Tpo -c -o libutils_a-atomsystem-nbor.obj `if test -f 'atomsystem-nbor.cpp'; then $(CYGPATH_W) 'atomsystem-nbor.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-nbor.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-atomsystem-nbor.obj -MD -MP -MF $(DEPDIR)/libutils_a-atomsystem-nbor.Tpo -c -o libutils_a-atomsystem-nbor.obj `if test -f 'atomsystem-nbor.cpp'; then $(CYGPATH_W) 'atomsystem-nbor.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-nbor.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-atomsystem-nbor.Tpo $(DEPDIR)/libutils_a-atomsystem-nbor.Po
 #	$(AM_V_CXX)source='atomsystem-nbor.cpp' object='libutils_a-atomsystem-nbor.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-nbor.obj `if test -f 'atomsystem-nbor.cpp'; then $(CYGPATH_W) 'atomsystem-nbor.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-nbor.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-atomsystem-nbor.obj `if test -f 'atomsystem-nbor.cpp'; then $(CYGPATH_W) 'atomsystem-nbor.cpp'; else $(CYGPATH_W) '$(srcdir)/atomsystem-nbor.cpp'; fi`
 
 libutils_a-bond.o: bond.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-bond.o -MD -MP -MF $(DEPDIR)/libutils_a-bond.Tpo -c -o libutils_a-bond.o `test -f 'bond.cpp' || echo '$(srcdir)/'`bond.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-bond.o -MD -MP -MF $(DEPDIR)/libutils_a-bond.Tpo -c -o libutils_a-bond.o `test -f 'bond.cpp' || echo '$(srcdir)/'`bond.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-bond.Tpo $(DEPDIR)/libutils_a-bond.Po
 #	$(AM_V_CXX)source='bond.cpp' object='libutils_a-bond.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-bond.o `test -f 'bond.cpp' || echo '$(srcdir)/'`bond.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-bond.o `test -f 'bond.cpp' || echo '$(srcdir)/'`bond.cpp
 
 libutils_a-bond.obj: bond.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-bond.obj -MD -MP -MF $(DEPDIR)/libutils_a-bond.Tpo -c -o libutils_a-bond.obj `if test -f 'bond.cpp'; then $(CYGPATH_W) 'bond.cpp'; else $(CYGPATH_W) '$(srcdir)/bond.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-bond.obj -MD -MP -MF $(DEPDIR)/libutils_a-bond.Tpo -c -o libutils_a-bond.obj `if test -f 'bond.cpp'; then $(CYGPATH_W) 'bond.cpp'; else $(CYGPATH_W) '$(srcdir)/bond.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-bond.Tpo $(DEPDIR)/libutils_a-bond.Po
 #	$(AM_V_CXX)source='bond.cpp' object='libutils_a-bond.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-bond.obj `if test -f 'bond.cpp'; then $(CYGPATH_W) 'bond.cpp'; else $(CYGPATH_W) '$(srcdir)/bond.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-bond.obj `if test -f 'bond.cpp'; then $(CYGPATH_W) 'bond.cpp'; else $(CYGPATH_W) '$(srcdir)/bond.cpp'; fi`
 
 libutils_a-funcfit-basics.o: funcfit-basics.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-funcfit-basics.o -MD -MP -MF $(DEPDIR)/libutils_a-funcfit-basics.Tpo -c -o libutils_a-funcfit-basics.o `test -f 'funcfit-basics.cpp' || echo '$(srcdir)/'`funcfit-basics.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-funcfit-basics.o -MD -MP -MF $(DEPDIR)/libutils_a-funcfit-basics.Tpo -c -o libutils_a-funcfit-basics.o `test -f 'funcfit-basics.cpp' || echo '$(srcdir)/'`funcfit-basics.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-funcfit-basics.Tpo $(DEPDIR)/libutils_a-funcfit-basics.Po
 #	$(AM_V_CXX)source='funcfit-basics.cpp' object='libutils_a-funcfit-basics.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-funcfit-basics.o `test -f 'funcfit-basics.cpp' || echo '$(srcdir)/'`funcfit-basics.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-funcfit-basics.o `test -f 'funcfit-basics.cpp' || echo '$(srcdir)/'`funcfit-basics.cpp
 
 libutils_a-funcfit-basics.obj: funcfit-basics.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-funcfit-basics.obj -MD -MP -MF $(DEPDIR)/libutils_a-funcfit-basics.Tpo -c -o libutils_a-funcfit-basics.obj `if test -f 'funcfit-basics.cpp'; then $(CYGPATH_W) 'funcfit-basics.cpp'; else $(CYGPATH_W) '$(srcdir)/funcfit-basics.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-funcfit-basics.obj -MD -MP -MF $(DEPDIR)/libutils_a-funcfit-basics.Tpo -c -o libutils_a-funcfit-basics.obj `if test -f 'funcfit-basics.cpp'; then $(CYGPATH_W) 'funcfit-basics.cpp'; else $(CYGPATH_W) '$(srcdir)/funcfit-basics.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-funcfit-basics.Tpo $(DEPDIR)/libutils_a-funcfit-basics.Po
 #	$(AM_V_CXX)source='funcfit-basics.cpp' object='libutils_a-funcfit-basics.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-funcfit-basics.obj `if test -f 'funcfit-basics.cpp'; then $(CYGPATH_W) 'funcfit-basics.cpp'; else $(CYGPATH_W) '$(srcdir)/funcfit-basics.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-funcfit-basics.obj `if test -f 'funcfit-basics.cpp'; then $(CYGPATH_W) 'funcfit-basics.cpp'; else $(CYGPATH_W) '$(srcdir)/funcfit-basics.cpp'; fi`
 
 libutils_a-mtwister.o: mtwister.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-mtwister.o -MD -MP -MF $(DEPDIR)/libutils_a-mtwister.Tpo -c -o libutils_a-mtwister.o `test -f 'mtwister.cpp' || echo '$(srcdir)/'`mtwister.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-mtwister.o -MD -MP -MF $(DEPDIR)/libutils_a-mtwister.Tpo -c -o libutils_a-mtwister.o `test -f 'mtwister.cpp' || echo '$(srcdir)/'`mtwister.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-mtwister.Tpo $(DEPDIR)/libutils_a-mtwister.Po
 #	$(AM_V_CXX)source='mtwister.cpp' object='libutils_a-mtwister.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-mtwister.o `test -f 'mtwister.cpp' || echo '$(srcdir)/'`mtwister.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-mtwister.o `test -f 'mtwister.cpp' || echo '$(srcdir)/'`mtwister.cpp
 
 libutils_a-mtwister.obj: mtwister.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-mtwister.obj -MD -MP -MF $(DEPDIR)/libutils_a-mtwister.Tpo -c -o libutils_a-mtwister.obj `if test -f 'mtwister.cpp'; then $(CYGPATH_W) 'mtwister.cpp'; else $(CYGPATH_W) '$(srcdir)/mtwister.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-mtwister.obj -MD -MP -MF $(DEPDIR)/libutils_a-mtwister.Tpo -c -o libutils_a-mtwister.obj `if test -f 'mtwister.cpp'; then $(CYGPATH_W) 'mtwister.cpp'; else $(CYGPATH_W) '$(srcdir)/mtwister.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-mtwister.Tpo $(DEPDIR)/libutils_a-mtwister.Po
 #	$(AM_V_CXX)source='mtwister.cpp' object='libutils_a-mtwister.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-mtwister.obj `if test -f 'mtwister.cpp'; then $(CYGPATH_W) 'mtwister.cpp'; else $(CYGPATH_W) '$(srcdir)/mtwister.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-mtwister.obj `if test -f 'mtwister.cpp'; then $(CYGPATH_W) 'mtwister.cpp'; else $(CYGPATH_W) '$(srcdir)/mtwister.cpp'; fi`
 
 libutils_a-omp-basics.o: omp-basics.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-omp-basics.o -MD -MP -MF $(DEPDIR)/libutils_a-omp-basics.Tpo -c -o libutils_a-omp-basics.o `test -f 'omp-basics.cpp' || echo '$(srcdir)/'`omp-basics.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-omp-basics.o -MD -MP -MF $(DEPDIR)/libutils_a-omp-basics.Tpo -c -o libutils_a-omp-basics.o `test -f 'omp-basics.cpp' || echo '$(srcdir)/'`omp-basics.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-omp-basics.Tpo $(DEPDIR)/libutils_a-omp-basics.Po
 #	$(AM_V_CXX)source='omp-basics.cpp' object='libutils_a-omp-basics.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-omp-basics.o `test -f 'omp-basics.cpp' || echo '$(srcdir)/'`omp-basics.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-omp-basics.o `test -f 'omp-basics.cpp' || echo '$(srcdir)/'`omp-basics.cpp
 
 libutils_a-omp-basics.obj: omp-basics.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-omp-basics.obj -MD -MP -MF $(DEPDIR)/libutils_a-omp-basics.Tpo -c -o libutils_a-omp-basics.obj `if test -f 'omp-basics.cpp'; then $(CYGPATH_W) 'omp-basics.cpp'; else $(CYGPATH_W) '$(srcdir)/omp-basics.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-omp-basics.obj -MD -MP -MF $(DEPDIR)/libutils_a-omp-basics.Tpo -c -o libutils_a-omp-basics.obj `if test -f 'omp-basics.cpp'; then $(CYGPATH_W) 'omp-basics.cpp'; else $(CYGPATH_W) '$(srcdir)/omp-basics.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-omp-basics.Tpo $(DEPDIR)/libutils_a-omp-basics.Po
 #	$(AM_V_CXX)source='omp-basics.cpp' object='libutils_a-omp-basics.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-omp-basics.obj `if test -f 'omp-basics.cpp'; then $(CYGPATH_W) 'omp-basics.cpp'; else $(CYGPATH_W) '$(srcdir)/omp-basics.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-omp-basics.obj `if test -f 'omp-basics.cpp'; then $(CYGPATH_W) 'omp-basics.cpp'; else $(CYGPATH_W) '$(srcdir)/omp-basics.cpp'; fi`
 
 libutils_a-param.o: param.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-param.o -MD -MP -MF $(DEPDIR)/libutils_a-param.Tpo -c -o libutils_a-param.o `test -f 'param.cpp' || echo '$(srcdir)/'`param.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-param.o -MD -MP -MF $(DEPDIR)/libutils_a-param.Tpo -c -o libutils_a-param.o `test -f 'param.cpp' || echo '$(srcdir)/'`param.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-param.Tpo $(DEPDIR)/libutils_a-param.Po
 #	$(AM_V_CXX)source='param.cpp' object='libutils_a-param.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-param.o `test -f 'param.cpp' || echo '$(srcdir)/'`param.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-param.o `test -f 'param.cpp' || echo '$(srcdir)/'`param.cpp
 
 libutils_a-param.obj: param.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-param.obj -MD -MP -MF $(DEPDIR)/libutils_a-param.Tpo -c -o libutils_a-param.obj `if test -f 'param.cpp'; then $(CYGPATH_W) 'param.cpp'; else $(CYGPATH_W) '$(srcdir)/param.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-param.obj -MD -MP -MF $(DEPDIR)/libutils_a-param.Tpo -c -o libutils_a-param.obj `if test -f 'param.cpp'; then $(CYGPATH_W) 'param.cpp'; else $(CYGPATH_W) '$(srcdir)/param.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-param.Tpo $(DEPDIR)/libutils_a-param.Po
 #	$(AM_V_CXX)source='param.cpp' object='libutils_a-param.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-param.obj `if test -f 'param.cpp'; then $(CYGPATH_W) 'param.cpp'; else $(CYGPATH_W) '$(srcdir)/param.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-param.obj `if test -f 'param.cpp'; then $(CYGPATH_W) 'param.cpp'; else $(CYGPATH_W) '$(srcdir)/param.cpp'; fi`
 
 libutils_a-utils-errors.o: utils-errors.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-errors.o -MD -MP -MF $(DEPDIR)/libutils_a-utils-errors.Tpo -c -o libutils_a-utils-errors.o `test -f 'utils-errors.cpp' || echo '$(srcdir)/'`utils-errors.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-errors.o -MD -MP -MF $(DEPDIR)/libutils_a-utils-errors.Tpo -c -o libutils_a-utils-errors.o `test -f 'utils-errors.cpp' || echo '$(srcdir)/'`utils-errors.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-utils-errors.Tpo $(DEPDIR)/libutils_a-utils-errors.Po
 #	$(AM_V_CXX)source='utils-errors.cpp' object='libutils_a-utils-errors.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-errors.o `test -f 'utils-errors.cpp' || echo '$(srcdir)/'`utils-errors.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-errors.o `test -f 'utils-errors.cpp' || echo '$(srcdir)/'`utils-errors.cpp
 
 libutils_a-utils-errors.obj: utils-errors.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-errors.obj -MD -MP -MF $(DEPDIR)/libutils_a-utils-errors.Tpo -c -o libutils_a-utils-errors.obj `if test -f 'utils-errors.cpp'; then $(CYGPATH_W) 'utils-errors.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-errors.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-errors.obj -MD -MP -MF $(DEPDIR)/libutils_a-utils-errors.Tpo -c -o libutils_a-utils-errors.obj `if test -f 'utils-errors.cpp'; then $(CYGPATH_W) 'utils-errors.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-errors.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-utils-errors.Tpo $(DEPDIR)/libutils_a-utils-errors.Po
 #	$(AM_V_CXX)source='utils-errors.cpp' object='libutils_a-utils-errors.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-errors.obj `if test -f 'utils-errors.cpp'; then $(CYGPATH_W) 'utils-errors.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-errors.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-errors.obj `if test -f 'utils-errors.cpp'; then $(CYGPATH_W) 'utils-errors.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-errors.cpp'; fi`
 
 libutils_a-utils-rototrans.o: utils-rototrans.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-rototrans.o -MD -MP -MF $(DEPDIR)/libutils_a-utils-rototrans.Tpo -c -o libutils_a-utils-rototrans.o `test -f 'utils-rototrans.cpp' || echo '$(srcdir)/'`utils-rototrans.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-rototrans.o -MD -MP -MF $(DEPDIR)/libutils_a-utils-rototrans.Tpo -c -o libutils_a-utils-rototrans.o `test -f 'utils-rototrans.cpp' || echo '$(srcdir)/'`utils-rototrans.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-utils-rototrans.Tpo $(DEPDIR)/libutils_a-utils-rototrans.Po
 #	$(AM_V_CXX)source='utils-rototrans.cpp' object='libutils_a-utils-rototrans.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-rototrans.o `test -f 'utils-rototrans.cpp' || echo '$(srcdir)/'`utils-rototrans.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-rototrans.o `test -f 'utils-rototrans.cpp' || echo '$(srcdir)/'`utils-rototrans.cpp
 
 libutils_a-utils-rototrans.obj: utils-rototrans.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-rototrans.obj -MD -MP -MF $(DEPDIR)/libutils_a-utils-rototrans.Tpo -c -o libutils_a-utils-rototrans.obj `if test -f 'utils-rototrans.cpp'; then $(CYGPATH_W) 'utils-rototrans.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-rototrans.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-rototrans.obj -MD -MP -MF $(DEPDIR)/libutils_a-utils-rototrans.Tpo -c -o libutils_a-utils-rototrans.obj `if test -f 'utils-rototrans.cpp'; then $(CYGPATH_W) 'utils-rototrans.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-rototrans.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-utils-rototrans.Tpo $(DEPDIR)/libutils_a-utils-rototrans.Po
 #	$(AM_V_CXX)source='utils-rototrans.cpp' object='libutils_a-utils-rototrans.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-rototrans.obj `if test -f 'utils-rototrans.cpp'; then $(CYGPATH_W) 'utils-rototrans.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-rototrans.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-rototrans.obj `if test -f 'utils-rototrans.cpp'; then $(CYGPATH_W) 'utils-rototrans.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-rototrans.cpp'; fi`
 
 libutils_a-utils-streamio.o: utils-streamio.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-streamio.o -MD -MP -MF $(DEPDIR)/libutils_a-utils-streamio.Tpo -c -o libutils_a-utils-streamio.o `test -f 'utils-streamio.cpp' || echo '$(srcdir)/'`utils-streamio.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-streamio.o -MD -MP -MF $(DEPDIR)/libutils_a-utils-streamio.Tpo -c -o libutils_a-utils-streamio.o `test -f 'utils-streamio.cpp' || echo '$(srcdir)/'`utils-streamio.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-utils-streamio.Tpo $(DEPDIR)/libutils_a-utils-streamio.Po
 #	$(AM_V_CXX)source='utils-streamio.cpp' object='libutils_a-utils-streamio.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-streamio.o `test -f 'utils-streamio.cpp' || echo '$(srcdir)/'`utils-streamio.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-streamio.o `test -f 'utils-streamio.cpp' || echo '$(srcdir)/'`utils-streamio.cpp
 
 libutils_a-utils-streamio.obj: utils-streamio.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-streamio.obj -MD -MP -MF $(DEPDIR)/libutils_a-utils-streamio.Tpo -c -o libutils_a-utils-streamio.obj `if test -f 'utils-streamio.cpp'; then $(CYGPATH_W) 'utils-streamio.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-streamio.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-streamio.obj -MD -MP -MF $(DEPDIR)/libutils_a-utils-streamio.Tpo -c -o libutils_a-utils-streamio.obj `if test -f 'utils-streamio.cpp'; then $(CYGPATH_W) 'utils-streamio.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-streamio.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-utils-streamio.Tpo $(DEPDIR)/libutils_a-utils-streamio.Po
 #	$(AM_V_CXX)source='utils-streamio.cpp' object='libutils_a-utils-streamio.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-streamio.obj `if test -f 'utils-streamio.cpp'; then $(CYGPATH_W) 'utils-streamio.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-streamio.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-streamio.obj `if test -f 'utils-streamio.cpp'; then $(CYGPATH_W) 'utils-streamio.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-streamio.cpp'; fi`
 
 libutils_a-utils-string.o: utils-string.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-string.o -MD -MP -MF $(DEPDIR)/libutils_a-utils-string.Tpo -c -o libutils_a-utils-string.o `test -f 'utils-string.cpp' || echo '$(srcdir)/'`utils-string.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-string.o -MD -MP -MF $(DEPDIR)/libutils_a-utils-string.Tpo -c -o libutils_a-utils-string.o `test -f 'utils-string.cpp' || echo '$(srcdir)/'`utils-string.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-utils-string.Tpo $(DEPDIR)/libutils_a-utils-string.Po
 #	$(AM_V_CXX)source='utils-string.cpp' object='libutils_a-utils-string.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-string.o `test -f 'utils-string.cpp' || echo '$(srcdir)/'`utils-string.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-string.o `test -f 'utils-string.cpp' || echo '$(srcdir)/'`utils-string.cpp
 
 libutils_a-utils-string.obj: utils-string.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-string.obj -MD -MP -MF $(DEPDIR)/libutils_a-utils-string.Tpo -c -o libutils_a-utils-string.obj `if test -f 'utils-string.cpp'; then $(CYGPATH_W) 'utils-string.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-string.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-string.obj -MD -MP -MF $(DEPDIR)/libutils_a-utils-string.Tpo -c -o libutils_a-utils-string.obj `if test -f 'utils-string.cpp'; then $(CYGPATH_W) 'utils-string.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-string.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-utils-string.Tpo $(DEPDIR)/libutils_a-utils-string.Po
 #	$(AM_V_CXX)source='utils-string.cpp' object='libutils_a-utils-string.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-string.obj `if test -f 'utils-string.cpp'; then $(CYGPATH_W) 'utils-string.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-string.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-string.obj `if test -f 'utils-string.cpp'; then $(CYGPATH_W) 'utils-string.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-string.cpp'; fi`
 
 libutils_a-utils-vecalg.o: utils-vecalg.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-vecalg.o -MD -MP -MF $(DEPDIR)/libutils_a-utils-vecalg.Tpo -c -o libutils_a-utils-vecalg.o `test -f 'utils-vecalg.cpp' || echo '$(srcdir)/'`utils-vecalg.cpp
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-vecalg.o -MD -MP -MF $(DEPDIR)/libutils_a-utils-vecalg.Tpo -c -o libutils_a-utils-vecalg.o `test -f 'utils-vecalg.cpp' || echo '$(srcdir)/'`utils-vecalg.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-utils-vecalg.Tpo $(DEPDIR)/libutils_a-utils-vecalg.Po
 #	$(AM_V_CXX)source='utils-vecalg.cpp' object='libutils_a-utils-vecalg.o' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-vecalg.o `test -f 'utils-vecalg.cpp' || echo '$(srcdir)/'`utils-vecalg.cpp
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-vecalg.o `test -f 'utils-vecalg.cpp' || echo '$(srcdir)/'`utils-vecalg.cpp
 
 libutils_a-utils-vecalg.obj: utils-vecalg.cpp
-	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-vecalg.obj -MD -MP -MF $(DEPDIR)/libutils_a-utils-vecalg.Tpo -c -o libutils_a-utils-vecalg.obj `if test -f 'utils-vecalg.cpp'; then $(CYGPATH_W) 'utils-vecalg.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-vecalg.cpp'; fi`
+	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -MT libutils_a-utils-vecalg.obj -MD -MP -MF $(DEPDIR)/libutils_a-utils-vecalg.Tpo -c -o libutils_a-utils-vecalg.obj `if test -f 'utils-vecalg.cpp'; then $(CYGPATH_W) 'utils-vecalg.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-vecalg.cpp'; fi`
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_a-utils-vecalg.Tpo $(DEPDIR)/libutils_a-utils-vecalg.Po
 #	$(AM_V_CXX)source='utils-vecalg.cpp' object='libutils_a-utils-vecalg.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-vecalg.obj `if test -f 'utils-vecalg.cpp'; then $(CYGPATH_W) 'utils-vecalg.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-vecalg.cpp'; fi`
+#	$(AM_V_CXX_no)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_a_CXXFLAGS) $(CXXFLAGS) -c -o libutils_a-utils-vecalg.obj `if test -f 'utils-vecalg.cpp'; then $(CYGPATH_W) 'utils-vecalg.cpp'; else $(CYGPATH_W) '$(srcdir)/utils-vecalg.cpp'; fi`
 
 libutils_la-atomsystem-box.lo: atomsystem-box.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-atomsystem-box.lo -MD -MP -MF $(DEPDIR)/libutils_la-atomsystem-box.Tpo -c -o libutils_la-atomsystem-box.lo `test -f 'atomsystem-box.cpp' || echo '$(srcdir)/'`atomsystem-box.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-atomsystem-box.lo -MD -MP -MF $(DEPDIR)/libutils_la-atomsystem-box.Tpo -c -o libutils_la-atomsystem-box.lo `test -f 'atomsystem-box.cpp' || echo '$(srcdir)/'`atomsystem-box.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-atomsystem-box.Tpo $(DEPDIR)/libutils_la-atomsystem-box.Plo
 #	$(AM_V_CXX)source='atomsystem-box.cpp' object='libutils_la-atomsystem-box.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-atomsystem-box.lo `test -f 'atomsystem-box.cpp' || echo '$(srcdir)/'`atomsystem-box.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-atomsystem-box.lo `test -f 'atomsystem-box.cpp' || echo '$(srcdir)/'`atomsystem-box.cpp
 
 libutils_la-atomsystem.lo: atomsystem.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-atomsystem.lo -MD -MP -MF $(DEPDIR)/libutils_la-atomsystem.Tpo -c -o libutils_la-atomsystem.lo `test -f 'atomsystem.cpp' || echo '$(srcdir)/'`atomsystem.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-atomsystem.lo -MD -MP -MF $(DEPDIR)/libutils_la-atomsystem.Tpo -c -o libutils_la-atomsystem.lo `test -f 'atomsystem.cpp' || echo '$(srcdir)/'`atomsystem.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-atomsystem.Tpo $(DEPDIR)/libutils_la-atomsystem.Plo
 #	$(AM_V_CXX)source='atomsystem.cpp' object='libutils_la-atomsystem.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-atomsystem.lo `test -f 'atomsystem.cpp' || echo '$(srcdir)/'`atomsystem.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-atomsystem.lo `test -f 'atomsystem.cpp' || echo '$(srcdir)/'`atomsystem.cpp
 
 libutils_la-atomsystem-dist.lo: atomsystem-dist.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-atomsystem-dist.lo -MD -MP -MF $(DEPDIR)/libutils_la-atomsystem-dist.Tpo -c -o libutils_la-atomsystem-dist.lo `test -f 'atomsystem-dist.cpp' || echo '$(srcdir)/'`atomsystem-dist.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-atomsystem-dist.lo -MD -MP -MF $(DEPDIR)/libutils_la-atomsystem-dist.Tpo -c -o libutils_la-atomsystem-dist.lo `test -f 'atomsystem-dist.cpp' || echo '$(srcdir)/'`atomsystem-dist.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-atomsystem-dist.Tpo $(DEPDIR)/libutils_la-atomsystem-dist.Plo
 #	$(AM_V_CXX)source='atomsystem-dist.cpp' object='libutils_la-atomsystem-dist.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-atomsystem-dist.lo `test -f 'atomsystem-dist.cpp' || echo '$(srcdir)/'`atomsystem-dist.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-atomsystem-dist.lo `test -f 'atomsystem-dist.cpp' || echo '$(srcdir)/'`atomsystem-dist.cpp
 
 libutils_la-atomsystem-frame.lo: atomsystem-frame.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-atomsystem-frame.lo -MD -MP -MF $(DEPDIR)/libutils_la-atomsystem-frame.Tpo -c -o libutils_la-atomsystem-frame.lo `test -f 'atomsystem-frame.cpp' || echo '$(srcdir)/'`atomsystem-frame.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-atomsystem-frame.lo -MD -MP -MF $(DEPDIR)/libutils_la-atomsystem-frame.Tpo -c -o libutils_la-atomsystem-frame.lo `test -f 'atomsystem-frame.cpp' || echo '$(srcdir)/'`atomsystem-frame.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-atomsystem-frame.Tpo $(DEPDIR)/libutils_la-atomsystem-frame.Plo
 #	$(AM_V_CXX)source='atomsystem-frame.cpp' object='libutils_la-atomsystem-frame.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-atomsystem-frame.lo `test -f 'atomsystem-frame.cpp' || echo '$(srcdir)/'`atomsystem-frame.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-atomsystem-frame.lo `test -f 'atomsystem-frame.cpp' || echo '$(srcdir)/'`atomsystem-frame.cpp
 
 libutils_la-atomsystem-nbor.lo: atomsystem-nbor.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-atomsystem-nbor.lo -MD -MP -MF $(DEPDIR)/libutils_la-atomsystem-nbor.Tpo -c -o libutils_la-atomsystem-nbor.lo `test -f 'atomsystem-nbor.cpp' || echo '$(srcdir)/'`atomsystem-nbor.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-atomsystem-nbor.lo -MD -MP -MF $(DEPDIR)/libutils_la-atomsystem-nbor.Tpo -c -o libutils_la-atomsystem-nbor.lo `test -f 'atomsystem-nbor.cpp' || echo '$(srcdir)/'`atomsystem-nbor.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-atomsystem-nbor.Tpo $(DEPDIR)/libutils_la-atomsystem-nbor.Plo
 #	$(AM_V_CXX)source='atomsystem-nbor.cpp' object='libutils_la-atomsystem-nbor.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-atomsystem-nbor.lo `test -f 'atomsystem-nbor.cpp' || echo '$(srcdir)/'`atomsystem-nbor.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-atomsystem-nbor.lo `test -f 'atomsystem-nbor.cpp' || echo '$(srcdir)/'`atomsystem-nbor.cpp
 
 libutils_la-bond.lo: bond.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-bond.lo -MD -MP -MF $(DEPDIR)/libutils_la-bond.Tpo -c -o libutils_la-bond.lo `test -f 'bond.cpp' || echo '$(srcdir)/'`bond.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-bond.lo -MD -MP -MF $(DEPDIR)/libutils_la-bond.Tpo -c -o libutils_la-bond.lo `test -f 'bond.cpp' || echo '$(srcdir)/'`bond.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-bond.Tpo $(DEPDIR)/libutils_la-bond.Plo
 #	$(AM_V_CXX)source='bond.cpp' object='libutils_la-bond.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-bond.lo `test -f 'bond.cpp' || echo '$(srcdir)/'`bond.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-bond.lo `test -f 'bond.cpp' || echo '$(srcdir)/'`bond.cpp
 
 libutils_la-funcfit-basics.lo: funcfit-basics.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-funcfit-basics.lo -MD -MP -MF $(DEPDIR)/libutils_la-funcfit-basics.Tpo -c -o libutils_la-funcfit-basics.lo `test -f 'funcfit-basics.cpp' || echo '$(srcdir)/'`funcfit-basics.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-funcfit-basics.lo -MD -MP -MF $(DEPDIR)/libutils_la-funcfit-basics.Tpo -c -o libutils_la-funcfit-basics.lo `test -f 'funcfit-basics.cpp' || echo '$(srcdir)/'`funcfit-basics.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-funcfit-basics.Tpo $(DEPDIR)/libutils_la-funcfit-basics.Plo
 #	$(AM_V_CXX)source='funcfit-basics.cpp' object='libutils_la-funcfit-basics.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-funcfit-basics.lo `test -f 'funcfit-basics.cpp' || echo '$(srcdir)/'`funcfit-basics.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-funcfit-basics.lo `test -f 'funcfit-basics.cpp' || echo '$(srcdir)/'`funcfit-basics.cpp
 
 libutils_la-mtwister.lo: mtwister.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-mtwister.lo -MD -MP -MF $(DEPDIR)/libutils_la-mtwister.Tpo -c -o libutils_la-mtwister.lo `test -f 'mtwister.cpp' || echo '$(srcdir)/'`mtwister.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-mtwister.lo -MD -MP -MF $(DEPDIR)/libutils_la-mtwister.Tpo -c -o libutils_la-mtwister.lo `test -f 'mtwister.cpp' || echo '$(srcdir)/'`mtwister.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-mtwister.Tpo $(DEPDIR)/libutils_la-mtwister.Plo
 #	$(AM_V_CXX)source='mtwister.cpp' object='libutils_la-mtwister.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-mtwister.lo `test -f 'mtwister.cpp' || echo '$(srcdir)/'`mtwister.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-mtwister.lo `test -f 'mtwister.cpp' || echo '$(srcdir)/'`mtwister.cpp
 
 libutils_la-omp-basics.lo: omp-basics.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-omp-basics.lo -MD -MP -MF $(DEPDIR)/libutils_la-omp-basics.Tpo -c -o libutils_la-omp-basics.lo `test -f 'omp-basics.cpp' || echo '$(srcdir)/'`omp-basics.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-omp-basics.lo -MD -MP -MF $(DEPDIR)/libutils_la-omp-basics.Tpo -c -o libutils_la-omp-basics.lo `test -f 'omp-basics.cpp' || echo '$(srcdir)/'`omp-basics.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-omp-basics.Tpo $(DEPDIR)/libutils_la-omp-basics.Plo
 #	$(AM_V_CXX)source='omp-basics.cpp' object='libutils_la-omp-basics.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-omp-basics.lo `test -f 'omp-basics.cpp' || echo '$(srcdir)/'`omp-basics.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-omp-basics.lo `test -f 'omp-basics.cpp' || echo '$(srcdir)/'`omp-basics.cpp
 
 libutils_la-param.lo: param.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-param.lo -MD -MP -MF $(DEPDIR)/libutils_la-param.Tpo -c -o libutils_la-param.lo `test -f 'param.cpp' || echo '$(srcdir)/'`param.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-param.lo -MD -MP -MF $(DEPDIR)/libutils_la-param.Tpo -c -o libutils_la-param.lo `test -f 'param.cpp' || echo '$(srcdir)/'`param.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-param.Tpo $(DEPDIR)/libutils_la-param.Plo
 #	$(AM_V_CXX)source='param.cpp' object='libutils_la-param.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-param.lo `test -f 'param.cpp' || echo '$(srcdir)/'`param.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-param.lo `test -f 'param.cpp' || echo '$(srcdir)/'`param.cpp
 
 libutils_la-utils-errors.lo: utils-errors.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-utils-errors.lo -MD -MP -MF $(DEPDIR)/libutils_la-utils-errors.Tpo -c -o libutils_la-utils-errors.lo `test -f 'utils-errors.cpp' || echo '$(srcdir)/'`utils-errors.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-utils-errors.lo -MD -MP -MF $(DEPDIR)/libutils_la-utils-errors.Tpo -c -o libutils_la-utils-errors.lo `test -f 'utils-errors.cpp' || echo '$(srcdir)/'`utils-errors.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-utils-errors.Tpo $(DEPDIR)/libutils_la-utils-errors.Plo
 #	$(AM_V_CXX)source='utils-errors.cpp' object='libutils_la-utils-errors.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-utils-errors.lo `test -f 'utils-errors.cpp' || echo '$(srcdir)/'`utils-errors.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-utils-errors.lo `test -f 'utils-errors.cpp' || echo '$(srcdir)/'`utils-errors.cpp
 
 libutils_la-utils-rototrans.lo: utils-rototrans.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-utils-rototrans.lo -MD -MP -MF $(DEPDIR)/libutils_la-utils-rototrans.Tpo -c -o libutils_la-utils-rototrans.lo `test -f 'utils-rototrans.cpp' || echo '$(srcdir)/'`utils-rototrans.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-utils-rototrans.lo -MD -MP -MF $(DEPDIR)/libutils_la-utils-rototrans.Tpo -c -o libutils_la-utils-rototrans.lo `test -f 'utils-rototrans.cpp' || echo '$(srcdir)/'`utils-rototrans.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-utils-rototrans.Tpo $(DEPDIR)/libutils_la-utils-rototrans.Plo
 #	$(AM_V_CXX)source='utils-rototrans.cpp' object='libutils_la-utils-rototrans.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-utils-rototrans.lo `test -f 'utils-rototrans.cpp' || echo '$(srcdir)/'`utils-rototrans.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-utils-rototrans.lo `test -f 'utils-rototrans.cpp' || echo '$(srcdir)/'`utils-rototrans.cpp
 
 libutils_la-utils-streamio.lo: utils-streamio.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-utils-streamio.lo -MD -MP -MF $(DEPDIR)/libutils_la-utils-streamio.Tpo -c -o libutils_la-utils-streamio.lo `test -f 'utils-streamio.cpp' || echo '$(srcdir)/'`utils-streamio.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-utils-streamio.lo -MD -MP -MF $(DEPDIR)/libutils_la-utils-streamio.Tpo -c -o libutils_la-utils-streamio.lo `test -f 'utils-streamio.cpp' || echo '$(srcdir)/'`utils-streamio.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-utils-streamio.Tpo $(DEPDIR)/libutils_la-utils-streamio.Plo
 #	$(AM_V_CXX)source='utils-streamio.cpp' object='libutils_la-utils-streamio.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-utils-streamio.lo `test -f 'utils-streamio.cpp' || echo '$(srcdir)/'`utils-streamio.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-utils-streamio.lo `test -f 'utils-streamio.cpp' || echo '$(srcdir)/'`utils-streamio.cpp
 
 libutils_la-utils-string.lo: utils-string.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-utils-string.lo -MD -MP -MF $(DEPDIR)/libutils_la-utils-string.Tpo -c -o libutils_la-utils-string.lo `test -f 'utils-string.cpp' || echo '$(srcdir)/'`utils-string.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-utils-string.lo -MD -MP -MF $(DEPDIR)/libutils_la-utils-string.Tpo -c -o libutils_la-utils-string.lo `test -f 'utils-string.cpp' || echo '$(srcdir)/'`utils-string.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-utils-string.Tpo $(DEPDIR)/libutils_la-utils-string.Plo
 #	$(AM_V_CXX)source='utils-string.cpp' object='libutils_la-utils-string.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-utils-string.lo `test -f 'utils-string.cpp' || echo '$(srcdir)/'`utils-string.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-utils-string.lo `test -f 'utils-string.cpp' || echo '$(srcdir)/'`utils-string.cpp
 
 libutils_la-utils-vecalg.lo: utils-vecalg.cpp
-	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-utils-vecalg.lo -MD -MP -MF $(DEPDIR)/libutils_la-utils-vecalg.Tpo -c -o libutils_la-utils-vecalg.lo `test -f 'utils-vecalg.cpp' || echo '$(srcdir)/'`utils-vecalg.cpp
+	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -MT libutils_la-utils-vecalg.lo -MD -MP -MF $(DEPDIR)/libutils_la-utils-vecalg.Tpo -c -o libutils_la-utils-vecalg.lo `test -f 'utils-vecalg.cpp' || echo '$(srcdir)/'`utils-vecalg.cpp
 	$(AM_V_at)$(am__mv) $(DEPDIR)/libutils_la-utils-vecalg.Tpo $(DEPDIR)/libutils_la-utils-vecalg.Plo
 #	$(AM_V_CXX)source='utils-vecalg.cpp' object='libutils_la-utils-vecalg.lo' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
-#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libutils_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-utils-vecalg.lo `test -f 'utils-vecalg.cpp' || echo '$(srcdir)/'`utils-vecalg.cpp
+#	$(AM_V_CXX_no)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libutils_la_CXXFLAGS) $(CXXFLAGS) -c -o libutils_la-utils-vecalg.lo `test -f 'utils-vecalg.cpp' || echo '$(srcdir)/'`utils-vecalg.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1150,9 +1154,6 @@ uninstall-am: uninstall-includeHEADERS uninstall-libLIBRARIES \
 	uninstall-includeHEADERS uninstall-libLIBRARIES \
 	uninstall-libLTLIBRARIES
 
-
-# foo_LDADD if foo is a program or a shared library
-# foo_LIBADD if foo is a static library
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -3,7 +3,13 @@
 #define OMP_BASICS_HPP
 
 
+extern "C" {
 #include <omp.h>
+}
+
+
+#include <cstdlib>
+
 
 
 class OMP_Info {
@@ -23,6 +29,9 @@ public:
 
 } ;
 
+
+
+int myomp_get_chunksize(size_t sizeoftype);
 
 
 

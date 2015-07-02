@@ -275,7 +275,7 @@ hardcode_into_libs=yes
 sys_lib_search_path_spec="/home/koehenri/lib /usr/lib/gcc/x86_64-linux-gnu/4.8 /usr/lib/x86_64-linux-gnu /usr/lib /lib/x86_64-linux-gnu /lib "
 
 # Run-time system search path for libraries.
-sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/lib/x86_64-linux-gnu/libfakeroot /usr/lib/i386-linux-gnu/mesa /lib/i386-linux-gnu /usr/lib/i386-linux-gnu /lib/i686-linux-gnu /usr/lib/i686-linux-gnu /usr/local/lib /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu/mesa-egl /usr/lib/x86_64-linux-gnu/mesa /lib32 /usr/lib32 /libx32 /usr/libx32 "
+sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/lib/x86_64-linux-gnu/libfakeroot /usr/lib/i386-linux-gnu/mesa /lib/i386-linux-gnu /usr/lib/i386-linux-gnu /lib/i686-linux-gnu /usr/lib/i686-linux-gnu /usr/local/lib /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu/mesa-egl /usr/lib/x86_64-linux-gnu/mesa /usr/lib/x86_64-linux-gnu/mir/clientplatform/mesa /lib32 /usr/lib32 /libx32 /usr/libx32 "
 
 # Whether dlopen is supported.
 dlopen_support=unknown
@@ -10230,7 +10230,7 @@ file_list_spec=""
 hardcode_action=immediate
 
 # The directories searched by this compiler when creating a shared library.
-compiler_lib_search_dirs="/home/koehenri/lib/../lib /usr/lib/gcc/x86_64-linux-gnu/4.8 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib /lib/x86_64-linux-gnu /lib/../lib /usr/lib/x86_64-linux-gnu /usr/lib/../lib . /home/koehenri/lib /usr/lib/x86_64-linux-gnu . /usr/lib/gcc/x86_64-linux-gnu/4.8/../../.."
+compiler_lib_search_dirs="/home/koehenri/lib/../lib /home/koehenri/lib/../lib /home/koehenri/lib/../lib /usr/lib/gcc/x86_64-linux-gnu/4.8 /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib /lib/x86_64-linux-gnu /lib/../lib /usr/lib/x86_64-linux-gnu /usr/lib/../lib . /home/koehenri/lib /usr/lib/x86_64-linux-gnu /home/koehenri/lib /usr/lib/x86_64-linux-gnu . /home/koehenri/lib /usr/lib/x86_64-linux-gnu . /usr/lib/gcc/x86_64-linux-gnu/4.8/../../.."
 
 # Dependencies to place before and after the objects being linked to
 # create a shared library.
@@ -10241,6 +10241,6 @@ postdeps="-lstdc++ -lm -lgcc_s -lc -lgcc_s"
 
 # The library search path used internally by the compiler when linking
 # a shared library.
-compiler_lib_search_path="-L/home/koehenri/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L. -L/home/koehenri/lib -L/usr/lib/x86_64-linux-gnu -L. -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.."
+compiler_lib_search_path="-L/home/koehenri/lib/../lib -L/home/koehenri/lib/../lib -L/home/koehenri/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L. -L/home/koehenri/lib -L/usr/lib/x86_64-linux-gnu -L/home/koehenri/lib -L/usr/lib/x86_64-linux-gnu -L. -L/home/koehenri/lib -L/usr/lib/x86_64-linux-gnu -L. -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.."
 
 # ### END LIBTOOL TAG CONFIG: CXX

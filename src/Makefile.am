@@ -88,6 +88,7 @@ utils-vector3.hpp \
 utils-vector.hpp
 
 
+ma_var  = -DLEVEL1_DCACHE_LINESIZE=`getconf LEVEL1_DCACHE_LINESIZE`
 ma_inc  = -I$(srcdir)
 ma_warn = -Wall -Wextra -Wstrict-aliasing
 ma_std  = -ansi -pedantic -std=c++98
@@ -95,17 +96,15 @@ ma_opt  = -O3
 ma_dbg  = -g
 ma_omp  = -fopenmp
 
+AM_CPPFLAGS = 
+AM_CFLAGS   = 
+AM_CXXFLAGS = $(ma_var) $(ma_inc) $(ma_warn) $(ma_std) $(ma_opt) $(ma_dbg) $(ma_omp)
 
-libutils_la_CPPFLAGS = $(ma_inc) $(ma_warn) $(ma_std) $(ma_opt) $(ma_dbg) $(ma_omp) -fpic
-libutils_a_CPPFLAGS  = $(ma_inc) $(ma_warn) $(ma_std) $(ma_opt) $(ma_dbg) $(ma_omp)
+
+libutils_la_CXXFLAGS = $(AM_CXXFLAGS) -fpic
+libutils_a_CXXFLAGS  = $(AM_CXXFLAGS)
 
 libutils_la_LDFLAGS = $(ma_omp) -rpath '$(libdir)' -lrt -lm -shared 
 libutils_a_AR = ar rcsvf
-
-
-# foo_LDADD if foo is a program or a shared library
-# foo_LIBADD if foo is a static library
-
-
 
 
