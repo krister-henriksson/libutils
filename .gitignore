@@ -1,13 +1,8 @@
 
 # Ignore contents of some directories:
 obj/
-config/**
-config.**
-Makefile
-configure
-libtool
 src/.deps/**
-src/Makefile
+old/
 
 
 # Ignore stuff in current directory and recursively down:
