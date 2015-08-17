@@ -263,7 +263,7 @@ ChiSqFunc<S,T,U> :: ChiSqFunc(){
   mModelFuncPointer = 0;
   mReportFuncPointer = 0;
   mbarrier_scale = 1.0;
-  muse_scales = false;
+  muse_scales = true;
   mstatus_X   = expired;
   mstatus_MDY = expired;
   mstatus_f   = expired;
@@ -296,7 +296,7 @@ ChiSqFunc<S,T,U> :: ChiSqFunc(const S & P,
   mModelFuncPointer = 0;
   mReportFuncPointer = 0;
   mbarrier_scale = 1.0;
-  muse_scales = false;
+  muse_scales = true;
   mstatus_X   = expired;
   mstatus_MDY = expired;
   mstatus_f   = expired;

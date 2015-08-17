@@ -1,6 +1,7 @@
 
+
 # #######################################################
-# Defaults:
+# Default paths, change values if needed:
 # #######################################################
 prefix = $(HOME)
 INCDIR = $(prefix)/include/libutils
@@ -9,35 +10,30 @@ LIBDIR = $(prefix)/lib
 # #######################################################
 
 
-
-
-.PHONY: all default dynamic static clean
-
-
-# --------------------------------------------------------------------------
-# --------------------------------------------------------------------------
-# Settings:
-
+# #######################################################
+# Default settings, change values if needed:
+# #######################################################
 CC      =  g++ 
 WARN    = -Wall -Wextra -Wstrict-aliasing
 STD     = -ansi -pedantic -std=c++98 
 DEBUG   = -g 
 OPT     = -O3 -fstrict-aliasing 
 OPENMP  = -fopenmp 
-CXXFLAGS  =  -c $(WARN) $(STD) $(OPT)  $(DEBUG)
+# #######################################################
+# #######################################################
 
-INC     = -I$(INCDIR)
 
-LIB     = -L$(LIBDIR)
-LIBFILE = $(LIBDIR)/libutils
-
+CXXFLAGS = -c $(WARN) $(STD) $(OPT)  $(DEBUG)
+INC      = -I$(INCDIR)
+LIB      = -L$(LIBDIR)
+LIBFILE  = $(LIBDIR)/libutils
 LDFLAGS        =  -lrt -lm 
 LDFLAGS_STATIC =  $(LDFLAGS) -static 
 
 
-# SRC = atomsystem.cpp utils-errors.cpp param.cpp mtwister.cpp \
-#	utils-string.cpp utils-streamio.cpp funcfit-basics.cpp \
-#	omp-basics.cpp
+.PHONY: all default dynamic static clean
+
+
 # SOURCES = $(addprefix src/,$(SRC))
 
 SRC    := $(wildcard src/*.cpp)
@@ -45,14 +41,11 @@ SOURCES = $(SRC)
 OBJECTS = $(SOURCES:src/%.cpp=obj/%.o)
 DEPS = obj/make.dep
 
-
-#OBJECTS = $(subst src/,obj/,$(TMP))
-
+# OBJECTS = $(subst src/,obj/,$(TMP))
 
 TARGET_DYNAMIC = $(LIBFILE).so
 TARGET_STATIC  = $(LIBFILE).a
-
-REBUILDABLES = $(TARGET_DYNAMIC) $(TARGET_STATIC)
+REBUILDABLES   = $(TARGET_DYNAMIC) $(TARGET_STATIC)
 
 
 # --------------------------------------------------------------------------
@@ -63,20 +56,23 @@ default: dirs dynamic static
 
 
 install: default
-	@echo ""
-	@echo " *** Installing under" $(prefix)
-	@echo " *** Installing header files in "$(INCDIR)
-	@echo " *** Installing library files in "$(LIBDIR)
-	@echo ""
-	# strip -s $(LIBFILE).so
+	@echo "-----------------------------------------------------------"
+	@echo "*** Installing under           :" $(prefix)
+	@echo "*** Installing header files in :" $(INCDIR)
+	@echo "*** Installing library files in:" $(LIBDIR)
+	@echo "-----------------------------------------------------------"
+	cp src/*.hpp $(INCDIR)/
 	chmod a+rx $(LIBFILE).so
-	# strip -s $(LIBFILE).a
 	chmod a+rx $(LIBFILE).a
-	@echo ""
-	@echo ' *** If running bash, put these lines into ~/.bashrc :'
+	@echo "-----------------------------------------------------------"
+	@echo '*** If running bash, put these lines into ~/.bashrc :'
 	@echo 'export LD_LIBRARY_PATH='$(LIBDIR)':$${LD_LIBRARY_PATH}'
 	@echo 'export LD_RUN_PATH='$(LIBDIR)':$${LD_RUN_PATH}'
-	@echo ""
+	@echo "-----------------------------------------------------------"
+
+
+strip: $(LIBFILE).so $(LIBFILE).a
+	strip -g $(LIBFILE).so $(LIBFILE).a
 
 
 dynamic: $(OBJECTS)
@@ -86,12 +82,11 @@ static: $(OBJECTS)
 	ar rcsvf $(LIBFILE).a  $(OBJECTS)
 
 
+
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
 # Pattern rules:
 
-
-#$(OBJECTS): $(SOURCES)
 obj/%.o: src/%.cpp
 	$(CC) $(STD) $(WARN) $(DEBUG) $(OPT) $(INC) $(OPENMP) -c -fpic $< -o $@
 
@@ -103,12 +98,11 @@ include $(DEPS)
 
 # --------------------------------------------------------------------------
 # --------------------------------------------------------------------------
-# Phony rules:
+# Other rules:
 
 dirs:
 	-mkdir obj
 	-mkdir -p $(INCDIR)
-	cp src/*.hpp $(INCDIR)/
 	-mkdir -p $(LIBDIR)
 
 clean:
