@@ -11,6 +11,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <algorithm>
+
 #include <cstdlib>
 #include <cmath>
 
@@ -63,7 +65,9 @@ namespace utils {
 
     Vector(const int N);
     Vector(const int N, const T & p);
+
     Vector(const Vector3<T> & sv); // conversion of Vector3 to Vector
+
     Vector(const T * p, int N); // Use array e.g. x, as input.
 
     Vector(const Vector & sv);
@@ -76,6 +80,22 @@ namespace utils {
     inline const T & operator[](const int & i) const;
     void to_array(T * p);        // explicit conversion of Vector to array
     Vector3<T> to_Vector3(void); // explicit conversion of Vector to Vector3
+
+    Vector<T> * This(){ return this; }
+
+    // ---------------------------------------------
+    operator Vector3<T>(void) const {
+      Vector3<T> r;
+      if (size()<3){
+	std::cout << "Error: Cannot convert Vector to Vector3 due to too few elements. Exiting." << std::endl;
+	exit(EXIT_FAILURE);
+      }
+      r[0] = mvec[0];
+      r[1] = mvec[1];
+      r[2] = mvec[2];
+      return r;
+    }
+    // ---------------------------------------------
 
 
     inline int size() const;      // Get the number of explicitly stored elements.
@@ -110,6 +130,68 @@ namespace utils {
   // Nonmembers:
   // -----------------------------------
 
+  // Handle a * b, scalar product:
+  template <typename T>
+  T scalarproduct(const Vector<T> & a, const Vector<T> & b);
+
+  // Handle a x b, vector product:
+  template <typename T>
+  void vectorproduct(const Vector<T> & a, const Vector<T> & b, Vector<T> & c);
+
+
+
+  // UNARY OPERATORS
+
+  // Handle &a:
+  template <typename T>
+  Vector<T> * operator&(Vector<T> & a);
+  // Handle +a:
+  template <typename T>
+  Vector<T> & operator+(const Vector<T> & a);
+  // Handle -a:
+  template <typename T>
+  Vector<T> operator-(const Vector<T> & a);
+
+  // Handle ++a:
+  template <typename T>
+  Vector<T> operator++(Vector<T> & a);
+  // Handle --a:
+  template <typename T>
+  Vector<T> operator--(Vector<T> & a);
+  // Handle a++:
+  template <typename T>
+  Vector<T> operator++(Vector<T> & a, int );
+  // Handle a--:
+  template <typename T>
+  Vector<T> operator--(Vector<T> & a, int );
+
+
+  // BINARY OPERATORS
+
+  // Handle +=:
+  template <typename T>
+  Vector<T> & operator+=(Vector<T> & a, const Vector<T> & b);
+  // Handle -=:
+  template <typename T>
+  Vector<T> & operator-=(Vector<T> & a, const Vector<T> & b);
+
+  // Handle a *= B, B other type:
+  template <typename S, typename T>
+  Vector<T> & operator*=(Vector<T> & a, const S & b);
+  // Handle a /= B, B other type:
+  template <typename S, typename T>
+  Vector<T> & operator/=(Vector<T> & a, const S & b);
+
+  // Handle a < b:
+  template <typename T>
+  bool operator<(const Vector<T> & a, const Vector<T> & b);
+  // Handle a > b:
+  template <typename T>
+  bool operator>(const Vector<T> & a, const Vector<T> & b);
+  // Handle a == b:
+  template <typename T>
+  bool operator==(const Vector<T> & a, const Vector<T> & b);
+
   // Handle a + b:
   template <typename T>
   Vector<T> operator+(const Vector<T> & a, const Vector<T> & b);
@@ -121,7 +203,6 @@ namespace utils {
   // Handle a * b:
   template <typename T>
   T operator*(const Vector<T> & a, const Vector<T> & b);
-
 
   // Handle a * B, B being nontype:
   template <typename S, typename T>
@@ -135,19 +216,11 @@ namespace utils {
   template <typename S, typename T>
   Vector<T> operator/(const Vector<T> & a, const S & B);
 
-
   // Handle printing of Vector<T> objects:
   template <typename T, typename U>
   U & operator << (U & os, const Vector<T> & sv);
 
 
-  // Handle a * b, scalar product:
-  template <typename T>
-  T scalarproduct(const Vector<T> & a, const Vector<T> & b);
-
-  // Handle a x b, vector product:
-  template <typename T>
-  void vectorproduct(const Vector<T> & a, const Vector<T> & b, Vector<T> & c);
 
   
 }
@@ -233,6 +306,7 @@ utils::Vector<T>::Vector(const Vector3<T> & sv){
 
 
 
+
 template <typename T>
 utils::Vector<T>::Vector(const T * p, int N){
   mN = N < 0 ? -N : N;
@@ -262,6 +336,41 @@ double utils::Vector<T>::reserve_fraction() const {
   return mresfrac;
 }
 
+
+
+// Get the number of explicitly stored elements.
+template <typename T>
+int utils::Vector<T>::size() const {
+  return mN;
+}
+
+
+
+// Change the number of visible elements:
+template <typename T>
+void utils::Vector<T>::resize(const int N){
+  if (N==0){
+    cap(0);
+    mN = 0;
+  }
+  else {
+    if (mNcap>=N){
+      mN = N;
+    }
+    else {
+      cap(N + mresfrac * N);
+      mN = N; // NOTE!!!
+    }
+  }
+}
+
+
+template <typename T>
+void utils::Vector<T>::trim(){
+  cap(mN);
+}
+
+
 template <typename T>
 int utils::Vector<T>::cap() const {
   return mNcap;
@@ -272,6 +381,7 @@ int utils::Vector<T>::cap() const {
 template <typename T>
 void utils::Vector<T>::cap(int N){
   if (N<0) return;
+
 
   if (N==0){
     //cout << "requsted cap is 0" << endl;
@@ -290,14 +400,20 @@ void utils::Vector<T>::cap(int N){
   if (N > mNcap){
     //cout << "[req. more] cap is " << mNcap << " requested cap is " << N << endl;
 
+
+    
+
     if (mNcap == 0){
       //cout << "[req. more] allocing new vector with size " << N << endl;
       mNcap = N;
       mvec = new T [mNcap] ();
+
+      //std::cout << "resizing array from zero cap to " << N << std::endl;
     }
     else {
 
-
+      //std::cout << "resizing array from " << mNcap << " to " << N << std::endl;
+      /*
       T *bak = new T [N] ();
       for (int i=0; i<mN; ++i) bak[i] = mvec[i];
       delete [] mvec;
@@ -305,19 +421,32 @@ void utils::Vector<T>::cap(int N){
       mvec = new T [N] ();
       for (int i=0; i<mN; ++i) mvec[i] = bak[i];
       delete [] bak;
-      
+      */
+
+
+      T *bak = new T [N] ();
+      //for (int i=0; i<mN; ++i) bak[i] = mvec[i];
+      std::copy(mvec, mvec+mN, bak);
+      delete [] mvec;
+      mvec = bak;
+
+
       mNcap = N;
     }
 
     return;
   }
-  
 
+
+
+  
+#if 0
   if (N < mNcap){
-    // shrink vector
+    // shrink vector  NO!!! Use trim() for this.
       
     if (mN >= N) mN = N;
-      
+
+    /*          
     T *bak = new T [N] ();
     for (int i=0; i<mN; ++i) bak[i] = mvec[i];
     delete [] mvec;
@@ -325,11 +454,23 @@ void utils::Vector<T>::cap(int N){
     mvec = new T [N] ();
     for (int i=0; i<mN; ++i) mvec[i] = bak[i];
     delete [] bak;
+    */
+
+
+    T *bak = new T [N] ();
+    std::copy(mvec, mvec+mN, bak);
+    //for (int i=0; i<mN; ++i) bak[i] = mvec[i];
+    delete [] mvec;
+    mvec = bak;
+
+
 
     mNcap = N;
       
     return;
   }
+#endif
+
 }
 
 
@@ -522,33 +663,6 @@ utils::Vector3<T> utils::Vector<T>::to_Vector3(void){
 
 
 
-// Get the number of explicitly stored elements.
-template <typename T>
-int utils::Vector<T>::size() const {
-  return mN;
-}
-
-
-
-// Change the number of visible elements:
-template <typename T>
-void utils::Vector<T>::resize(const int N){
-  if (N==0){
-    cap(0);
-    mN = 0;
-  }
-  else {
-    cap(N + mresfrac * N);
-    mN = N;
-  }
-}
-
-
-template <typename T>
-void utils::Vector<T>::trim(){
-  cap(mN);
-}
-
 
 
 
@@ -618,20 +732,16 @@ T * utils::Vector<T>::end() const {
 
 #if 0
 // Handle Vector3 a = Vector b:
-
 template <typename T>
 utils::Vector3<T> & utils::operator=(utils::Vector3<T> & a, const utils::Vector<T> & b){
   if (b.size()>=3){
     a[0]=b[0];
     a[1]=b[1];
     a[2]=b[2];
-  }
-  else {
+  } else {
     cout << "Error: In assignment Vector3 a = Vector b the size of b is less than 3." << endl;
     exit(EXIT_FAILURE);
-  }
-  return a;
-}
+  } return a; }
 #endif
 
 
@@ -640,85 +750,6 @@ utils::Vector3<T> & utils::operator=(utils::Vector3<T> & a, const utils::Vector<
 // ------------------------------------------------------------
 // Non-members
 // ------------------------------------------------------------
-
-// Handle a + b:
-template <typename T>
-utils::Vector<T> utils::operator+(const utils::Vector<T> & a, const utils::Vector<T> & b){
-  if (a.size()!=b.size()){
-    std::cout << "Cannot add vectors of different sizes. Exiting." << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  Vector<T> r(a.size(), 0);
-  for (int i=0; i<a.size(); ++i) r[i] = a[i] + b[i];
-  return r;
-}
-
-// Handle a - b:
-template <typename T>
-utils::Vector<T> utils::operator-(const utils::Vector<T> & a, const utils::Vector<T> & b){
-  if (a.size()!=b.size()){
-    std::cout << "Cannot subtract vectors of different sizes. Exiting." << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  Vector<T> r(a.size(), 0);
-  for (int i=0; i<a.size(); ++i) r[i] = a[i] - b[i];
-  return r;
-}
-
-
-// Handle a * b:
-template <typename T>
-T utils::operator*(const utils::Vector<T> & a, const utils::Vector<T> & b){
-  if (a.size()!=b.size()){
-    std::cout << "Cannot multiply vectors of different sizes. Exiting." << std::endl;
-    exit(EXIT_FAILURE);
-  }
-  T tmp=0;
-  for (int i=0; i<a.size(); ++i) tmp += a[i] * b[i];
-  return tmp;
-}
-
-
-
-
-// Handle a * B, B being nontype:
-template <typename S, typename T>
-utils::Vector<T> utils::operator*(const utils::Vector<T> & a, const S & b){
-  Vector<T> r(a.size(), 0);
-  for (int i=0; i<a.size(); ++i) r[i] = a[i] * T(b);
-  return r;
-}
-
-// Handle A * b, A being nontype:
-template <typename S, typename T>
-utils::Vector<T> utils::operator*(const S & a, const utils::Vector<T> & b){
-  Vector<T> r(b.size(), 0);
-  for (int i=0; i<b.size(); ++i) r[i] = T(a) * b[i];
-  return r;
-}
-
-// Handle a / B, B being nontype:
-template <typename S, typename T>
-utils::Vector<T> utils::operator/(const utils::Vector<T> & a, const S & b){
-  Vector<T> r(a.size(), 0);
-  for (int i=0; i<a.size(); ++i) r[i] = a[i] / T(b);
-  return r;
-}
-
-
-
-
-// Handle printing of a:
-template <typename T, typename U>
-U & utils::operator << (U & os, const utils::Vector<T> & sv){
-  for (int i=0; i<sv.size(); ++i){
-    os << " " << sv[i];
-    os.clear();
-  }
-  os << " ";
-  return os;
-}
-
 
 
 // Handle a * b, scalar product:
@@ -746,6 +777,198 @@ void utils::vectorproduct(const utils::Vector<T> & a,
   c[0] = a[1] * b[2] - a[2] * b[1];
   c[1] = a[2] * b[0] - a[0] * b[2];
 }
+
+
+
+// UNARY OPERATORS
+
+
+// Handle &a:
+template <typename T>
+utils::Vector<T> * utils::operator&(utils::Vector<T> & a){
+  return a.This();
+}
+// Handle +a:
+template <typename T>
+utils::Vector<T> & utils::operator+(const utils::Vector<T> & a){
+  return a;
+}
+// Handle -a:
+template <typename T>
+utils::Vector<T> utils::operator-(const utils::Vector<T> & a){
+  Vector<T> r(a.size(), 0);
+  for (int i=0; i<a.size(); ++i) r[i] = - a[i];
+  return r;
+}
+// Handle ++a:
+template <typename T>
+utils::Vector<T> utils::operator++(utils::Vector<T> & a){
+  Vector<T> r(a.size(), 0);
+  for (int i=0; i<a.size(); ++i) r[i] = ++(a[i]);
+  return r;
+}
+// Handle --a:
+template <typename T>
+utils::Vector<T> utils::operator--(utils::Vector<T> & a){
+  Vector<T> r(a.size(), 0);
+  for (int i=0; i<a.size(); ++i) r[i] = --(a[i]);
+  return r;
+}
+// Handle a++:
+template <typename T>
+utils::Vector<T> utils::operator++(utils::Vector<T> & a, int ){
+  Vector<T> r(a.size(), 0);
+  for (int i=0; i<a.size(); ++i) r[i] = (a[i])++;
+  return r;
+}
+// Handle a--:
+template <typename T>
+utils::Vector<T> utils::operator--(utils::Vector<T> & a, int ){
+  Vector<T> r(a.size(), 0);
+  for (int i=0; i<a.size(); ++i) r[i] = (a[i])--;
+  return r;
+}
+
+
+// BINARY OPERATORS
+
+// Handle a += b:
+template <typename T>
+utils::Vector<T> & utils::operator+=(utils::Vector<T> & a, const utils::Vector<T> & b){
+  if (a.size()!=b.size()){
+    std::cout << "Cannot perform 'a += b' since a, b are of different sizes. Exiting." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  for (int i=0; i<a.size(); ++i) a[i] += b[i];
+  return a;
+}
+// Handle a -= b:
+template <typename T>
+utils::Vector<T> & utils::operator-=(utils::Vector<T> & a, const utils::Vector<T> & b){
+  if (a.size()!=b.size()){
+    std::cout << "Cannot perform 'a -= b' since a, b are of different sizes. Exiting." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  for (int i=0; i<a.size(); ++i) a[i] -= b[i];
+  return a;
+}
+// Handle a *= B, B other type:
+template <typename S, typename T>
+utils::Vector<T> & utils::operator*=(utils::Vector<T> & a, const S & b){
+  T tmp = T(b);
+  for (int i=0; i<a.size(); ++i) a[i] *= tmp;
+  return a;
+}
+// Handle a /= B, B other type:
+template <typename S, typename T>
+utils::Vector<T> & utils::operator/=(utils::Vector<T> & a, const S & b){
+  T tmp = T(1)/T(b);
+  for (int i=0; i<a.size(); ++i) a[i] *= tmp;
+  return a;
+}
+// Handle a < b:
+template <typename T>
+bool utils::operator<(const utils::Vector<T> & a, const utils::Vector<T> & b){
+  if (a.size()!=b.size()){
+    std::cout << "Cannot evaluate 'a < b' since a, b are of different sizes. Exiting." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  int n=0;
+  for (int i=0; i<a.size(); ++i){ if (a[i] < b[i]) n++; }
+  if (n==a.size()) return true;
+  else return false;
+}
+// Handle a > b:
+template <typename T>
+bool utils::operator>(const utils::Vector<T> & a, const utils::Vector<T> & b){
+  return operator<(b,a);
+}
+// Handle a == b:
+template <typename T>
+bool utils::operator==(const utils::Vector<T> & a, const utils::Vector<T> & b){
+  if (a.size()!=b.size()){
+    std::cout << "Cannot evaluate 'a == b' since a, b are of different sizes. Exiting." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  int n=0;
+  for (int i=0; i<a.size(); ++i){ if (a[i] == b[i]) n++; }
+  if (n==a.size()) return true;
+  else return false;
+}
+
+// Handle a + b:
+template <typename T>
+utils::Vector<T> utils::operator+(const utils::Vector<T> & a, const utils::Vector<T> & b){
+  if (a.size()!=b.size()){
+    std::cout << "Cannot add vectors of different sizes. Exiting." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  Vector<T> r(a.size(), 0);
+  for (int i=0; i<a.size(); ++i) r[i] = a[i] + b[i];
+  return r;
+}
+
+// Handle a - b:
+template <typename T>
+utils::Vector<T> utils::operator-(const utils::Vector<T> & a, const utils::Vector<T> & b){
+  if (a.size()!=b.size()){
+    std::cout << "Cannot subtract vectors of different sizes. Exiting." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  Vector<T> r(a.size(), 0);
+  for (int i=0; i<a.size(); ++i) r[i] = a[i] - b[i];
+  return r;
+}
+
+// Handle a * b:
+template <typename T>
+T utils::operator*(const utils::Vector<T> & a, const utils::Vector<T> & b){
+  if (a.size()!=b.size()){
+    std::cout << "Cannot multiply vectors of different sizes. Exiting." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  T tmp=0;
+  for (int i=0; i<a.size(); ++i) tmp += a[i] * b[i];
+  return tmp;
+}
+
+// Handle a * B, B being nontype:
+template <typename S, typename T>
+utils::Vector<T> utils::operator*(const utils::Vector<T> & a, const S & b){
+  Vector<T> r(a.size(), 0);
+  for (int i=0; i<a.size(); ++i) r[i] = a[i] * T(b);
+  return r;
+}
+
+// Handle A * b, A being nontype:
+template <typename S, typename T>
+utils::Vector<T> utils::operator*(const S & a, const utils::Vector<T> & b){
+  Vector<T> r(b.size(), 0);
+  for (int i=0; i<b.size(); ++i) r[i] = T(a) * b[i];
+  return r;
+}
+
+// Handle a / B, B being nontype:
+template <typename S, typename T>
+utils::Vector<T> utils::operator/(const utils::Vector<T> & a, const S & b){
+  Vector<T> r(a.size(), 0);
+  for (int i=0; i<a.size(); ++i) r[i] = a[i] / T(b);
+  return r;
+}
+
+// Handle printing of a:
+template <typename T, typename U>
+U & utils::operator << (U & os, const utils::Vector<T> & sv){
+  for (int i=0; i<sv.size(); ++i){
+    os << " " << sv[i];
+    os.clear();
+  }
+  os << " ";
+  return os;
+}
+
+
+
 
 
 

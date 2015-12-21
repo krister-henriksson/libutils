@@ -40,6 +40,9 @@ using utils::MatrixSq3;
 class AtomSystem
 //  : public CoordSys
 {
+private:
+  int nat;
+
 public:
 
   // System-related properties:
@@ -93,6 +96,10 @@ public:
 
   // Enables sys.clear_all_atoms() before adding any atoms.
   void clear_all_atoms();
+
+  void init_atoms(int n);
+  void finalize_atoms();
+
   // Insert atom info:
   int add_atom(); // returns vector index of atom, use to update position etc.
 

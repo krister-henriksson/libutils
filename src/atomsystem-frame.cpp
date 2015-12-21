@@ -182,9 +182,16 @@ void AtomSystem::getframe(ifstream & fin,
   this->clear_all_atoms();
 
 
+  //std::cout << "MFCA: Made it here 03" << std::endl;
 
+  int ic=0;
   while (true){
+    //std::cout << ".";
 
+    // if ( (ic % 1000) == 0) std::cout << " " << ic << std::endl;
+
+
+    //std::cout << "MFCA: Made it here 04 a" << std::endl;
     // Get line from file:
     get_line( fin, line );
     // Error condition means one of two things:
@@ -193,6 +200,7 @@ void AtomSystem::getframe(ifstream & fin,
     // The following function for extracting substrings will return 0
     // for case (2), and nonzero otherwise.
 
+    //std::cout << "MFCA: Made it here 04 b" << std::endl;
     // Get words on line:
     ns = get_substrings(line, args, "\t ");
 
@@ -200,10 +208,16 @@ void AtomSystem::getframe(ifstream & fin,
     // cout << "Word " << i << " is: " << args[i] << endl;
     // }
 
+    //std::cout << "MFCA: Made it here 04 c" << std::endl;
+
     if (ns==1){
       sstream.str(args[0]);
       sstream >> tnatoms;
       sstream.clear();
+
+      //std::cout << "read " << tnatoms << " to be allocated for" << std::endl;
+
+      init_atoms( tnatoms );
 
       // Next call will help avoid unncessary reallocations, don't need to guess
       // appropriate chunk size to optimize memory calls.
@@ -267,7 +281,10 @@ void AtomSystem::getframe(ifstream & fin,
 	tfield += " " + string(args[i]);
       }
 
+      //std::cout << "adding atom" << std::endl;
       iat = add_atom();
+      //std::cout << "iat = " << iat << std::endl;
+
       //cout << "made it here gf 00, tmatter = " << tmatter << endl;
       matter[iat] = tmatter;
       //cout << "made it here gf 00b" << endl;
@@ -298,17 +315,19 @@ void AtomSystem::getframe(ifstream & fin,
 	last_frame_line = true;
 	//matoms.chunksize(0);
 	//matoms.trim();
+	finalize_atoms();
       }
 
-    }
 
+    }
 
 
     // ###########################################################
     // NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE 
     // ###########################################################
 
-
+    ic++;
+    
     
     if (! fin){ // tried to read beyond end of file
       fin.setstate(ios::failbit);

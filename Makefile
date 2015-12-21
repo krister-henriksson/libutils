@@ -15,7 +15,7 @@ LIBDIR = $(prefix)/lib
 # #######################################################
 CC      =  g++ 
 WARN    = -Wall -Wextra -Wstrict-aliasing
-STD     = -ansi -pedantic -std=c++98 
+STD     = -ansi -pedantic -std=c++98 -pg
 DEBUG   = -g 
 OPT     = -O3 -fstrict-aliasing 
 OPENMP  = -fopenmp 
@@ -26,7 +26,8 @@ OPENMP  = -fopenmp
 CXXFLAGS = -c $(WARN) $(STD) $(OPT)  $(DEBUG)
 INC      = -I$(INCDIR)
 LIB      = -L$(LIBDIR)
-LIBFILE  = $(LIBDIR)/libutils
+#LIBFILE  = $(LIBDIR)/libutils
+LIBFILE  = libutils
 LDFLAGS        =  -lrt -lm 
 LDFLAGS_STATIC =  $(LDFLAGS) -static 
 
@@ -64,6 +65,7 @@ install: default
 	cp src/*.hpp $(INCDIR)/
 	chmod a+rx $(LIBFILE).so
 	chmod a+rx $(LIBFILE).a
+	cp  $(LIBFILE).so $(LIBFILE).a  $(LIBDIR)/
 	@echo "-----------------------------------------------------------"
 	@echo '*** If running bash, put these lines into ~/.bashrc :'
 	@echo 'export LD_LIBRARY_PATH='$(LIBDIR)':$${LD_LIBRARY_PATH}'
@@ -73,6 +75,7 @@ install: default
 
 strip: $(LIBFILE).so $(LIBFILE).a
 	strip -g $(LIBFILE).so $(LIBFILE).a
+	cp  $(LIBFILE).so $(LIBFILE).a  $(LIBDIR)/
 
 
 dynamic: $(OBJECTS)
@@ -106,7 +109,7 @@ dirs:
 	-mkdir -p $(LIBDIR)
 
 clean:
-	-rm -f obj/*.o $(REBUILDABLES) $(DEPS)
+	-rm -f obj/*.o $(REBUILDABLES) $(DEPS) $(LIBFILE).so $(LIBFILE).a
 
 
 

@@ -202,7 +202,7 @@ namespace funcfit {
 	      if (x[i][j] - eps2r < xmin[j]) x[i][j] = xmin[j] + eps2r;
 	      if (x[i][j] + eps2r > xmax[j]) x[i][j] = xmax[j] - eps2r;
 
-	      v[i][j] = 0.5*(xmax[j]-xmin[j]) * (2 * mtwister.unif() - 1);
+	      v[i][j] = 0.5*(xmax[j]-xmin[j]) * (2 * mtwister.unif() - 1) / 10.0;
 	    }
 	    fx[i] = func(x[i]);
 	  }

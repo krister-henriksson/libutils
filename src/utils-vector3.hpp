@@ -25,17 +25,10 @@
 using std::cout;
 using std::endl;
 
+
+
+
 namespace utils {
-
-
-
-
-
-  /* #########################################################################
-     Declaration of vec<T> template class:
-     #########################################################################
-  */
-
 
   template <typename T>
   class Vector3 {
@@ -64,6 +57,9 @@ namespace utils {
     inline const T & operator[](const int & i) const;
     void to_array(T * p);        // explicit conversion of Vector3 to array
 
+
+    Vector3<T> * This(){ return this; }
+
     // Vector3 operations:
     T normalize();
     T    magn() const;
@@ -79,6 +75,67 @@ namespace utils {
 
 
   // Nonmembers:
+
+  // Handle a * b, scalar product:
+  template <typename T>
+  T scalarproduct(const Vector3<T> & a, const Vector3<T> & b);
+
+  // Handle a x b, vector product:
+  template <typename T>
+  void vectorproduct(const Vector3<T> & a, const Vector3<T> & b, Vector3<T> & c);
+
+
+  // UNARY OPERATORS
+
+  // Handle &a:
+  template <typename T>
+  Vector3<T> * operator&(Vector3<T> & a);
+  // Handle +a:
+  template <typename T>
+  Vector3<T> & operator+(const Vector3<T> & a);
+  // Handle -a:
+  template <typename T>
+  Vector3<T> operator-(const Vector3<T> & a);
+
+  // Handle ++a:
+  template <typename T>
+  Vector3<T> operator++(Vector3<T> & a);
+  // Handle --a:
+  template <typename T>
+  Vector3<T> operator--(Vector3<T> & a);
+  // Handle a++:
+  template <typename T>
+  Vector3<T> operator++(Vector3<T> & a, int );
+  // Handle a--:
+  template <typename T>
+  Vector3<T> operator--(Vector3<T> & a, int );
+
+
+  // BINARY OPERATORS
+
+  // Handle +=:
+  template <typename T>
+  Vector3<T> & operator+=(Vector3<T> & a, const Vector3<T> & b);
+  // Handle -=:
+  template <typename T>
+  Vector3<T> & operator-=(Vector3<T> & a, const Vector3<T> & b);
+
+  // Handle a *= B, B other type:
+  template <typename S, typename T>
+  Vector3<T> & operator*=(Vector3<T> & a, const S & b);
+  // Handle a /= B, B other type:
+  template <typename S, typename T>
+  Vector3<T> & operator/=(Vector3<T> & a, const S & b);
+
+  // Handle a < b:
+  template <typename T>
+  bool operator<(const Vector3<T> & a, const Vector3<T> & b);
+  // Handle a > b:
+  template <typename T>
+  bool operator>(const Vector3<T> & a, const Vector3<T> & b);
+  // Handle a == b:
+  template <typename T>
+  bool operator==(const Vector3<T> & a, const Vector3<T> & b);
 
   // Handle a + b:
   template <typename T>
@@ -108,13 +165,6 @@ namespace utils {
   template <typename T, typename U>
   U & operator << (U & os, const Vector3<T> & sv);
 
-  // Handle a * b, scalar product:
-  template <typename T>
-  T scalarproduct(const Vector3<T> & a, const Vector3<T> & b);
-
-  // Handle a x b, vector product:
-  template <typename T>
-  void vectorproduct(const Vector3<T> & a, const Vector3<T> & b, Vector3<T> & c);
   
 }
 
@@ -303,6 +353,152 @@ T * utils::Vector3<T>::end() const {
 
 
 
+// Non-members
+
+
+// Handle a * b, scalar product:
+template <typename T>
+T utils::scalarproduct(const utils::Vector3<T> & a, const utils::Vector3<T> & b){
+  return utils::operator*(a, b);
+}
+
+
+// Handle a x b, vector product:
+template <typename T>
+void utils::vectorproduct(const utils::Vector3<T> & a,
+			  const utils::Vector3<T> & b,
+			  utils::Vector3<T> & c){
+  c[2] = a[0] * b[1] - a[1] * b[0];
+  c[0] = a[1] * b[2] - a[2] * b[1];
+  c[1] = a[2] * b[0] - a[0] * b[2];
+}
+
+
+
+// UNARY OPERATORS
+
+// Handle &a:
+template <typename T>
+utils::Vector3<T> * utils::operator&(utils::Vector3<T> & a){
+  return a.This();
+}
+// Handle +a:
+template <typename T>
+utils::Vector3<T> & utils::operator+(const utils::Vector3<T> & a){
+  return a;
+}
+// Handle -a:
+template <typename T>
+utils::Vector3<T> utils::operator-(const utils::Vector3<T> & a){
+  Vector3<T> r;
+  r[0] = - a[0];
+  r[1] = - a[1];
+  r[2] = - a[2];
+  return r;
+}
+// Handle ++a:
+template <typename T>
+utils::Vector3<T> utils::operator++(utils::Vector3<T> & a){
+  Vector3<T> r;
+  r[0] = ++a[0];
+  r[1] = ++a[1];
+  r[2] = ++a[2];
+  return r;
+}
+// Handle --a:
+template <typename T>
+utils::Vector3<T> utils::operator--(utils::Vector3<T> & a){
+  Vector3<T> r;
+  r[0] = --a[0];
+  r[1] = --a[1];
+  r[2] = --a[2];
+  return r;
+}
+// Handle a++:
+template <typename T>
+utils::Vector3<T> utils::operator++(utils::Vector3<T> & a, int ){
+  Vector3<T> r;
+  r[0] = a[0]++;
+  r[1] = a[1]++;
+  r[2] = a[2]++;
+  return r;
+}
+// Handle a--:
+template <typename T>
+utils::Vector3<T> utils::operator--(utils::Vector3<T> & a, int ){
+  Vector3<T> r;
+  r[0] = a[0]--;
+  r[1] = a[1]--;
+  r[2] = a[2]--;
+  return r;
+}
+
+
+// BINARY OPERATORS
+
+// Handle a += b:
+template <typename T>
+utils::Vector3<T> & utils::operator+=(utils::Vector3<T> & a, const utils::Vector3<T> & b){
+  a[0] += b[0];
+  a[1] += b[1];
+  a[2] += b[2];
+  return a;
+}
+// Handle a -= b:
+template <typename T>
+utils::Vector3<T> & utils::operator-=(utils::Vector3<T> & a, const utils::Vector3<T> & b){
+  a[0] -= b[0];
+  a[1] -= b[1];
+  a[2] -= b[2];
+  return a;
+}
+// Handle a *= B, B other type:
+template <typename S, typename T>
+utils::Vector3<T> & utils::operator*=(utils::Vector3<T> & a, const S & b){
+  T tmp = T(b);
+  a[0] *= tmp;
+  a[1] *= tmp;
+  a[2] *= tmp;
+  return a;
+}
+// Handle a /= B, B other type:
+template <typename S, typename T>
+utils::Vector3<T> & utils::operator/=(utils::Vector3<T> & a, const S & b){
+  T tmp = T(1)/T(b);
+  a[0] *= tmp;
+  a[1] *= tmp;
+  a[2] *= tmp;
+  return a;
+}
+
+
+// Handle a < b:
+template <typename T>
+bool utils::operator<(const utils::Vector3<T> & a, const utils::Vector3<T> & b){
+  int n=0;
+  if (a[0] < b[0]) n++;
+  if (a[1] < b[1]) n++;
+  if (a[2] < b[2]) n++;
+  if (n==3) return true;
+  else return false;
+}
+// Handle a > b:
+template <typename T>
+bool utils::operator>(const utils::Vector3<T> & a, const utils::Vector3<T> & b){
+  return operator<(b,a);
+}
+// Handle a == b:
+template <typename T>
+bool utils::operator==(const utils::Vector3<T> & a, const utils::Vector3<T> & b){
+  int n=0;
+  if (a[0] == b[0]) n++;
+  if (a[1] == b[1]) n++;
+  if (a[2] == b[2]) n++;
+  if (n==3) return true;
+  else return false;
+}
+
+
 // Handle a + b:
 template <typename T>
 utils::Vector3<T> utils::operator+(const utils::Vector3<T> & a, const utils::Vector3<T> & b){
@@ -362,9 +558,6 @@ utils::Vector3<T> utils::operator/(const utils::Vector3<T> & a, const S & b){
 }
 
 
-
-
-
 template <typename T, typename U>
 U & utils::operator << (U & os, const utils::Vector3<T> & sv){
   os << " " << sv[0]
@@ -375,30 +568,6 @@ U & utils::operator << (U & os, const utils::Vector3<T> & sv){
   return os;
 }
 
-
-
-
-
-
-
-// Handle a * b, scalar product:
-template <typename T>
-T utils::scalarproduct(const utils::Vector3<T> & a, const utils::Vector3<T> & b){
-  return utils::operator*(a, b);
-}
-
-
-
-
-// Handle a x b, vector product:
-template <typename T>
-void utils::vectorproduct(const utils::Vector3<T> & a,
-			  const utils::Vector3<T> & b,
-			  utils::Vector3<T> & c){
-  c[2] = a[0] * b[1] - a[1] * b[0];
-  c[0] = a[1] * b[2] - a[2] * b[1];
-  c[1] = a[2] * b[0] - a[0] * b[2];
-}
 
 
 
