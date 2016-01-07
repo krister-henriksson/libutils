@@ -114,8 +114,14 @@ void AtomSystem::get_boxdir(const int idir,
 }
 
 
+/* ###################################################################################
+   ###################################################################################
 
-// Normalize the box direction vectors and build the Bravais matrix and its inverse:
+  Normalize the box direction vectors and build the Bravais matrix and its inverse:
+
+  ###################################################################################
+  ###################################################################################
+*/
 void AtomSystem::update_box_geometry(){
   Vector3<double> tmpv(0);
 
@@ -207,6 +213,9 @@ void AtomSystem::update_box_geometry(){
   cout << mBravaismatrix_inv << endl;
   */
 }
+
+
+
 
 
 
