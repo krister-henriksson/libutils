@@ -83,6 +83,7 @@ AtomSystem::AtomSystem()
 
   sitetype.cap(0);
   type.cap(0);
+  itype.cap(0);
   idx.cap(0);
   matter.cap(0);
   field.cap(0);
@@ -117,6 +118,7 @@ AtomSystem::AtomSystem(const AtomSystem & sys){
 
   sitetype = sys.sitetype;
   type = sys.type;
+  itype = sys.itype;
   idx = sys.idx;
   pos = sys.pos;
   matter = sys.matter;
@@ -161,6 +163,7 @@ AtomSystem & AtomSystem::operator=(const AtomSystem & sys){
 
   sitetype = sys.sitetype;
   type = sys.type;
+  itype = sys.itype;
   idx = sys.idx;
   pos = sys.pos;
   matter = sys.matter;
@@ -190,6 +193,7 @@ void AtomSystem::clear_all_atoms(){
   nat=0;
   sitetype.resize(0);
   type.resize(0);
+  itype.resize(0);
   idx.resize(0);
   pos.resize(0);
   matter.resize(0);
@@ -205,6 +209,7 @@ void AtomSystem::clear_all_atoms(){
 void AtomSystem::init_atoms(int n){
   sitetype.reserve_fraction(0.0);
   type.reserve_fraction(0.0);
+  itype.reserve_fraction(0.0);
   idx.reserve_fraction(0.0);
   pos.reserve_fraction(0.0);
   matter.reserve_fraction(0.0);
@@ -216,6 +221,7 @@ void AtomSystem::init_atoms(int n){
 
   sitetype.cap(n);
   type.cap(n);
+  itype.cap(n);
   idx.cap(n);
   pos.cap(n);
   matter.cap(n);
@@ -229,6 +235,7 @@ void AtomSystem::init_atoms(int n){
 void AtomSystem::finalize_atoms(){
   sitetype.trim();
   type.trim();
+  itype.trim();
   idx.trim();
   pos.trim();
   matter.trim();
@@ -247,6 +254,7 @@ int AtomSystem::add_atom(){
 
   sitetype.resize(nat);
   type.resize(nat);
+  itype.resize(nat);
   idx.resize(nat);
   pos.resize(nat);
   matter.resize(nat);

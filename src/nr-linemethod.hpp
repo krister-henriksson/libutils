@@ -92,7 +92,13 @@ namespace nr {
       xi = dir_io;
       n = p.size();
     
+
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       xi.normalize();
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
 
       F1dim<T> f1dim(p, xi, func);
       Golden< F1dim<T> > golden(f1dim);
@@ -151,6 +157,10 @@ namespace nr {
 
 
       double ax=0.0, xx=1.0;
+
+
+      //xx = 1.0;
+
       /*
       if (ax<smin) ax=smin;
       if (xx>smax) xx=smax;
@@ -176,27 +186,11 @@ namespace nr {
 	break;
       }
       // *********************************************************************
-      if (fp_is_small(xx)){
-	status.small_step = true;
-	// Cleanup before returning:
-	for (int j=0; j!=n; ++j){
-	  xi[j] *= sxmin; // actual vectorial step moved
-	  p[j] += xi[j];
-	}
-	point_io = p;
-	dir_io = xi;
-	fmin = golden.fmin;
-	status.funcmin = golden.fmin;
-	return fmin;
-      }
-      // *********************************************************************
-
-
 
       if (debug)
 	cout << "Line minimization: xmin = " << sxmin << endl;
 
-      // Cleanup before returning:
+
       for (int j=0; j!=n; ++j){
 	xi[j] *= sxmin; // actual vectorial step moved
 	p[j] += xi[j];
@@ -204,8 +198,21 @@ namespace nr {
       point_io = p;
       dir_io = xi;
 
+
+      double hxi = xi.magn();
+      if (fp_is_small(hxi)){
+	status.small_step = true;
+	fmin = golden.fmin;
+	status.funcmin = golden.fmin;
+	return fmin;
+      }
+      // *********************************************************************
+
       return fmin;
+
+
     }
+
   } ;
 
 

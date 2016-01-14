@@ -220,7 +220,7 @@ namespace nr {
 	niter++;
 	if (debug)
 	  std::cout << "golden: bracket: Iteration " << niter << ": "
-		    << "ax bx cx "  << ax << " " << bx << " " << cx << " "
+ 		    << "ax bx cx "  << ax << " " << bx << " " << cx << " "
 		    << "fa fb fc " << fa << " " << fb << " " << fc
 		    << std::endl;
 

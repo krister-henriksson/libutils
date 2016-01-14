@@ -292,6 +292,7 @@ void AtomSystem::getframe(ifstream & fin,
 
       sitetype[iat] = iat;
       type[iat] = ttype;
+      itype[iat] = ttype;
       idx[iat] = tidx;
       //cout << "made it here gf 01" << endl;
       if (tfield.size()>0) field[iat] = tfield;

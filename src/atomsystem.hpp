@@ -64,7 +64,8 @@ public:
 
   // Atom-related properties:
   Vector<int> sitetype;
-  Vector<int> type;
+  Vector<int> type;  // external (arbitrary) type, e.g. specified by user
+  Vector<int> itype; // internal type, e.g. index of element in array of element names
   Vector<int> idx;
   Vector<string> matter;
   Vector<string> field;
@@ -113,9 +114,9 @@ public:
   // Set box direction vectors and length of box in the specified direction. The vectors
   // are normalized inside the method.
   void set_boxdir(const int idir,
-	      const double & px,
-	      const double & py,
-	      const double & pz);
+		  const double & px,
+		  const double & py,
+		  const double & pz);
   void set_boxdir(const int idir, Vector3<double> & p);
   // Get box direction vectors:
   void get_boxdir(const int idir, Vector3<double> & v) const;

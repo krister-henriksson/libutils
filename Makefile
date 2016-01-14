@@ -94,6 +94,7 @@ obj/%.o: src/%.cpp
 	$(CC) $(STD) $(WARN) $(DEBUG) $(OPT) $(INC) $(OPENMP) -c -fpic $< -o $@
 
 $(DEPS): $(SOURCES)
+	- mkdir obj
 	$(CC) -MM $(INC) $(SOURCES) | sed 's/\(.*\.o\)/obj\/\1/g' > $(DEPS)
 
 include $(DEPS)
@@ -104,7 +105,6 @@ include $(DEPS)
 # Other rules:
 
 dirs:
-	-mkdir obj
 	-mkdir -p $(INCDIR)
 	-mkdir -p $(LIBDIR)
 

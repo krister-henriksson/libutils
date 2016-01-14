@@ -38,6 +38,8 @@ namespace utils {
     Matrix3();
     ~Matrix3();
 
+
+    Matrix3(const int N1, const int N2, const int N3);
     Matrix3(const int N1, const int N2, const int N3, const T & p);
 
     Matrix3(const Matrix3<T> & sv);
@@ -131,6 +133,16 @@ utils::Matrix3<T>::~Matrix3(){
 // Alternative constructors:
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+template <typename T>
+utils::Matrix3<T>::Matrix3(const int N1, const int N2, const int N3){
+  mn1 = N1;
+  mn2 = N2;
+  mn3 = N3;
+  int nelem = N1 * N2 * N3;
+  mmat3 = new T [nelem] ();
+  for (int i=0; i!=nelem; ++i) mmat3[i]=T(0);
+}
+  
 template <typename T>
 utils::Matrix3<T>::Matrix3(const int N1, const int N2, const int N3, const T & p){
   mn1 = N1;
