@@ -308,7 +308,9 @@ void utils::Matrix3<T>::reshape(const int N1, const int N2, const int N3){
     // Copy elements in original matrix into the new one, in the serial order they
     // occur (row, column) in the oiginal matrix.
     if (mn1*mn2*mn3 != N1*N2*N3){
-      std::cout << "Matrix reshaping: Different number of elements in original matrix and requested new matrix. Exiting." << std::endl;
+      std::cout << "Matrix reshaping: Different number of elements in original matrix and requested new matrix. "
+		<< mn1 << " " << mn2 << " " << mn3 << " versus "
+		<< N1  << " " << N2  << " " << N3 << ". Exiting." << std::endl;
       exit(EXIT_FAILURE);
     }
 
@@ -377,15 +379,15 @@ int utils::Matrix3<T>::size() const {
 template <typename T>
 T & utils::Matrix3<T>::elem(const int & i, const int & j, const int & k) {
   if (i<0 || i>=mn1){
-    std::cout << "First index " << i << " is out of range. Exiting." << std::endl;
+    std::cout << "First index " << i << " is out of range " << mn1-1 << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   if (j<0 || j>=mn2){
-    std::cout << "Second index " << j << " is out of range. Exiting." << std::endl;
+    std::cout << "Second index " << j << " is out of range " << mn2-1 << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   if (k<0 || k>=mn3){
-    std::cout << "Third index " << k << " is out of range. Exiting." << std::endl;
+    std::cout << "Third index " << k << " is out of range " << mn3-1 << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -395,15 +397,15 @@ T & utils::Matrix3<T>::elem(const int & i, const int & j, const int & k) {
 template <typename T>
 const T & utils::Matrix3<T>::elem(const int & i, const int & j, const int & k) const {
   if (i<0 || i>=mn1){
-    std::cout << "First index " << i << " is out of range. Exiting." << std::endl;
+    std::cout << "First index " << i << " is out of range " << mn1-1 << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   if (j<0 || j>=mn2){
-    std::cout << "Second index " << j << " is out of range. Exiting." << std::endl;
+    std::cout << "Second index " << j << " is out of range " << mn2-1 << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   if (k<0 || k>=mn3){
-    std::cout << "Third index " << k << " is out of range. Exiting." << std::endl;
+    std::cout << "Third index " << k << " is out of range " << mn3-1 << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -466,7 +468,9 @@ utils::Matrix3<T> utils::operator+(const utils::Matrix3<T> & a, const utils::Mat
   if (! ( a.n1()==b.n1() &&
 	  a.n2()==b.n2() &&
 	  a.n3()==b.n3() ) ){
-    std::cout << "Cannot add matrices of different shape. Exiting." << std::endl;
+    std::cout << "Cannot add matrices of different shape: "
+	      << a.n1() << " " << a.n2() << " " << a.n3() << " versus "
+	      << b.n1() << " " << b.n2() << " " << b.n3() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   int N1 = a.n1();
@@ -488,7 +492,9 @@ utils::Matrix3<T> utils::operator-(const utils::Matrix3<T> & a, const utils::Mat
   if (! ( a.n1()==b.n1() &&
 	  a.n2()==b.n2() &&
 	  a.n3()==b.n3() ) ){
-    std::cout << "Cannot subtract matrices of different shape. Exiting." << std::endl;
+    std::cout << "Cannot subtract matrices of different shape: "
+	      << a.n1() << " " << a.n2() << " " << a.n3() << " versus "
+	      << b.n1() << " " << b.n2() << " " << b.n3() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   int N1 = a.n1();

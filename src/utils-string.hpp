@@ -32,7 +32,7 @@ namespace utils {
   bool bool_in_string(string arg);
 
 
-
+  bool get_boolean_choice(std::string ts);
   
 
   template <typename T>

@@ -332,7 +332,9 @@ void utils::Matrix<T>::reshape(const int Nr, const int Nc){
     // Copy elements in original matrix into the new one, in the serial order they
     // occur (row, column) in the oiginal matrix.
     if (mnrows*mncols != Nr*Nc){
-      std::cout << "Different number of elements in original matrix and requested new matrix. Exiting." << std::endl;
+      std::cout << "Different number of elements in original matrix and requested new matrix: "
+		<< mnrows << " " << mncols << " versus "
+		<< Nr << " " << Nc << ". Exiting." << std::endl;
       exit(EXIT_FAILURE);
     }
 
@@ -392,31 +394,29 @@ int utils::Matrix<T>::size() const {
 
 template <typename T>
 T & utils::Matrix<T>::elem(const int & i, const int & j) {
-  /*
+
   if (i<0 || i>=mnrows){
-    std::cout << "First index " << i << " is out of range. Exiting." << std::endl;
+    std::cout << "First index " << i << " is out of range " << mnrows-1 << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   if (j<0 || j>=mncols){
-    std::cout << "Second index " << j << " is out of range. Exiting." << std::endl;
+    std::cout << "Second index " << j << " is out of range " << mncols-1 << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
-  */
+
   return mmat[mncols*i+j];
 }
 
 template <typename T>
 const T & utils::Matrix<T>::elem(const int & i, const int & j) const {
-  /*
   if (i<0 || i>=mnrows){
-    std::cout << "First index " << i << " is out of range. Exiting." << std::endl;
+    std::cout << "First index " << i << " is out of range " << mnrows-1 << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   if (j<0 || j>=mncols){
-    std::cout << "Second index " << j << " is out of range. Exiting." << std::endl;
+    std::cout << "Second index " << j << " is out of range " << mncols-1 << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
-  */
   return mmat[mncols*i+j];
 }
 
@@ -460,7 +460,8 @@ void utils::Matrix<T>::row(const int & irow, const Vector<T> & v){
       exit(EXIT_FAILURE);
     }
     if (Nc!=mncols){
-      std::cout << "Cannot set a row which is of different length than the supplied vector. Exiting." << std::endl;
+      std::cout << "Cannot set a row of length " << mncols
+		<< " since length of the supplied vector is " << Nc << ". Exiting." << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -489,7 +490,8 @@ void utils::Matrix<T>::col(const int & icol, const Vector<T> & v){
       exit(EXIT_FAILURE);
     }
     if (Nr!=mnrows){
-      std::cout << "Cannot set a column which is of different length than the supplied vector. Exiting." << std::endl;
+      std::cout << "Cannot set a column of length " << mnrows
+		<< " since length of the supplied vector is " << Nr << ". Exiting." << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -503,12 +505,16 @@ void utils::Matrix<T>::col(const int & icol, const Vector<T> & v){
 // Get a row:
 template <typename T>
 Vector<T> utils::Matrix<T>::row(const int & irow) const {
-  /*
   if (mnrows==0 || mncols==0){
     std::cout << "Cannot get a row from an unallocated matrix. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
-  */
+  if (irow >= mnrows){
+    std::cout << "Specified row " << irow << " is outside matrix, whose last row is " << mnrows-1
+	      << ". Exiting." << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
   Vector<T> v(mncols);
   for (int j=0; j<mncols; ++j)
     v[j] = mmat[mncols*irow+j];
@@ -520,12 +526,15 @@ Vector<T> utils::Matrix<T>::row(const int & irow) const {
 // Get a column:
 template <typename T>
 Vector<T> utils::Matrix<T>::col(const int & icol) const {
-  /*
   if (mnrows==0 || mncols==0){
     std::cout << "Cannot get a column from an unallocated matrix. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
-  */
+  if (icol >= mncols){
+    std::cout << "Specified column " << icol << " is outside matrix, whose last column is " << mncols-1
+	      << ". Exiting." << std::endl;
+    exit(EXIT_FAILURE);
+  }
   Vector<T> v(mnrows);
   for (int j=0; j<mnrows; ++j)
     v[j] = mmat[mncols*j+icol];
@@ -549,12 +558,10 @@ void utils::Matrix<T>::unity(){
     std::cout << "Cannot set unallocated matrix of unknown size to unity matrix. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
-
   if (mnrows!=mncols){
-    std::cout << "Cannot set non-square mat object to 'unity matrix'. Exiting." << std::endl;
+    std::cout << "Cannot set non-square matrix to unity matrix. Exiting." << std::endl;
     exit(EXIT_FAILURE);   
   }
-
 
   for (int i=0; i<mnrows; ++i){
     for (int j=0; j<mncols; ++j)
@@ -569,7 +576,7 @@ void utils::Matrix<T>::unity(){
 template <typename T>
 utils::Matrix<T> utils::Matrix<T>::transpose(){
   if (mnrows==0 || mncols==0){
-    std::cout << "Cannot transpose unallocated matrix of unknown size. Exiting." << std::endl;
+    std::cout << "Cannot transpose unallocated matrix. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   utils::Matrix<T> tmpm(mncols, mnrows);
@@ -936,7 +943,9 @@ T utils::Matrix<T>::det() const {
 template <typename T>
 utils::Matrix<T> utils::operator+(const utils::Matrix<T> & a, const utils::Matrix<T> & b){
   if (a.nrows()!=b.nrows() || a.ncols()!=b.ncols()){
-    std::cout << "Cannot add matrices of different shape. Exiting." << std::endl;
+    std::cout << "Cannot add matrices of different shapes: "
+	      << a.nrows() << " " << a.ncols() << " versus "
+	      << b.nrows() << " " << b.ncols() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   int Nr = a.nrows();
@@ -952,7 +961,9 @@ utils::Matrix<T> utils::operator+(const utils::Matrix<T> & a, const utils::Matri
 template <typename T>
 utils::Matrix<T> utils::operator-(const utils::Matrix<T> & a, const utils::Matrix<T> & b){
   if (a.nrows()!=b.nrows() || a.ncols()!=b.ncols()){
-    std::cout << "Cannot subtract matrices of different shape. Exiting." << std::endl;
+    std::cout << "Cannot subtract matrices of different shapes: "
+	      << a.nrows() << " " << a.ncols() << " versus "
+	      << b.nrows() << " " << b.ncols() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   int Nr = a.nrows();
@@ -968,7 +979,9 @@ utils::Matrix<T> utils::operator-(const utils::Matrix<T> & a, const utils::Matri
 template <typename T>
 utils::Matrix<T> utils::operator*(const utils::Matrix<T> & a, const utils::Matrix<T> & b){
   if (a.ncols()!=b.nrows()){
-    std::cout << "Cannot multiply matrices of different column, row dimensions. Exiting." << std::endl;
+    std::cout << "Cannot multiply matrices: First matrix is "
+	      << a.nrows() << "x" << a.ncols() << " and second matrix is "
+	      << b.nrows() << "x" << b.ncols() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   int Nr = a.nrows();
@@ -993,7 +1006,9 @@ utils::Matrix<T> utils::operator*(const utils::Matrix<T> & a, const utils::Matri
 template <typename T>
 Vector<T> utils::operator*(const utils::Matrix<T> & a, const Vector<T> & b){
   if (a.ncols()!=b.size()){
-    std::cout << "Cannot multiply matrix and vector: mismatched sizes. Exiting." << std::endl;
+    std::cout << "Cannot multiply matrix and vector: Matrix is "
+	      << a.nrows() << "x" << a.ncols() << " and vector is of length "
+	      << b.size() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   int Nr = a.nrows();
@@ -1014,7 +1029,9 @@ Vector<T> utils::operator*(const utils::Matrix<T> & a, const Vector<T> & b){
 template <typename T>
 Vector<T> utils::operator*(const Vector<T> & a, const utils::Matrix<T> & b){
   if (a.size()!=b.nrows()){
-    std::cout << "Cannot multiply matrix and vector: mismatched sizes. Exiting." << std::endl;
+    std::cout << "Cannot multiply matrix and vector: Vector is of length "
+	      << a.size() << " and matrix is "
+	      << a.nrows() << "x" << a.ncols() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   int Nr = a.size();

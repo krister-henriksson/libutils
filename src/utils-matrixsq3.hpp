@@ -202,11 +202,11 @@ utils::MatrixSq3<T> & utils::MatrixSq3<T>::operator=(const utils::MatrixSq3<T> &
 template <typename T>
 T & utils::MatrixSq3<T>::elem(const int & i, const int & j) {
   if (i<0 || i>=3){
-    std::cout << "First index " << i << " is out of range. Exiting." << std::endl;
+    std::cout << "Square matrix 3x3: First index " << i << " is out of range. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   if (j<0 || j>=3){
-    std::cout << "Second index " << j << " is out of range. Exiting." << std::endl;
+    std::cout << "Square matrix 3x3: Second index " << j << " is out of range. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   return mmat[3*i+j];
@@ -215,11 +215,11 @@ T & utils::MatrixSq3<T>::elem(const int & i, const int & j) {
 template <typename T>
 const T & utils::MatrixSq3<T>::elem(const int & i, const int & j) const {
   if (i<0 || i>=3){
-    std::cout << "First index " << i << " is out of range. Exiting." << std::endl;
+    std::cout << "Square matrix 3x3: First index " << i << " is out of range. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   if (j<0 || j>=3){
-    std::cout << "Second index " << j << " is out of range. Exiting." << std::endl;
+    std::cout << "Square matrix 3x3: Second index " << j << " is out of range. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   return mmat[3*i+j];
@@ -236,7 +236,7 @@ const T & utils::MatrixSq3<T>::elem(const int & i, const int & j) const {
 template <typename T>
 void utils::MatrixSq3<T>::row(const int & irow, const Vector3<T> & v){
   if (irow<0 || irow>=3){
-    std::cout << "Row index " << irow << " is out of range. Exiting." << std::endl;
+    std::cout << "Square matrix 3x3: Row index " << irow << " is out of range. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   // Copy input data into object.
@@ -249,7 +249,7 @@ void utils::MatrixSq3<T>::row(const int & irow, const Vector3<T> & v){
 template <typename T>
 void utils::MatrixSq3<T>::col(const int & icol, const Vector3<T> & v){
   if (icol<0 || icol>=3){
-    std::cout << "Column index " << icol << " is out of range. Exiting." << std::endl;
+    std::cout << "Square matrix 3x3: Column index " << icol << " is out of range. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   // Copy input data into object.
@@ -262,7 +262,7 @@ void utils::MatrixSq3<T>::col(const int & icol, const Vector3<T> & v){
 template <typename T>
 Vector3<T> utils::MatrixSq3<T>::row(const int & irow) const {
   if (irow<0 || irow>=3){
-    std::cout << "Row index " << irow << " is out of range. Exiting." << std::endl;
+    std::cout << "Square matrix 3x3: Row index " << irow << " is out of range. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   Vector3<T> v(0);
@@ -277,7 +277,7 @@ Vector3<T> utils::MatrixSq3<T>::row(const int & irow) const {
 template <typename T>
 Vector3<T> utils::MatrixSq3<T>::col(const int & icol) const {
   if (icol<0 || icol>=3){
-    std::cout << "Column index " << icol << " is out of range. Exiting." << std::endl;
+    std::cout << "Square matrix 3x3: Column index " << icol << " is out of range. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   Vector3<T> v(0);

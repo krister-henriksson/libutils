@@ -587,34 +587,32 @@ utils::Vector<T> & utils::Vector<T>::operator=(const utils::Vector3<T> & sv){
 template <typename T>
 T & utils::Vector<T>::operator[](const int & i) {
 
-  /*
   if (i<0 || i>=mN){
     std::cout << "Vector index " << i << " is out of range. Allowed: " << 0 << " to " << mN-1 << ". Exiting." << std::endl;
-    //std::cout << "Error in " << __FILE__ << " at line number " << __LINE__ << std::endl;
+    std::cout << "Error in " << __FILE__ << " at line number " << __LINE__ << std::endl;
     exit(EXIT_FAILURE);
   }
   if (mvec==0){
     std::cout << "Vector is not allocated. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
-  */
+
   return mvec[i];
 }
 
 template <typename T>
 const T & utils::Vector<T>::operator[](const int & i) const {
 
-  /*
   if (i<0 || i>=mN){
     std::cout << "Vector index " << i << " is out of range. Allowed: " << 0 << " to " << mN-1 << ". Exiting." << std::endl;
-    //std::cout << "Error in " << __FILE__ << " at line number " << __LINE__ << std::endl;
+    std::cout << "Error in " << __FILE__ << " at line number " << __LINE__ << std::endl;
     exit(EXIT_FAILURE);
   }
   if (mvec==0){
     std::cout << "Vector is not allocated. Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
-  */
+
   return mvec[i];
 }
 
@@ -654,14 +652,6 @@ utils::Vector3<T> utils::Vector<T>::to_Vector3(void){
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // For storage changes/updates/queries:
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-
-
-
-
-
-
 
 
 
@@ -836,7 +826,8 @@ utils::Vector<T> utils::operator--(utils::Vector<T> & a, int ){
 template <typename T>
 utils::Vector<T> & utils::operator+=(utils::Vector<T> & a, const utils::Vector<T> & b){
   if (a.size()!=b.size()){
-    std::cout << "Cannot perform 'a += b' since a, b are of different sizes. Exiting." << std::endl;
+    std::cout << "Cannot perform 'a += b' since a, b are of different sizes: "
+	      << a.size() << " versus " << b.size() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   for (int i=0; i<a.size(); ++i) a[i] += b[i];
@@ -846,7 +837,8 @@ utils::Vector<T> & utils::operator+=(utils::Vector<T> & a, const utils::Vector<T
 template <typename T>
 utils::Vector<T> & utils::operator-=(utils::Vector<T> & a, const utils::Vector<T> & b){
   if (a.size()!=b.size()){
-    std::cout << "Cannot perform 'a -= b' since a, b are of different sizes. Exiting." << std::endl;
+    std::cout << "Cannot perform 'a -= b' since a, b are of different sizes: "
+	      << a.size() << " versus " << b.size() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   for (int i=0; i<a.size(); ++i) a[i] -= b[i];
@@ -870,7 +862,8 @@ utils::Vector<T> & utils::operator/=(utils::Vector<T> & a, const S & b){
 template <typename T>
 bool utils::operator<(const utils::Vector<T> & a, const utils::Vector<T> & b){
   if (a.size()!=b.size()){
-    std::cout << "Cannot evaluate 'a < b' since a, b are of different sizes. Exiting." << std::endl;
+    std::cout << "Cannot evaluate 'a < b' since a, b are of different sizes: "
+	      << a.size() << " versus " << b.size() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   int n=0;
@@ -887,7 +880,8 @@ bool utils::operator>(const utils::Vector<T> & a, const utils::Vector<T> & b){
 template <typename T>
 bool utils::operator==(const utils::Vector<T> & a, const utils::Vector<T> & b){
   if (a.size()!=b.size()){
-    std::cout << "Cannot evaluate 'a == b' since a, b are of different sizes. Exiting." << std::endl;
+    std::cout << "Cannot evaluate 'a == b' since a, b are of different sizes: "
+	      << a.size() << " versus " << b.size() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   int n=0;
@@ -900,7 +894,8 @@ bool utils::operator==(const utils::Vector<T> & a, const utils::Vector<T> & b){
 template <typename T>
 utils::Vector<T> utils::operator+(const utils::Vector<T> & a, const utils::Vector<T> & b){
   if (a.size()!=b.size()){
-    std::cout << "Cannot add vectors of different sizes. Exiting." << std::endl;
+    std::cout << "Cannot add vectors of different sizes: "
+	      << a.size() << " versus " << b.size() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   Vector<T> r(a.size(), 0);
@@ -912,7 +907,8 @@ utils::Vector<T> utils::operator+(const utils::Vector<T> & a, const utils::Vecto
 template <typename T>
 utils::Vector<T> utils::operator-(const utils::Vector<T> & a, const utils::Vector<T> & b){
   if (a.size()!=b.size()){
-    std::cout << "Cannot subtract vectors of different sizes. Exiting." << std::endl;
+    std::cout << "Cannot subtract vectors of different sizes: "
+	      << a.size() << " versus " << b.size() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   Vector<T> r(a.size(), 0);
@@ -924,7 +920,8 @@ utils::Vector<T> utils::operator-(const utils::Vector<T> & a, const utils::Vecto
 template <typename T>
 T utils::operator*(const utils::Vector<T> & a, const utils::Vector<T> & b){
   if (a.size()!=b.size()){
-    std::cout << "Cannot multiply vectors of different sizes. Exiting." << std::endl;
+    std::cout << "Cannot multiply vectors of different sizes: "
+	      << a.size() << " versus " << b.size() << ". Exiting." << std::endl;
     exit(EXIT_FAILURE);
   }
   T tmp=0;

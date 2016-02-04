@@ -114,7 +114,10 @@ namespace funcfit {
 
       methodstring = "ls-powelldogleg";
 
+      func.set_point(p);
+
       if (debug)
+	/*
 	cout << prefix_report_debug
 	     << methodstring << ": "
 	     << "Getting auxiliary data for merit function gradient ... " << endl;
@@ -122,6 +125,7 @@ namespace funcfit {
       //cout << "made it here 001" << endl;
       J = func.J(p);
       //cout << "made it here 002" << endl;
+      */
       if (debug)
 	cout << prefix_report_debug
 	     << methodstring << ": "
@@ -244,17 +248,18 @@ namespace funcfit {
 
 	fp_old = fp;
 
-	
+	//cout << "made it here 007" << endl;
+	J = func.J();
 	tmp1  = ag * ag;
 	tmpv1 = J * ag;
 	tmp2 = tmpv1 * tmpv1;
 	alpha = tmp1 / tmp2;
+	//cout << "made it here 008" << endl;
 
 
 	// *************************************************************************
 	// Gauss-Newton direction
 	// *************************************************************************
-
 	JTJ = J.transpose() * J;
 	if ( JTJ.solve( ag, h_gn, JTJ_inv) == 1 ){
 	  status.singular_matrix = true;
@@ -309,9 +314,10 @@ namespace funcfit {
 	// *************************************************************************
 	// Trial step
 
+	func.backup();
+
 	while (true){
 	  int nerr=0;
-
 
 	  try {
 	    // ------------------------------------------------------------------
@@ -337,7 +343,7 @@ namespace funcfit {
 	      break;
 	    }
 
-	    f_trial = func.f(p_trial);
+	    //f_trial = func.f(p_trial);
 	    // ------------------------------------------------------------------
 	  }
 	  catch (funcfit::bad_point & e1){
@@ -352,6 +358,8 @@ namespace funcfit {
 	  }
 	  break;
 	}
+
+	func.set_point(p_trial);
 
 	if (debug) 
 	  cout << prefix_report_debug
@@ -380,15 +388,16 @@ namespace funcfit {
 	if (gain > 0){
 	  // Accept step
 	  p = p_trial;
-	  f = f_trial;
+	  //f = f_trial;
 	  fp = fp_trial;
-	  func.set_point(p);
+	  func.trial_accept();
+	  //func.set_point(p);
 
 	  if (debug) 
 	    cout << prefix_report_debug
 		      << methodstring << ": "
 		      << "Getting auxiliary data for merit function gradient ... " << endl;	  
-	  J = func.J(p);
+	  //J = func.J(p);
 	  if (debug)
 	    cout << prefix_report_debug
 		      << methodstring << ": "
@@ -399,7 +408,8 @@ namespace funcfit {
 	  choice = "step accepted";
 	}
 	else {
-	  func.set_point(p);
+	  func.trial_reject();
+	  //func.set_point(p);
 	  choice = "step failed";
 	}	
 	

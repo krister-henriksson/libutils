@@ -167,11 +167,10 @@ namespace funcfit {
 	  else {
 	    printf("%s%s: Iter %4d   Func %15.8e Change %15.8e   "
 		   "Func_barrier %15.8e   Grad %15.8e Grad_barrier %15.8e   "
-		   "Step %15.8e\n",
+		   "Step %15.8e  %s\n",
 		   cond_print.prefix_report_iter.c_str(),
 		   methodstring.c_str(), niter, fp, fp-fp_old,
-		   vb, gmagn, gbmagn,
-		   hmagn);
+		   vb, gmagn, gbmagn, hmagn, choice.c_str());
 	    printf("Par.index  Param.  Gradient  Gradient_barrier  Step:\n");
 	    for (int i=0; i<p.size(); ++i)
 	      printf("%5d  %20.10f  %20.10e  %20.10e  %20.10e\n", i, p[i], -1.0*ag[i], gb[i], h[i]);
@@ -235,6 +234,8 @@ namespace funcfit {
 	// *************************************************************************
 	// Trial step
 
+	func.backup();
+
 	while (true){
 
 	  try {
@@ -282,6 +283,8 @@ namespace funcfit {
 	  break;
 	}
 
+	func.set_point(p_trial);
+
 	if (debug)
 	  cout << prefix_report_debug
 		    << methodstring << ": "
@@ -305,7 +308,7 @@ namespace funcfit {
 	  p = p_trial;
 	  f = f_trial;
 	  J = J_trial;
-	  func.set_point(p);
+	  func.trial_accept();
 	  if (debug) 
 	    cout << prefix_report_debug
 		      << methodstring << ": "
@@ -325,7 +328,7 @@ namespace funcfit {
 	  choice = "step accepted";
 	}
 	else {
-	  func.set_point(p);
+	  func.trial_reject();
 	  mu = mu * nu;
 	  nu = 2 * nu;
 	  choice = "step failed";

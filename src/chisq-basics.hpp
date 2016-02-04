@@ -120,21 +120,36 @@ private:
   typename ChiSqFunc<S,T,U>::F_report mReportFuncPointer;
   Vector<U> mModelDataY;
   Vector<U> mModelDataY_bak;
+
+  Vector<double> X_bak;
   Vector<double> mf;
   Vector<double> mf_bak;
   Matrix<double> mJ;
   Matrix<double> mJ_bak;
-  Vector<double> X_bak;
+
   double mbarrier_scale;
+  double mbarrier_scale_bak;
+  Vector<double> mV;
+  Vector<double> mV_bak;
+  Vector<double> mdV_dx;
+  Vector<double> mdV_dx_bak;
+
+  bool muse_barrier_rescaling;
   bool muse_scales;
+
   object_status mstatus_X;
   object_status mstatus_MDY;
   object_status mstatus_f;
   object_status mstatus_J;
+  object_status mstatus_V;
+  object_status mstatus_dV_dx;
+
   object_status mstatus_X_bak;
   object_status mstatus_MDY_bak;
   object_status mstatus_f_bak;
   object_status mstatus_J_bak;
+  object_status mstatus_V_bak;
+  object_status mstatus_dV_dx_bak;
 
 
 public:
@@ -152,15 +167,36 @@ public:
 
   // Operators:
   ChiSqFunc & operator=(const ChiSqFunc & sv);
+
   // VERY IMPORTANT OPERATOR ():
   double operator()(void);
   double operator()(const Vector<double> & xi);
+
+
+
 
   // Setting a parameter point explicitly:
   void set_point(const Vector<double> & xi);
 
   void reset(const Vector<double> & xi);
   void reset(void);
+
+  void clear_data(void); // Removes DataX, DataY, DataUncertainty, DataWeightY, DataScaleY, ModelDataY
+
+  void finalize_setup();
+
+  void backup();
+  void restore();
+
+  void trial_do(const Vector<double> & xi);
+  void trial_accept();
+  void trial_reject();
+
+  void debug();
+
+
+
+
 
   bool           point_is_good(void);
   bool           point_is_good(const Vector<double> & xi);
@@ -182,9 +218,9 @@ public:
 
 
   double & barrier_scale(void);
+  bool   & use_barrier_rescaling(void);
+
   bool & use_scales(void);
-
-
 
   S & Param(void);
   Vector<T> & DataX(void);
@@ -200,9 +236,6 @@ public:
   Vector<U> & ModelDataY(void);
   Vector<U>   ModelDataY(const Vector<double> & xi);
 
-  void clear_data(void); // Removes DataX, DataY, DataUncertainty, DataWeightY, DataScaleY, ModelDataY
-
-  void finalize_setup();
 
   void report_on_parameters_and_data();
 
@@ -211,18 +244,20 @@ public:
   Vector<double> & f(void);
   void             calc_f(void);
 
-  double value(const Vector<double> & xi);
-  double value(void);
+  Matrix<double>   J(const Vector<double> & xi);
+  Matrix<double> & J(void);
 
-  double value_barrier(const Vector<double> & xi);
-  double value_barrier(void);
+  Vector<double>   V(const Vector<double> & xi);
+  Vector<double> & V(void);
+  void             calc_V(void);
+
+  Vector<double>   dV_dx(const Vector<double> & xi);
+  Vector<double> & dV_dx(void);
+  void             calc_dV_dx(void);
 
   Matrix<double>   df_dx(const Vector<double> & xi);
   Matrix<double> & df_dx(void);
   void             calc_df_dx(void);
-
-  Matrix<double>   J(const Vector<double> & xi);
-  Matrix<double> & J(void);
 
   Vector < Matrix<double> > d2f_dx1dx2(const Vector<double> & xi);
   Vector < Matrix<double> > d2f_dx1dx2(void);
@@ -233,9 +268,25 @@ public:
   Matrix<double> Hessian(const Vector<double> & xi);
   Matrix<double> Hessian(void);
 
+
+
+
+  double value(const Vector<double> & xi);
+  double value(void);
+  double value_data(const Vector<double> & xi);
+  double value_data(void);
+  double value_barrier_raw(const Vector<double> & xi);
+  double value_barrier_raw(void);
+  double adjust_barrier(const Vector<double> & xi);
+  double adjust_barrier(void);
+  double value_barrier(const Vector<double> & xi);
+  double value_barrier(void);
+
+
   Vector<double> gradient(const Vector<double> & xi);
   Vector<double> gradient(void);
-
+  Vector<double> gradient_data(const Vector<double> & xi);
+  Vector<double> gradient_data(void);
   Vector<double> gradient_barrier(const Vector<double> & xi);
   Vector<double> gradient_barrier(void);
 
@@ -244,11 +295,8 @@ public:
 
 
 
-  void backup();
-  void restore();
 
 
-  void debug();
 
 
 } ;
@@ -263,11 +311,14 @@ ChiSqFunc<S,T,U> :: ChiSqFunc(){
   mModelFuncPointer = 0;
   mReportFuncPointer = 0;
   mbarrier_scale = 1.0;
+  muse_barrier_rescaling = true;
   muse_scales = true;
   mstatus_X   = expired;
   mstatus_MDY = expired;
   mstatus_f   = expired;
   mstatus_J   = expired;
+  mstatus_V     = expired;
+  mstatus_dV_dx = expired;
 }
 
 
@@ -296,11 +347,14 @@ ChiSqFunc<S,T,U> :: ChiSqFunc(const S & P,
   mModelFuncPointer = 0;
   mReportFuncPointer = 0;
   mbarrier_scale = 1.0;
+  muse_barrier_rescaling = true;
   muse_scales = true;
   mstatus_X   = expired;
   mstatus_MDY = expired;
   mstatus_f   = expired;
   mstatus_J   = expired;
+  mstatus_V     = expired;
+  mstatus_dV_dx = expired;
 }
 
 
@@ -327,6 +381,7 @@ ChiSqFunc<S,T,U> :: ChiSqFunc(const ChiSqFunc<S,T,U> & sv){
   mJ     = sv.mJ;
   mJ_bak = sv.mJ_bak;
   mbarrier_scale = sv.mbarrier_scale;
+  muse_barrier_rescaling = sv.muse_barrier_rescaling;
   muse_scales = sv.muse_scales;
   mstatus_X   = sv.mstatus_X;
   mstatus_MDY = sv.mstatus_MDY;
@@ -336,6 +391,8 @@ ChiSqFunc<S,T,U> :: ChiSqFunc(const ChiSqFunc<S,T,U> & sv){
   mstatus_MDY_bak = sv.mstatus_MDY_bak;
   mstatus_f_bak   = sv.mstatus_f_bak;
   mstatus_J_bak   = sv.mstatus_J_bak;
+  mstatus_V_bak     = sv.mstatus_V_bak;
+  mstatus_dV_dx_bak = sv.mstatus_dV_dx_bak;
 }
 
 
@@ -366,6 +423,7 @@ ChiSqFunc<S,T,U> & ChiSqFunc<S,T,U> ::operator=(const ChiSqFunc<S,T,U> & sv){
   mJ     = sv.mJ;
   mJ_bak = sv.mJ_bak;
   mbarrier_scale = sv.mbarrier_scale;
+  muse_barrier_rescaling = sv.muse_barrier_rescaling;
   muse_scales = sv.muse_scales;
   mstatus_X   = sv.mstatus_X;
   mstatus_MDY = sv.mstatus_MDY;
@@ -375,6 +433,8 @@ ChiSqFunc<S,T,U> & ChiSqFunc<S,T,U> ::operator=(const ChiSqFunc<S,T,U> & sv){
   mstatus_MDY_bak = sv.mstatus_MDY_bak;
   mstatus_f_bak   = sv.mstatus_f_bak;
   mstatus_J_bak   = sv.mstatus_J_bak;
+  mstatus_V_bak     = sv.mstatus_V_bak;
+  mstatus_dV_dx_bak = sv.mstatus_dV_dx_bak;
 
   return *this;
 }
@@ -395,6 +455,8 @@ double ChiSqFunc<S,T,U> ::operator()(const Vector<double> & xi){
     mstatus_MDY = expired;
     mstatus_f   = expired;
     mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
   }
   return value();
 }
@@ -437,6 +499,8 @@ Vector<double> ChiSqFunc<S,T,U> ::free_parameters(const Vector<double> & any){
     mstatus_MDY = expired;
     mstatus_f   = expired;
     mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
   }
 
   return mParam.Xfree(any);
@@ -535,6 +599,8 @@ Vector<double> ChiSqFunc<S,T,U> ::all_parameters(const Vector<double> & any){
     mstatus_MDY = expired;
     mstatus_f   = expired;
     mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
   }
   return mParam.X(any);
 }
@@ -652,6 +718,8 @@ bool ChiSqFunc<S,T,U> ::point_is_good(const Vector<double> & xi){
     mstatus_MDY = expired;
     mstatus_f   = expired;
     mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
   }
   return mParam.Xfree_is_good();
 }
@@ -664,6 +732,11 @@ bool ChiSqFunc<S,T,U> ::point_is_good(const Vector<double> & xi){
 template <typename S, typename T, typename U>
 double &  ChiSqFunc<S,T,U> ::barrier_scale(void){
   return mbarrier_scale;
+}
+
+template <typename S, typename T, typename U>
+bool &  ChiSqFunc<S,T,U> ::use_barrier_rescaling(void){
+  return muse_barrier_rescaling;
 }
 
 
@@ -712,41 +785,6 @@ Vector<U> & ChiSqFunc<S,T,U> ::DataY(void){
   return mDataY;
 }
 
-
-template <typename S, typename T, typename U>
-void ChiSqFunc<S,T,U> ::set_point(const Vector<double> & xi){
-  if (point_is_new(xi)){
-    mParam.Xupdate(xi);
-    mstatus_X   = updated;
-    mstatus_MDY = expired;
-    mstatus_f   = expired;
-    mstatus_J   = expired;
-  }
-}
-
-// Use this after catching an exception. This resets the point to being a new
-// point, so things are recalculated to make sure the internal state is good.
-template <typename S, typename T, typename U>
-void ChiSqFunc<S,T,U> ::reset(const Vector<double> & xi){
-  mstatus_X   = expired;
-  mstatus_MDY = expired;
-  mstatus_f   = expired;
-  mstatus_J   = expired;
-  mParam.Xupdate(xi);
-  mstatus_X   = updated;
-  mstatus_MDY = expired;
-  mstatus_f   = expired;
-  mstatus_J   = expired;
-}
-
-
-template <typename S, typename T, typename U>
-void ChiSqFunc<S,T,U> ::reset(void){
-  mstatus_X   = expired;
-  mstatus_MDY = expired;
-  mstatus_f   = expired;
-  mstatus_J   = expired;
-}
 
 
 
@@ -804,6 +842,8 @@ Vector<U> ChiSqFunc<S,T,U> ::ModelDataY(const Vector<double> & xi){
     mstatus_MDY = expired;
     mstatus_f   = expired;
     mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
   }
   return ModelDataY();
 }
@@ -817,139 +857,6 @@ Vector<U> & ChiSqFunc<S,T,U> ::ModelDataY(void){
   return mModelDataY;
 }
 
-
-// Removes DataX, DataY, DataUncertainty, DataWeightY, DataScaleY, ModelDataY
-template <typename S, typename T, typename U>
-void ChiSqFunc<S,T,U> ::clear_data(void){
-  // mbarrier_scale = 1.0;
-  // muse_scales = false;
-  mDataX.resize(0);
-  mDataY.resize(0);
-  mDataUncertaintyY.resize(0);
-  mModelDataY.resize(0);
-
-  mstatus_X   = updated;
-  mstatus_MDY = expired;
-  mstatus_f   = expired;
-  mstatus_J   = expired;
-}
-
-
-
-
-
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-template <typename S, typename T, typename U>
-void ChiSqFunc<S,T,U> ::finalize_setup(){
-
-  // Check if any prefactor vectors are set:
-  if (mDataUncertaintyY.size() != mDataY.size() &&
-      mDataWeightY.size()      != mDataY.size()){
-    aborterror("Neither uncertainties nor weights are in use! Please fill any or both vectors.");
-  }
-
-  // 1. Suppose uncertainty is set. Check for negative values. If such values found,
-  // then there must be a weight vector of the same size, and with certain properties.
-  if (mDataUncertaintyY.size() == mDataY.size()){
-    int neg=0;
-    for (int i=0; i<mDataUncertaintyY.size(); ++i){
-      if (mDataUncertaintyY[i]<0) neg++;
-    }
-    // No negative values:
-    if (neg==0) mDataWeightY = Vector<U>(mDataY.size(), -1);
-
-    // Negative values means we need the weight vector:
-    if (neg>0 && mDataWeightY.size() != mDataY.size()){
-      // aborterror("Uncertainty vector OK, but weight vector needed, and not supplied (or of wrong dimension).");
-      mDataWeightY = Vector<U>(mDataY.size(), 1);
-      for (int i=0; i<mDataUncertaintyY.size(); ++i){
-	if (mDataUncertaintyY[i]<0) mDataWeightY[i]=U(1);
-      }
-    }
-
-    // Check if negative uncertainty values are consistent with positive weight values:
-    if (neg>0 && mDataWeightY.size() == mDataY.size()){
-      int notOK1=0, notOK2=0;
-      for (int i=0; i<mDataUncertaintyY.size(); ++i){
-	if (mDataUncertaintyY[i]<0 && mDataWeightY[i]<0) notOK1++;
-	if (mDataUncertaintyY[i]>0 && mDataWeightY[i]>0) notOK2++;
-      }
-      if (notOK1>0 || notOK2>0)
-	aborterror("Uncertainty and weight vectors OK, but weight vector elements not consistent with uncertainty elements.");
-    }
-  }
-
-
-  // 2. Suppose weight is set. Check for negative values. If such values found,
-  // then there must be an uncertainty vector of the same size, and with certain properties.
-  if (mDataWeightY.size() == mDataY.size()){
-    int neg=0;
-    for (int i=0; i<mDataWeightY.size(); ++i){
-      if (mDataWeightY[i]<0) neg++;
-    }
-    // No negative values:
-    if (neg==0) mDataUncertaintyY = Vector<U>(mDataY.size(), -1);
-
-    // Negative values means we need the uncertainty vector:
-    if (neg>0 && mDataUncertaintyY.size() != mDataY.size()){
-      // aborterror("Weight vector OK, but uncertainty vector needed, and not supplied (or of wrong dimension).");
-      mDataUncertaintyY = Vector<U>(mDataY.size(), 1);
-      for (int i=0; i<mDataWeightY.size(); ++i){
-	if (mDataWeightY[i]<0) mDataUncertaintyY[i]=U(1);
-      }
-    }      
-
-    // Check if negative weight values are consistent with positive uncertainty values:
-    if (neg>0 && mDataUncertaintyY.size() == mDataY.size()){
-      int notOK1=0, notOK2=0;
-      for (int i=0; i<mDataWeightY.size(); ++i){
-	if (mDataWeightY[i]<0 && mDataUncertaintyY[i]<0) notOK1++;
-	if (mDataWeightY[i]>0 && mDataUncertaintyY[i]>0) notOK2++;
-      }
-      if (notOK1>0 || notOK2>0)
-	aborterror("Weight and uncertainty vectors OK, but uncertainty vector elements not consistent with weight elements.");
-    }
-  }
-
-
-  // 3. Normalize weights:
-  double tmp=0.0;
-  for (int i=0; i<mDataWeightY.size(); ++i)
-    if (mDataWeightY[i]>0) tmp += double(mDataWeightY[i]);
-  tmp = 1.0/tmp;
-  for (int i=0; i<mDataWeightY.size(); ++i)
-    if (mDataWeightY[i]>0) mDataWeightY[i] = U(tmp * double(mDataWeightY[i]));
-
-
-
-
-
-
-
-
-  double eps = std::numeric_limits<double>::epsilon();
-
-  mDataScaleY.resize( mDataY.size() );
-  for (int i=0; i<mDataY.size(); ++i)
-    mDataScaleY[i] = U(1);
-
-  if (muse_scales){
-    // Set scales of DataY
-    for (int i=0; i<mDataY.size(); ++i){
-      mDataScaleY[i] = ((mDataY[i] < 0) ? -1 : 1) * mDataY[i];
-      if (double(mDataScaleY[i]) < eps)
-	mDataScaleY[i] = U(eps);
-    }
-  }
-
-
-  // Set scales of constraints
-  // do it on the fly, saves memory
-
-}
 
 
 
@@ -969,6 +876,14 @@ void ChiSqFunc<S,T,U> ::report_on_parameters_and_data(){
 
 
 
+
+
+
+
+
+
+
+
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Set/get f vector
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -981,6 +896,8 @@ Vector<double> ChiSqFunc<S,T,U> ::f(const Vector<double> & xi){
     mstatus_MDY = expired;
     mstatus_f   = expired;
     mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
   }
   return f();
 }
@@ -1039,110 +956,193 @@ void ChiSqFunc<S,T,U> ::calc_f(void){
 
 
 
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// Get ChiSq value
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
 
 template <typename S, typename T, typename U>
-double ChiSqFunc<S,T,U> ::value(const Vector<double> & xi){
-
+Vector<double>   ChiSqFunc<S,T,U> ::V(const Vector<double> & xi){
   if (point_is_new(xi)){
     mParam.Xupdate(xi);
     mstatus_X   = updated;
     mstatus_MDY = expired;
     mstatus_f   = expired;
     mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
   }
-
-  return value();
+  return V();
 }
 
 template <typename S, typename T, typename U>
-double ChiSqFunc<S,T,U> ::value(void){
-  double chisq = 0.0;
-
-  mf = f();
-
-  for (int i=0; i<mf.size(); ++i)
-    chisq += mf[i] * mf[i];
-  chisq *= 0.5;
-
-
-  double eps = std::numeric_limits<double>::epsilon();
-  double tbs = mbarrier_scale;
-  if (tbs < 0.0) tbs *= -1.0; 
-  if (tbs < eps)
-    return chisq;
-  else
-    return chisq + value_barrier();
-}
-
-
-
-template <typename S, typename T, typename U>
-double ChiSqFunc<S,T,U> ::value_barrier(const Vector<double> & xi){
-
-  if (point_is_new(xi)){
-    mParam.Xupdate(xi);
-    mstatus_X   = updated;
-    mstatus_MDY = expired;
-    mstatus_f   = expired;
-    mstatus_J   = expired;
+Vector<double> & ChiSqFunc<S,T,U> ::V(void){
+  if (mstatus_V==expired){
+    calc_V();
+    mstatus_V=updated;
   }
-
-  return value_barrier();
+  return mV;
 }
 
 template <typename S, typename T, typename U>
-double ChiSqFunc<S,T,U> ::value_barrier(void){
+void             ChiSqFunc<S,T,U> ::calc_V(void){
   // ************************************************************
   // ************************************************************
   // Barrier part: Check all parameters!
   // ************************************************************
   // ************************************************************
-  double barrier=0.0, xi, ci, ai, bi, xti, si;
-  funcfit::bad_point ebp;
+  int N=0;
+  for (int i=0; i< mParam.X().size(); ++i){
+    if (mParam.X_is_unconstrained(i)) continue;
+    if (mParam.X_is_fixed(i)) continue;
+    N++;
+  }
+  mV.resize(N);
+  if (N==0) return;
 
+  double xi, ai, bi, ci;
   double eps = std::numeric_limits<double>::epsilon();
   double tbs = mbarrier_scale;
+  //std::cout << "calc_V(): barrier_scale is " << tbs << std::endl;
+  //std::cout << "calc_V(): eps is " << eps << std::endl;
   if (tbs < 0.0) tbs *= -1.0; 
-  if (tbs < eps)
-    return 0.0;
+  if (tbs < eps) return;
+  funcfit::bad_point ebp;
 
-
+  int n=0;
   for (int i=0; i< mParam.X().size(); ++i){
-
     if (mParam.X_is_unconstrained(i)) continue;
     if (mParam.X_is_fixed(i)) continue;
 
     xi = mParam.X(i);
     ai = mParam.Xmin(i);
     bi = mParam.Xmax(i);
-    si = 1.0;
-    if (muse_scales)
-      si = 0.5 * ( ((ai<0)? -ai : ai) + ((bi<0)? -bi : bi) );
 
-    xti = xi - 0.5 * (ai + bi);
-    ci = (-0.5 * (ai - bi)) * (-0.5 * (ai - bi)) - xti * xti;
-    ci /= si;
-
-    if (ci<=0.0){
-      std::cout << "chisq-basics: Warning: Parameter value " << xi
+    if (xi<=ai || xi>=bi){
+      std::cout << "chisq-basics: calc_V: Warning: Parameter value " << xi
 		<< " is outside limits (" << ai << ", " << bi << ")."
 		<< " Throwing exception." << std::endl;
       throw ebp;
     }
-
-    barrier += -mbarrier_scale * log(ci);
+    /* Penalty/Barrier function is logarithm based:
+       U = - mu * sum_i p(xi,ai,bi)
+       where
+       p(xi,ai,bi) = log(bi-xi) + log(xi-ai) - 2*log(0.5*(bi-ai))
+       dp/dxi = -1/(bi-xi) + 1/(xi-ai) = (-xi+ai + bi-xi)/((bi-xi)*(xi-ai))
+       = (bi+ai - 2*xi)/((bi-xi)*(xi-ai))
+    */
+    ci = log(bi-xi) + log(xi-ai) - 2.0*log(0.5*(bi-ai));
+    //std::cout << "n = " << n << " constraint (without -mu factor) is " << ci << std::endl;
+    mV[n] = ci;
+    n++;
+    //barrier += -mbarrier_scale * ci;
   }
   // ************************************************************
   // ************************************************************
-  return barrier;
+}
+
+template <typename S, typename T, typename U>
+Vector<double>   ChiSqFunc<S,T,U> ::dV_dx(const Vector<double> & xi){
+  if (point_is_new(xi)){
+    mParam.Xupdate(xi);
+    mstatus_X   = updated;
+    mstatus_MDY = expired;
+    mstatus_f   = expired;
+    mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
+  }
+  return dV_dx();
+}
+
+template <typename S, typename T, typename U>
+Vector<double> & ChiSqFunc<S,T,U> ::dV_dx(void){
+  if (mstatus_dV_dx==expired){
+    calc_dV_dx();
+    mstatus_dV_dx=updated;
+  }
+  return mdV_dx;
+}
+
+template <typename S, typename T, typename U>
+void             ChiSqFunc<S,T,U> ::calc_dV_dx(void){
+  // ************************************************************
+  // ************************************************************
+  // Barrier part: Check all parameters!
+  // ************************************************************
+  // ************************************************************
+  int N=0;
+  for (int i=0; i< mParam.X().size(); ++i){
+    if (mParam.X_is_unconstrained(i)) continue;
+    if (mParam.X_is_fixed(i)) continue;
+    N++;
+  }
+  mdV_dx.resize(N);
+  if (N==0) return;
+
+  double xi, ci, ai, bi, si, xti, dci_dxi;
+  double eps = std::numeric_limits<double>::epsilon();
+  double tbs = mbarrier_scale;
+  if (tbs < 0.0) tbs *= -1.0; 
+  if (tbs < eps) return;
+  funcfit::bad_point ebp;
+
+  int n=0;
+  for (int i=0; i< mParam.X().size(); ++i){
+    if (mParam.X_is_unconstrained(i)) continue;
+    if (mParam.X_is_fixed(i)) continue;
+
+    xi = mParam.X(i);
+    ai = mParam.Xmin(i);
+    bi = mParam.Xmax(i);
+
+    if (xi<=ai || xi>=bi){
+      std::cout << "chisq-basics: calc_dV_dx: Warning: Parameter value " << xi
+		<< " is outside limits (" << ai << ", " << bi << ")."
+		<< " Throwing exception." << std::endl;
+      throw ebp;
+    }
+    /* Penalty/Barrier function is logarithm based:
+       U = - mu * sum_i p(xi,ai,bi)
+       where
+       p(xi,ai,bi) = log(bi-xi) + log(xi-ai) - 2*log(0.5*(bi-ai))
+       dp/dxi = -1/(bi-xi) + 1/(xi-ai) = (-xi+ai + bi-xi)/((bi-xi)*(xi-ai))
+       = (bi+ai - 2*xi)/((bi-xi)*(xi-ai))
+    */
+    dci_dxi = -1.0/(bi-xi) + 1.0/(xi-ai);
+    mdV_dx[n] = dci_dxi;
+    //Xt[n] = - mbarrier_scale * dci_dxi;
+    n++;
+  }
+  // ************************************************************
+  // ************************************************************
 }
 
 
 
 
+
+
+
+
+
+
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Set/get J = df_dx matrix
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+template <typename S, typename T, typename U>
+Matrix<double> ChiSqFunc<S,T,U> ::J(const Vector<double> & xi){
+  return df_dx(xi);
+}
+
+template <typename S, typename T, typename U>
+Matrix<double> & ChiSqFunc<S,T,U> ::J(void){
+  return df_dx();
+}
 
 
 
@@ -1159,6 +1159,8 @@ Matrix<double> ChiSqFunc<S,T,U> ::df_dx(const Vector<double> & xi){
     mstatus_MDY = expired;
     mstatus_f   = expired;
     mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
   }
   return df_dx();
 }
@@ -1247,20 +1249,6 @@ void ChiSqFunc<S,T,U> ::calc_df_dx(void){
 
 
 
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// Set/get J = df_dx matrix
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-template <typename S, typename T, typename U>
-Matrix<double> ChiSqFunc<S,T,U> ::J(const Vector<double> & xi){
-  return df_dx(xi);
-}
-
-template <typename S, typename T, typename U>
-Matrix<double> & ChiSqFunc<S,T,U> ::J(void){
-  return df_dx();
-}
-
 
 
 
@@ -1276,6 +1264,8 @@ Vector < Matrix<double> > ChiSqFunc<S,T,U> ::d2f_dx1dx2(const Vector<double> & x
     mstatus_MDY = expired;
     mstatus_f   = expired;
     mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
   }
   return d2f_dx1dx2();
 }
@@ -1566,6 +1556,8 @@ Matrix<double> ChiSqFunc<S,T,U> ::Hessian_exact(const Vector<double> & xi){
     mstatus_MDY = expired;
     mstatus_f   = expired;
     mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
   }
   return Hessian_exact();
 }
@@ -1575,22 +1567,22 @@ template <typename S, typename T, typename U>
 Matrix<double> ChiSqFunc<S,T,U> ::Hessian_exact(void){
   int N = mDataY.size();
   int NXf = mParam.NXfree();
-  Vector < Matrix<double> > fpp_x1x2;
   Matrix<double> hessian(NXf, NXf, 0);
 
-  mf = f();  
-  mJ = J();  
+  hessian = Hessian();
+
+  Vector < Matrix<double> > fpp_x1x2;
+  mf = f();
   fpp_x1x2 = d2f_dx1dx2();
 
   for (int i=0; i<NXf; ++i){
     for (int j=0; j<NXf; ++j){
-      hessian.elem(i,j) = 0.0;
       for (int k=0; k<N; ++k){
 	hessian.elem(i,j) += mf[k] * fpp_x1x2[k].elem(i,j);
       }
     }
   }
-  hessian = hessian + mJ.transpose() * mJ;
+
   return hessian;
 }
 
@@ -1610,16 +1602,199 @@ Matrix<double> ChiSqFunc<S,T,U> ::Hessian(const Vector<double> & xi){
     mstatus_MDY = expired;
     mstatus_f   = expired;
     mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
   }
   return Hessian();
 }
 
 template <typename S, typename T, typename U>
 Matrix<double> ChiSqFunc<S,T,U> ::Hessian(void){
+  int NXf = mParam.NXfree();
+  Matrix<double> hessian(NXf, NXf, 0);
+
   mJ = J();
-  return mJ.transpose() * mJ;
+  hessian = mJ.transpose() * mJ;
+
+  double eps = std::numeric_limits<double>::epsilon();
+  double tbs = mbarrier_scale;
+  if (tbs < 0.0) tbs *= -1.0; 
+  if (tbs < eps)
+    return hessian;
+
+
+  // Penalty/Barrier function contribution:
+  funcfit::bad_point ebp;
+  double xi, ai, bi, td1, td2, d2U_dx2;
+  int n=0;
+  for (int i=0; i< mParam.X().size(); ++i){
+    if (mParam.X_is_unconstrained(i)) continue;
+    if (mParam.X_is_fixed(i)) continue;
+
+    xi = mParam.X(i);
+    ai = mParam.Xmin(i);
+    bi = mParam.Xmax(i);
+    if (xi<=ai || xi>=bi){
+      std::cout << "chisq-basics: Hessian_exact: Warning: Parameter value " << xi
+		<< " is outside limits (" << ai << ", " << bi << ")."
+		<< " Throwing exception." << std::endl;
+      throw ebp;
+    }
+    td1 = bi-xi;
+    td1 *= td1;
+    td2 = xi-ai;
+    td2 *= td2;
+    d2U_dx2 = mbarrier_scale * (1.0/td1 + 1.0/td2);
+    hessian.elem(n,n) += d2U_dx2;
+    n++;
+  }
+
+  return hessian;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Get ChiSq value
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+template <typename S, typename T, typename U>
+double ChiSqFunc<S,T,U> ::value(const Vector<double> & xi){
+  if (point_is_new(xi)){
+    mParam.Xupdate(xi);
+    mstatus_X   = updated;
+    mstatus_MDY = expired;
+    mstatus_f   = expired;
+    mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
+  }
+  return value();
+}
+
+template <typename S, typename T, typename U>
+double ChiSqFunc<S,T,U> ::value(void){
+  return value_data() + value_barrier();
+}
+
+
+template <typename S, typename T, typename U>
+double ChiSqFunc<S,T,U> ::value_data(const Vector<double> & xi){
+  if (point_is_new(xi)){
+    mParam.Xupdate(xi);
+    mstatus_X   = updated;
+    mstatus_MDY = expired;
+    mstatus_f   = expired;
+    mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
+  }
+  return value_data();
+}
+
+template <typename S, typename T, typename U>
+double ChiSqFunc<S,T,U> ::value_data(void){
+  double chisq_M=0;
+
+  mf = f();
+  for (int i=0; i<mf.size(); ++i) chisq_M += mf[i] * mf[i];
+  chisq_M *= 0.5;
+
+  return chisq_M;
+}
+
+template <typename S, typename T, typename U>
+double ChiSqFunc<S,T,U> ::value_barrier_raw(const Vector<double> & xi){
+  if (point_is_new(xi)){
+    mParam.Xupdate(xi);
+    mstatus_X   = updated;
+    mstatus_MDY = expired;
+    mstatus_f   = expired;
+    mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
+  }
+  return value_barrier_raw();
+}
+
+template <typename S, typename T, typename U>
+double ChiSqFunc<S,T,U> ::value_barrier_raw(void){
+
+  double eps = std::numeric_limits<double>::epsilon();
+  double tbs = barrier_scale();
+  //std::cout << "barrier_scale is " << tbs << std::endl;
+  if (tbs < 0.0) tbs *= -1.0;
+  if (tbs < eps) return 0;
+  
+  double chisq_U=0;
+  mV = V();
+  //std::cout << "size of V is " << mV.size() << std::endl;
+  for (int i=0; i<mV.size(); ++i) chisq_U -= tbs * mV[i];
+  return chisq_U;
+}
+
+template <typename S, typename T, typename U>
+double ChiSqFunc<S,T,U> ::adjust_barrier(const Vector<double> & xi){
+  if (point_is_new(xi)){
+    mParam.Xupdate(xi);
+    mstatus_X   = updated;
+    mstatus_MDY = expired;
+    mstatus_f   = expired;
+    mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
+  }
+  return adjust_barrier();
+}
+
+template <typename S, typename T, typename U>
+double ChiSqFunc<S,T,U> ::adjust_barrier(void){
+  double chisq_M = value_data();
+  double chisq_U = value_barrier_raw();
+
+  double eps = std::numeric_limits<double>::epsilon();
+  double tbs = barrier_scale();
+  if (tbs < 0.0) tbs *= -1.0; 
+  if (tbs < eps) tbs = 0;
+
+  double chisq_U_old = chisq_U;
+  double f=1.0;
+  if (use_barrier_rescaling()){
+    if (chisq_U_old > eps) f = chisq_M / chisq_U_old;
+    barrier_scale() *= f;
+    chisq_U_old *= f;
+  }
+  return chisq_U_old;
+}
+
+template <typename S, typename T, typename U>
+double ChiSqFunc<S,T,U> ::value_barrier(const Vector<double> & xi){
+  if (point_is_new(xi)){
+    mParam.Xupdate(xi);
+    mstatus_X   = updated;
+    mstatus_MDY = expired;
+    mstatus_f   = expired;
+    mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
+  }
+  return value_barrier();
+}
+
+template <typename S, typename T, typename U>
+double ChiSqFunc<S,T,U> ::value_barrier(void){
+  return adjust_barrier();
+}
 
 
 
@@ -1638,6 +1813,8 @@ Vector<double> ChiSqFunc<S,T,U> ::gradient(const Vector<double> & xi){
     mstatus_MDY = expired;
     mstatus_f   = expired;
     mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
   }
   return gradient();
 }
@@ -1650,7 +1827,7 @@ Vector<double> ChiSqFunc<S,T,U> ::gradient(void){
   mJ = J();
 
   double eps = std::numeric_limits<double>::epsilon();
-  double tbs = mbarrier_scale;
+  double tbs = barrier_scale();
   if (tbs < 0.0) tbs *= -1.0; 
   if (tbs < eps)
     return mJ.transpose() * mf;
@@ -1658,6 +1835,27 @@ Vector<double> ChiSqFunc<S,T,U> ::gradient(void){
     return mJ.transpose() * mf + gradient_barrier();
 }
 
+
+template <typename S, typename T, typename U>
+Vector<double> ChiSqFunc<S,T,U> ::gradient_data(const Vector<double> & xi){
+  if (point_is_new(xi)){
+    mParam.Xupdate(xi);
+    mstatus_X   = updated;
+    mstatus_MDY = expired;
+    mstatus_f   = expired;
+    mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
+  }
+  return gradient_data();
+}
+
+template <typename S, typename T, typename U>
+Vector<double> ChiSqFunc<S,T,U> ::gradient_data(void){
+  mf = f();
+  mJ = J();
+  return mJ.transpose() * mf;
+}
 
 
 template <typename S, typename T, typename U>
@@ -1668,51 +1866,22 @@ Vector<double> ChiSqFunc<S,T,U> ::gradient_barrier(const Vector<double> & xi){
     mstatus_MDY = expired;
     mstatus_f   = expired;
     mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
   }
   return gradient_barrier();
 }
 
-
 template <typename S, typename T, typename U>
 Vector<double> ChiSqFunc<S,T,U> ::gradient_barrier(void){
-  // ************************************************************
-  // ************************************************************
-  // Barrier part: Check all parameters!
-  // ************************************************************
-  // ************************************************************
-  double xi, ci, ai, bi, si, xti, dci_dxi;
-  Vector<double> Xt(mParam.NXfree(), 0);
-  int n=0;
+  mdV_dx = dV_dx();
 
   double eps = std::numeric_limits<double>::epsilon();
-  double tbs = mbarrier_scale;
+  double tbs = barrier_scale();
   if (tbs < 0.0) tbs *= -1.0; 
-  if (tbs < eps)
-    return Xt;
 
-
-  for (int i=0; i< mParam.X().size(); ++i){
-
-    if (mParam.X_is_unconstrained(i)) continue;
-    if (mParam.X_is_fixed(i)) continue;
-
-    xi = mParam.X(i);
-    ai = mParam.Xmin(i);
-    bi = mParam.Xmax(i);
-    si = 1.0;
-    if (muse_scales)
-      si = 0.5 * ( ((ai<0)? -ai : ai) + ((bi<0)? -bi : bi) );
-
-    xti = xi - 0.5 * (ai + bi);
-    ci = pow( -0.5 * (ai - bi), 2.0) - pow(xti, 2.0);
-    ci /= si;
-    dci_dxi = -2.0/si * xti;
-
-    Xt[n] = - mbarrier_scale / ci * dci_dxi;
-    n++;
-  }
-  // ************************************************************
-  // ************************************************************
+  Vector<double> Xt(mParam.NXfree(), 0);
+  for (int i=0; i<mdV_dx.size(); ++i) Xt[i] = - tbs * mdV_dx[i];
   return Xt;
 }
 
@@ -1725,18 +1894,201 @@ Vector<double> ChiSqFunc<S,T,U> ::gradient_barrier(void){
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
+
+// Removes DataX, DataY, DataUncertainty, DataWeightY, DataScaleY, ModelDataY
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::clear_data(void){
+  // mbarrier_scale = 1.0;
+  // muse_scales = false;
+  mDataX.resize(0);
+  mDataY.resize(0);
+  mDataUncertaintyY.resize(0);
+  mModelDataY.resize(0);
+
+  mstatus_X   = updated;
+  mstatus_MDY = expired;
+  mstatus_f   = expired;
+  mstatus_J   = expired;
+  mstatus_V     = expired;
+  mstatus_dV_dx = expired;
+}
+
+
+
+
+
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::finalize_setup(){
+
+  // Check if any prefactor vectors are set:
+  if (mDataUncertaintyY.size() != mDataY.size() &&
+      mDataWeightY.size()      != mDataY.size()){
+    aborterror("Neither uncertainties nor weights are in use! Please fill any or both vectors.");
+  }
+
+  // 1. Suppose uncertainty is set. Check for negative values. If such values found,
+  // then there must be a weight vector of the same size, and with certain properties.
+  if (mDataUncertaintyY.size() == mDataY.size()){
+    int neg=0;
+    for (int i=0; i<mDataUncertaintyY.size(); ++i){
+      if (mDataUncertaintyY[i]<0) neg++;
+    }
+    // No negative values:
+    if (neg==0) mDataWeightY = Vector<U>(mDataY.size(), -1);
+
+    // Negative values means we need the weight vector:
+    if (neg>0 && mDataWeightY.size() != mDataY.size()){
+      // aborterror("Uncertainty vector OK, but weight vector needed, and not supplied (or of wrong dimension).");
+      mDataWeightY = Vector<U>(mDataY.size(), 1);
+      for (int i=0; i<mDataUncertaintyY.size(); ++i){
+	if (mDataUncertaintyY[i]<0) mDataWeightY[i]=U(1);
+      }
+    }
+
+    // Check if negative uncertainty values are consistent with positive weight values:
+    if (neg>0 && mDataWeightY.size() == mDataY.size()){
+      int notOK1=0, notOK2=0;
+      for (int i=0; i<mDataUncertaintyY.size(); ++i){
+	if (mDataUncertaintyY[i]<0 && mDataWeightY[i]<0) notOK1++;
+	if (mDataUncertaintyY[i]>0 && mDataWeightY[i]>0) notOK2++;
+      }
+      if (notOK1>0 || notOK2>0)
+	aborterror("Uncertainty and weight vectors OK, but weight vector elements not consistent with uncertainty elements.");
+    }
+  }
+
+
+  // 2. Suppose weight is set. Check for negative values. If such values found,
+  // then there must be an uncertainty vector of the same size, and with certain properties.
+  if (mDataWeightY.size() == mDataY.size()){
+    int neg=0;
+    for (int i=0; i<mDataWeightY.size(); ++i){
+      if (mDataWeightY[i]<0) neg++;
+    }
+    // No negative values:
+    if (neg==0) mDataUncertaintyY = Vector<U>(mDataY.size(), -1);
+
+    // Negative values means we need the uncertainty vector:
+    if (neg>0 && mDataUncertaintyY.size() != mDataY.size()){
+      // aborterror("Weight vector OK, but uncertainty vector needed, and not supplied (or of wrong dimension).");
+      mDataUncertaintyY = Vector<U>(mDataY.size(), 1);
+      for (int i=0; i<mDataWeightY.size(); ++i){
+	if (mDataWeightY[i]<0) mDataUncertaintyY[i]=U(1);
+      }
+    }      
+
+    // Check if negative weight values are consistent with positive uncertainty values:
+    if (neg>0 && mDataUncertaintyY.size() == mDataY.size()){
+      int notOK1=0, notOK2=0;
+      for (int i=0; i<mDataWeightY.size(); ++i){
+	if (mDataWeightY[i]<0 && mDataUncertaintyY[i]<0) notOK1++;
+	if (mDataWeightY[i]>0 && mDataUncertaintyY[i]>0) notOK2++;
+      }
+      if (notOK1>0 || notOK2>0)
+	aborterror("Weight and uncertainty vectors OK, but uncertainty vector elements not consistent with weight elements.");
+    }
+  }
+
+
+  // 3. Normalize weights:
+  double tmp=0.0;
+  for (int i=0; i<mDataWeightY.size(); ++i)
+    if (mDataWeightY[i]>0) tmp += double(mDataWeightY[i]);
+  tmp = 1.0/tmp;
+  for (int i=0; i<mDataWeightY.size(); ++i)
+    if (mDataWeightY[i]>0) mDataWeightY[i] = U(tmp * double(mDataWeightY[i]));
+
+
+
+
+
+
+
+
+  double eps = std::numeric_limits<double>::epsilon();
+
+  mDataScaleY.resize( mDataY.size() );
+  for (int i=0; i<mDataY.size(); ++i)
+    mDataScaleY[i] = U(1);
+
+  if (muse_scales){
+    // Set scales of DataY
+    for (int i=0; i<mDataY.size(); ++i){
+      mDataScaleY[i] = ((mDataY[i] < 0) ? -1 : 1) * mDataY[i];
+      if (double(mDataScaleY[i]) < eps)
+	mDataScaleY[i] = U(eps);
+    }
+  }
+
+
+}
+
+
+
+
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::set_point(const Vector<double> & xi){
+  if (point_is_new(xi)){
+    mParam.Xupdate(xi);
+    mstatus_X   = updated;
+    mstatus_MDY = expired;
+    mstatus_f   = expired;
+    mstatus_J   = expired;
+    mstatus_V     = expired;
+    mstatus_dV_dx = expired;
+  }
+}
+
+// Use this after catching an exception. This resets the point to being a new
+// point, so things are recalculated to make sure the internal state is good.
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::reset(const Vector<double> & xi){
+  mstatus_X   = expired;
+  mstatus_MDY = expired;
+  mstatus_f   = expired;
+  mstatus_J   = expired;
+  mstatus_V     = expired;
+  mstatus_dV_dx = expired;
+
+  mParam.Xupdate(xi);
+  mstatus_X   = updated;
+  mstatus_MDY = expired;
+  mstatus_f   = expired;
+  mstatus_J   = expired;
+  mstatus_V     = expired;
+  mstatus_dV_dx = expired;
+}
+
+
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::reset(void){
+  mstatus_X   = expired;
+  mstatus_MDY = expired;
+  mstatus_f   = expired;
+  mstatus_J   = expired;
+  mstatus_V     = expired;
+  mstatus_dV_dx = expired;
+}
+
+
 template <typename S, typename T, typename U>
 void ChiSqFunc<S,T,U> ::backup(){
   X_bak = mParam.X();
   mModelDataY_bak = mModelDataY;
   mf_bak = mf;
   mJ_bak = mJ;
+  mbarrier_scale_bak = mbarrier_scale;
   mstatus_X_bak   = mstatus_X;
   mstatus_MDY_bak = mstatus_MDY;
   mstatus_f_bak   = mstatus_f;
   mstatus_J_bak   = mstatus_J;
-
-
+  mstatus_V_bak     = mstatus_V;
+  mstatus_dV_dx_bak = mstatus_dV_dx;
 }
 
 template <typename S, typename T, typename U>
@@ -1745,13 +2097,34 @@ void ChiSqFunc<S,T,U> ::restore(){
   mModelDataY = mModelDataY_bak;
   mf = mf_bak;
   mJ = mJ_bak;
+  mbarrier_scale = mbarrier_scale_bak;
   mstatus_X   = mstatus_X_bak;
   mstatus_MDY = mstatus_MDY_bak;
   mstatus_f   = mstatus_f_bak;
   mstatus_J   = mstatus_J_bak;
+  mstatus_V     = mstatus_V_bak;
+  mstatus_dV_dx = mstatus_dV_dx_bak;
 }
 
 
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::trial_do(const Vector<double> & xi){
+  backup();
+  set_point(xi);
+}
+
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::trial_accept(){
+  /* May need to adjust barrier_scale! This is normally only done when
+     value() or operator() is used.
+   */
+  adjust_barrier();
+}
+
+template <typename S, typename T, typename U>
+void ChiSqFunc<S,T,U> ::trial_reject(){
+  restore();
+}
 
 
 
@@ -1766,7 +2139,10 @@ void ChiSqFunc<S,T,U> ::debug(){
   cout << "DataScaleY       vector: " << mDataScaleY << endl;
   cout << "DataWeightY      vector: " << mDataWeightY << endl;
   cout << "DataUncertaintyY vector: " << mDataUncertaintyY << endl;
-  cout << "barrier scale: " << mbarrier_scale << endl;
+  cout << "barrier scale          : " << mbarrier_scale << endl;
+  cout << "use_barrier rescaling  : " << muse_barrier_rescaling << endl;
+  //cout << "V vector               : " << mV << endl;
+  //cout << "dV_dx vector           : " << mdV_dx << endl;
   //cout << "ModelFuncPointer : " << mModelFuncPointer << endl;
   //cout << "ReportFuncPointer: " << mReportFuncPointer << endl;
 
