@@ -153,8 +153,8 @@ namespace funcfit {
 
       for (int i=0; i<nx; ++i){
 	xch_ini[i] = x[i] * simann_delta_rel;
-	if (utils::abs(xch_ini[i])<eps) xch_ini[i] = sqrt(eps);
 	if (xch_ini[i] < 0) xch_ini[i] *= -1.0;
+	if (xch_ini[i]<eps) xch_ini[i] = sqrt(eps);
 
 	if (xch_ini[i] > xmax[i] - xmin[i]) xch_ini[i] = xmax[i] - xmin[i];
       }

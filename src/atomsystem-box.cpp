@@ -297,16 +297,20 @@ void AtomSystem::calc_closepacked_volume(){
 
 
 void AtomSystem::get_bond_list(BondData & bond_list,
+			       BondData & bond_list12,
+			       BondData & bond_list21,
 			       string & name1,
 			       string & name2,
 			       int & nat1,
 			       int & nat2,
 			       int & nbonds,
+			       int & nbonds12,
+			       int & nbonds21,
 			       double rc12
 			       ){
 
-  // Consider A-B and B-A bonds, since they both contribute to the
-  // A-B pair (bond) energy.
+  // Consider A-B bonds only, since it contains also the B-A version.
+  // For A-A we need to consider A_i-A_j, i<j (for instance).
 
   double drsq=0,r,rcutsq;
   Vector3<double> posi(0), posj(0), dr(0);
@@ -315,7 +319,7 @@ void AtomSystem::get_bond_list(BondData & bond_list,
 
   rcutsq = rc12 * rc12;
 
-  nat1 = nat2 = nbonds = 0;
+  nat1 = nat2 = nbonds = nbonds12 = nbonds21 = 0;
 
   for (i=0; i<nat; ++i){
     posi[0] = pos[i][0];
@@ -339,8 +343,11 @@ void AtomSystem::get_bond_list(BondData & bond_list,
       // std::cout << "pair ij " << i << " " << j << " types " << matter[i] << " " << matter[j] << std::endl;
 
       bondOK = false;
-      if ( (matter[i]==name1 && matter[j]==name2) ||
-	   (matter[i]==name2 && matter[j]==name1) ) bondOK = true;
+      if ( (name1 != name2) &&
+	   ( (matter[i]==name1 && matter[j]==name2) || (matter[i]==name2 && matter[j]==name1) ) ) bondOK = true;
+      //if ( (name1 == name2) && (matter[i]==name2) && (matter[j]==name1) && (i<j) ) bondOK = true;
+      if ( (name1 == name2) && (matter[i]==name1) && (matter[j]==name1) ) bondOK = true;
+
       if (!bondOK) continue;
 
 
@@ -380,53 +387,107 @@ void AtomSystem::get_bond_list(BondData & bond_list,
 
       if (drsq>=rcutsq) continue;
 
-      nbonds++;
-
 
       r = sqrt(drsq);
       // std::cout << r << std::endl;
 
-      /*
+
       if (name1==name2){
-	if (matter[j]==name1) nbonds11++;
+	if (matter[j]==name2) nbonds++;
       }
       else {
 	if      (matter[i]==name1 && matter[j]==name2) nbonds12++;
-	else if (matter[i]==name2 && matter[j]==name1) nbonds12++;
+	else if (matter[i]==name2 && matter[j]==name1) nbonds21++;
       }
-      */
+
 
       bool is_present=false;
-      for (k=0; k<bond_list.dist.size(); ++k){
-	if (fp_are_equal(bond_list.dist[k], r, 1e-3)){
-	  ++bond_list.ndist[k];
-	  is_present=true;
-	  break;
+      if (name1==name2){
+	for (k=0; k<bond_list.dist.size(); ++k){
+	  if (fp_are_equal(bond_list.dist[k], r, 1e-3)){
+	    ++bond_list.ndist[k]; is_present=true; break;
+	  }
+	}
+	if (!is_present){
+	  bond_list.dist.push_back(r); bond_list.ndist.push_back(1);
 	}
       }
-      if (!is_present){
-	bond_list.dist.push_back(r);
-	bond_list.ndist.push_back(1);
+      else {
+	if      (matter[i]==name1 && matter[j]==name2){
+	  for (k=0; k<bond_list12.dist.size(); ++k){
+	    if (fp_are_equal(bond_list12.dist[k], r, 1e-3)){
+	      ++bond_list12.ndist[k]; is_present=true; break;
+	    }
+	  }
+	  if (!is_present){
+	    bond_list12.dist.push_back(r); bond_list12.ndist.push_back(1);
+	  }
+	}
+	else if (matter[i]==name2 && matter[j]==name1){
+	  for (k=0; k<bond_list21.dist.size(); ++k){
+	    if (fp_are_equal(bond_list21.dist[k], r, 1e-3)){
+	      ++bond_list21.ndist[k]; is_present=true; break;
+	    }
+	  }
+	  if (!is_present){
+	    bond_list21.dist.push_back(r); bond_list21.ndist.push_back(1);
+	  }
+	}
       }
+
     }
   }
 
   bool swapped;
-  while (true){
-    swapped = false;
-    for (k=0; k<bond_list.dist.size()-1; ++k){
-      if (bond_list.dist[k] > bond_list.dist[k+1]){
-	double td = bond_list.dist[k];
-	int    ti = bond_list.ndist[k];
-	bond_list.dist[k]    = bond_list.dist[k+1];
-	bond_list.ndist[k]   = bond_list.ndist[k+1];
-	bond_list.dist[k+1]  = td;
-	bond_list.ndist[k+1] = ti;
-	swapped = true;
-	break;
+  if (name1==name2){
+    while (true){
+      swapped = false;
+      for (k=0; k<bond_list.dist.size()-1; ++k){
+	if (bond_list.dist[k] > bond_list.dist[k+1]){
+	  double td = bond_list.dist[k];
+	  int    ti = bond_list.ndist[k];
+	  bond_list.dist[k]    = bond_list.dist[k+1];
+	  bond_list.ndist[k]   = bond_list.ndist[k+1];
+	  bond_list.dist[k+1]  = td;
+	  bond_list.ndist[k+1] = ti;
+	  swapped = true; break;
+	}
       }
+      if (!swapped) break;
     }
-    if (!swapped) break;
+  }
+  else {
+    while (true){
+      swapped = false;
+      for (k=0; k<bond_list12.dist.size()-1; ++k){
+	if (bond_list12.dist[k] > bond_list12.dist[k+1]){
+	  double td = bond_list12.dist[k];
+	  int    ti = bond_list12.ndist[k];
+	  bond_list12.dist[k]    = bond_list12.dist[k+1];
+	  bond_list12.ndist[k]   = bond_list12.ndist[k+1];
+	  bond_list12.dist[k+1]  = td;
+	  bond_list12.ndist[k+1] = ti;
+	  swapped = true; break;
+	}
+      }
+      if (!swapped) break;
+    }
+
+    while (true){
+      swapped = false;
+      for (k=0; k<bond_list21.dist.size()-1; ++k){
+	if (bond_list21.dist[k] > bond_list21.dist[k+1]){
+	  double td = bond_list21.dist[k];
+	  int    ti = bond_list21.ndist[k];
+	  bond_list21.dist[k]    = bond_list21.dist[k+1];
+	  bond_list21.ndist[k]   = bond_list21.ndist[k+1];
+	  bond_list21.dist[k+1]  = td;
+	  bond_list21.ndist[k+1] = ti;
+	  swapped = true; break;
+	}
+      }
+      if (!swapped) break;
+    }
   }
 
 

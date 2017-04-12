@@ -27,6 +27,10 @@ using std::endl;
 using utils::Vector;
 
 
+#define DT_DECR_FAC 0.7
+#define DT_INCR_FAC 1.3
+
+
 namespace funcfit {
 
 
@@ -137,8 +141,12 @@ namespace funcfit {
       Ek = 0.0;
       Et = Ep + Ek;
       
-
-
+      double Ek_prev[5];
+      Ek_prev[0] = 0.0;
+      Ek_prev[1] = 0.0;
+      Ek_prev[2] = 0.0;
+      Ek_prev[3] = 0.0;
+      Ek_prev[4] = Ek;
 
 
 
@@ -220,7 +228,7 @@ namespace funcfit {
 	    double step_max, step_min, td;
 
 	    for (i=0; i<nx; ++i){
-	      xvel[i] = 0.0;
+	      //xvel[i] = 0.0;
 
 	      td = xvel[i] * dt + 0.5 * xacc[i] * dt*dt;
 	      if (td < 0) td *= -1.0;
@@ -232,8 +240,8 @@ namespace funcfit {
 		      << " step_min = " << step_min
 		      << " dt = " << dt << std::endl;
 
-	    if      (step_max > max_dx) dt *= 0.33333;
-	    else if (step_min < min_dx) dt *= 1.5;
+	    if      (step_max > max_dx) dt *= DT_DECR_FAC;
+	    else if (step_min < min_dx) dt *= DT_INCR_FAC;
 	    else break;
 	  }
 
@@ -243,7 +251,7 @@ namespace funcfit {
 	    // Predictor
 	    for (i=0; i<nx; ++i){
 	      //xvel[i]=0;
-	      xvel[i] = 0.0;
+	      //xvel[i] = 0.0;
 
 	      x_trial[i] = x[i] + xvel[i] * dt + 0.5 * xacc[i] * dt*dt;
 	      //if (x_trial[i] < xmin[i]) x_trial[i] = xmin[i];
@@ -259,7 +267,7 @@ namespace funcfit {
 		cout << cond_print.prefix_report_warn
 		     << methodstring << ": "
 		     << "Too large step " << h.magn() << ". Decreasing timestep and retrying." << endl;
-	      dt = 0.33333 * dt;
+	      dt = DT_DECR_FAC * dt;
 	      continue;
 	    }
 
@@ -271,7 +279,7 @@ namespace funcfit {
 		cout << cond_print.prefix_report_error
 		     << methodstring << ": "
 		     << "Too small step " << h.magn() << ". Increasing timestep and retrying." << endl;
-	      dt = 2.0 * dt;
+	      dt = 1.5 * dt;
 	      continue;
 	    }
 
@@ -285,7 +293,7 @@ namespace funcfit {
 	      cout << cond_print.prefix_report_warn
 		   << methodstring << ": "
 		   << "Bad function value. Retrying with smaller step." << endl;
-	    dt = 0.33333 * dt;
+	    dt = DT_DECR_FAC * dt;
 	    continue;
 	  }
 
@@ -321,23 +329,49 @@ namespace funcfit {
 	// Corrector
 	for (i=0; i<nx; ++i){
 	  //xvel[i]=0;
-	  xvel[i] = 0.0;
+	  //xvel[i] = 0.0;
 
 	  xvel[i] = xvel[i] + 0.5 * xacc[i] * dt;
 	}
 
+
+	// If forces * momenta < 0 then we just passed a (local) minimum.
+	// Remove all velocities.
+	double sp = scalarproduct(xacc, xvel);
+	if (sp < 0.0){
+	  for (i=0; i<nx; ++i) xvel[i] = 0.0;
+	}
+
 	Ep = fx;
 	Ek = 0.0; for (i=0; i<nx; ++i) Ek += 0.5 * xmass[i] * xvel[i]*xvel[i];
+
+	Ek_prev[0] = Ek_prev[1];
+	Ek_prev[1] = Ek_prev[2];
+	Ek_prev[2] = Ek_prev[3];
+	Ek_prev[3] = Ek_prev[4];
+	Ek_prev[4] = Ek;
+
+	if (niter >= 5){
+	  double ch = 1.0;
+	  if (Ek_prev[0] > 0) ch = Ek_prev[4]/Ek_prev[0];
+	  if (ch > 1.0){
+	    double adj = sqrt(1.0/ch);
+	    for (i=0; i<nx; ++i) xvel[i] *= adj;
+	    Ek *= adj;
+	    Ek_prev[4] = Ek;
+	    std::cout << "Adjusted kinetic energy by factor " << adj << std::endl;
+	  }
+	}
+
 	Et = Ep + Ek;
 	cout << "Total energy : " << Et << endl;
 	// This is a different 'h':
 	for (i=0; i<nx; ++i) h[i] = x[i] - x_old[i];
 
-
-
-
 	// Go to next iteration.
 	niter++;
+
+
       }
       // ###################################################################
       // ###################################################################

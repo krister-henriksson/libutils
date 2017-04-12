@@ -88,9 +88,9 @@ public:
 public:
   AtomSystem();
   virtual ~AtomSystem();
-  AtomSystem(const AtomSystem & sys);
-  
-  AtomSystem & operator=(const AtomSystem & sys);
+
+  //AtomSystem(const AtomSystem & sys);
+  //AtomSystem & operator=(const AtomSystem & sys);
 
   // ##################################################################################
   // ##################################################################################
@@ -127,6 +127,7 @@ public:
   void calc_volume(void);
 
   void calc_closepacked_volume(void);
+
 
 
   // ##################################################################################
@@ -179,11 +180,15 @@ public:
 
 
   void get_bond_list(BondData & bond_list,
+		     BondData & bond_list12,
+		     BondData & bond_list21,
 		     string & name1,
 		     string & name2,
 		     int & nat1,
 		     int & nat2,
 		     int & nbonds,
+		     int & nbonds12,
+		     int & nbonds21,
 		     double rc12
 		     );
 

@@ -89,6 +89,8 @@ void AtomSystem:: get_all_neighborcollections(bool debug){
   cout << "The total number of cells is " << Ncells << endl;
   */
 
+
+
   /* ###############################################################################
      ###############################################################################
 
@@ -199,6 +201,8 @@ void AtomSystem:: get_all_neighborcollections(bool debug){
   /* Arrays needed for linked-list neighbor list creation: */
   head = new int [Ncells];
   list = new int [nat];
+  for (i=0; i<Ncells; i++) head[i] = -1;
+  for (i=0; i<nat; i++) list[i] = -1;
 
   
   /* ###############################################################################
@@ -206,9 +210,6 @@ void AtomSystem:: get_all_neighborcollections(bool debug){
      ############################################################################### */
   //cout << "Building linked-list of neighbors ..." << endl;
   
-  for (i=0; i<Ncells; i++)   head[i] = -1;
-  for (i=0; i<nat; i++) list[i] = -1;
-
   for (i=0; i<nat; i++){
     // Cartesian position:
     posi[0] = pos[i][0];

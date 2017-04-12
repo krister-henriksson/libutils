@@ -398,20 +398,16 @@ void utils::Vector<T>::cap(int N){
   }
 
   if (N > mNcap){
-    //cout << "[req. more] cap is " << mNcap << " requested cap is " << N << endl;
-
-
-    
+    //std::cout << "[req. more] cap is " << mNcap << " requested cap is " << N << std::endl;
 
     if (mNcap == 0){
-      //cout << "[req. more] allocing new vector with size " << N << endl;
+      //std::cout << "[req. more] allocing new vector with size " << N << std::endl;
       mNcap = N;
       mvec = new T [mNcap] ();
 
       //std::cout << "resizing array from zero cap to " << N << std::endl;
     }
     else {
-
       //std::cout << "resizing array from " << mNcap << " to " << N << std::endl;
       /*
       T *bak = new T [N] ();
@@ -423,13 +419,11 @@ void utils::Vector<T>::cap(int N){
       delete [] bak;
       */
 
-
       T *bak = new T [N] ();
       //for (int i=0; i<mN; ++i) bak[i] = mvec[i];
       std::copy(mvec, mvec+mN, bak);
       delete [] mvec;
       mvec = bak;
-
 
       mNcap = N;
     }

@@ -98,7 +98,7 @@ AtomSystem::AtomSystem()
 }
 
 
-
+/*
 AtomSystem::AtomSystem(const AtomSystem & sys){
   // Default copy constructors for standard vectors don't work properly
   // if the source/destination is not initialized:
@@ -135,14 +135,15 @@ AtomSystem::AtomSystem(const AtomSystem & sys){
   use_def_xyz_fmt = sys.use_def_xyz_fmt;
   def_xyz_fmt = sys.def_xyz_fmt;
 }
-
-
-AtomSystem::~AtomSystem()
-{ }
+*/
 
 
 
+AtomSystem::~AtomSystem(){ }
 
+
+
+/*
 AtomSystem & AtomSystem::operator=(const AtomSystem & sys){
     
   // watch out for self-assignment!
@@ -182,6 +183,7 @@ AtomSystem & AtomSystem::operator=(const AtomSystem & sys){
 
   return *this;
 }
+*/
   
 
 
